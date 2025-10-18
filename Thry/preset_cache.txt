@@ -1,0 +1,420 @@
+1.1.0
+
+_full_
+Example/Hologram/Additive;62a278a074e00c94ba4aa2181a2ae166
+Example/Hologram/Fade;3f8642ecde170d8408527738fd5392f4
+Example/Video Effects/CRT;184220e68e6660c43b5c86d9d6385a81
+Example/Video Effects/GameBoy;5982d97f856cb8644a2a291618472530
+Example/Video Effects/LCD;dcc08de1c605ef74e9c9a6a0d3999fb9
+Example/Video Effects/OLED;15e2af2268763664b94fd0619e5153a5
+Example/Video Effects/TN Panel;a79dd004459fd1d45961efa3622c4f47
+Shading/Shading/Cloth;2807a42a52df1c44d97cf5e17934fb66
+Shading/Shading/Shade Maps;0dfb68f3451a286408b0be70c899a6c2
+SpecialFX/DepthFX/Fade Near Object;85ae851a357ebf4429ba502c9c0a1a64
+Example/Ice;8d183e97b99f26040a156cbc60955feb
+Example/Sunglasses (Early Outline);e882f4d57a954904b8a144bdcea017ea
+Lighting/Full UTS2;b3ea4f0c69d93b14ca1f17342c9502fa
+Rendering/Double Sided;3015a1788cdd8dc4cb79bd921cbffb59
+Teeh's Quick Shading Models/QuickCel;3376ba1da5060904fad953f4af5802ee
+Teeh's Quick Shading Models/QuickFlat;2be46401421f6214296d9c0d90df8745
+Teeh's Quick Shading Models/QuickToon;a9b85a227a5eca54eb8736f6221ed4b3
+Teeh's Quick Shading Models/QuickWrap;c3bc736fe193e3f43a32e9f2ab399887
+TwoPassParticle/Aura;e901563556c598048b412751960648fc
+LilToon Shading Preset;bf8c5ab91bf6aaa49b949bf74998ddc2
+MP_Slime;a4f86e8a74171954fbc15b5ee578dfb7
+PBR+GI Compatibility;97cc2bfac2a8e7e4692d7c7ad9eeec80
+
+m_start_emission1Options
+AudioLink/CenterOut/10W;e304774b36de29a49bd67576551ca746
+AudioLink/CenterOut/250W;04a9abb44cb287847ba9f0b70a506c85
+AudioLink/CenterOut/3000W;0f56a940fb56b2346a4c2381cafd916c
+AudioLink/Glow/10W;8dab919bca384a2499d114641bb7f1ad
+AudioLink/Glow/250W;b8e15a0e250ace54ba1f84d7efb9fb88
+AudioLink/Glow/3000W;6a19a992ae69bc54180fe67a2801d2d9
+Rainbow Stars;ab63f44b70bac8e4ab447c3fb7803125
+
+m_start_emission2Options
+AudioLink/CenterOut/10W;e304774b36de29a49bd67576551ca746
+AudioLink/CenterOut/250W;04a9abb44cb287847ba9f0b70a506c85
+AudioLink/CenterOut/3000W;0f56a940fb56b2346a4c2381cafd916c
+AudioLink/Glow/10W;8dab919bca384a2499d114641bb7f1ad
+AudioLink/Glow/250W;b8e15a0e250ace54ba1f84d7efb9fb88
+AudioLink/Glow/3000W;6a19a992ae69bc54180fe67a2801d2d9
+Rainbow Stars;ab63f44b70bac8e4ab447c3fb7803125
+
+m_start_emission3Options
+AudioLink/CenterOut/10W;e304774b36de29a49bd67576551ca746
+AudioLink/CenterOut/250W;04a9abb44cb287847ba9f0b70a506c85
+AudioLink/CenterOut/3000W;0f56a940fb56b2346a4c2381cafd916c
+AudioLink/Glow/10W;8dab919bca384a2499d114641bb7f1ad
+AudioLink/Glow/250W;b8e15a0e250ace54ba1f84d7efb9fb88
+AudioLink/Glow/3000W;6a19a992ae69bc54180fe67a2801d2d9
+Rainbow Stars;ab63f44b70bac8e4ab447c3fb7803125
+
+m_start_emissionOptions
+AudioLink/CenterOut/10W;e304774b36de29a49bd67576551ca746
+AudioLink/CenterOut/250W;04a9abb44cb287847ba9f0b70a506c85
+AudioLink/CenterOut/3000W;0f56a940fb56b2346a4c2381cafd916c
+AudioLink/Glow/10W;8dab919bca384a2499d114641bb7f1ad
+AudioLink/Glow/250W;b8e15a0e250ace54ba1f84d7efb9fb88
+AudioLink/Glow/3000W;6a19a992ae69bc54180fe67a2801d2d9
+Rainbow Stars;ab63f44b70bac8e4ab447c3fb7803125
+
+m_start_FlipbookAudioLink
+10W;67ca07f5ecca1804ea63f70fdfa360f5
+2000W;1b554d513234cef468b0778acdec93c5
+300W;4ccb17d0fa7ada74190025227a9dc06d
+
+m_start_glitter
+AudioLink / 2000W;6da4ec4deb4ed3d4088216c8ce0aba67
+AudioLink / 300W;bab679e29a5dc0842b989b06e3c58b18
+AudioLink/10W;26376d6c6777c8f4eb6ccb17be9513e8
+"PBR" Glitter;e5a42ecf096cbd141b1ea46dd190391c
+Bright Like A Diamond;a78201e1ed7109a409bf47c1bdc344ae
+Falling Stars;3ab4e086078cb2b48aa5d21f3983b7c6
+Oh God It's Everywhere;fd19370832eeea842a5b49505a5c4f25
+Specular Shine;b7ff8e1d4597a6e4e97d7a44575217eb
+
+m_start_ALDecalSpectrum
+Transform/Flip/Standard;4b2f66c1368172243a40266842df0569
+Transform/Rotate/0 deg;38c49e6bd9938a84892be48f290f2b86
+Transform/Rotate/180 deg;ba502067e85e5d24ea90e10c567dd65a
+Transform/Rotate/270 deg;be9393f6af0591a44824d01018f79937
+Transform/Rotate/90 deg;f618a36cef928d94dbd42e5d5cfbfe27
+Frequency Bands/10-Band;f56083cae8b1d4d4f89f3e60679f0eb9
+Frequency Bands/12-Band;af4d68fdf44a3f641920862411a5413b
+Frequency Bands/4-Band;dcfe7452207d2404e86c5ca30156ae5d
+Frequency Bands/8-Band;7a8d9f918ddd2564ca01e0bf122a1a09
+Frequency Bands/Reset;39e5448d27f20b042b4b26690ab93b55
+Shape Clip/A little bit;79e9030983879a946865745af96856b7
+Shape Clip/Bit More;c278d253e763bd64e817883fdde3fb97
+Shape Clip/Chungus;94ebc4bc852f882438bdc758f40a7f3c
+Shape Clip/Horizontal;07dddbdf73d66fc4ca8b64cf08c75eac
+Shape Clip/None;2faedc967d87bf84a85ef450ba101864
+Shape Clip/Vertical;a2c7263ba6763c648acd7cf2efbd42d8
+Transform/Flip Horizontal;cab7eb9af4f895c49b79999799876e4f
+Transform/Flip Vertical;b79700941a7005e46bbef8aaa4c9f182
+Volume Bands/10-Band;16032a9845148cd4da6c9bde2547d1f6
+Volume Bands/12-Band;0b416ffba1a7d97429ff71b7efc9230c
+Volume Bands/4-Band;c616aa2d7967623489243ae874323c90
+Volume Bands/8-Band;be96e40be3814e84fbca071cf6782a66
+Volume Bands/Reset;53395a2a59ff2f148b53eafd66967204
+Oldschool VFD;e521e7368b5839d4d927e507e15593eb
+
+m_start_Alpha
+Alpha to Coverage + Dithering;11cc49b1463fe4240ae384b23baf0f67
+Center Fade;f317269719aab3943bb257b3ccd5df9c
+Fade Close;9d3374f93cc20444ea719f89dd54fa40
+Fade Far;d8998f2d34f7a3c45b228d16870516e7
+
+m_start_backFace
+Glow;149f22d578708e749b912f9c811a7977
+Shadow;cfcaec3ad1fcf08429c610802a285c49
+Toon Shadow 1;3bbe11b74297cbd43935b332458a4e61
+Toon Shadow 2;c80772dfa04766b48b39c957e46792c1
+
+m_start_ColorAdjust
+Hue Shift/Continuous Shift;5a0731fb35950a94b8080e2fc98fd21c
+Old Timey;ed36fcd884e1f784c9d913e6fc45bdd7
+
+m_start_uvDistortion
+Distort 1;c781c4faae2a8e7478eef8c89b376f69
+Distort 3;7a50a7b05ade5824585c295d7b29f4fe
+Flow 1;71205da691058794f8d3917649dbb715
+Flow 2;de4d74224d300984e98f1c4340c7e07e
+Flow 3;45b9bd23025ab5c4e801ed2a1737d796
+
+m_start_PoiLightData
+Max Brightness/Add Pass - 1;77ff67845f589134fbb97c874371f1d2
+Max Brightness/Add Pass - 2.5;4b6acbbff7140f247b2a9b6d5366f173
+Max Brightness/Add Pass - Infinite;9d224ea6ad7e12b4498d8ab03ae828cf
+Max Brightness/Base Pass - 1;28f2822ecc4c2e249b1facc185f11311
+Max Brightness/Base Pass - 2.5;8ba71927cffa069439522334b3b8997c
+Max Brightness/Base Pass - Infinite;55712670cbacacb49afb8b15b76becb7
+Min Brightness/.01 (Recognizable);82c5aafb37530a643b4e3f9421d5fda5
+Min Brightness/.1 (Glowstick);a5dc2b822da4d1a428581dfadf5f3dbb
+Min Brightness/0 (Correct);26af5cb87deb3ed4c8c2032134d84d5d
+"PBR";372d7ee2fdaa3914986be8eb2b0cdd0d
+Teeh Custom;9392d94f15870434facaa649d54973f0
+
+m_start_OutlineAudioLink
+10W;4439ffc714f4ad44ab0bd637620826d7
+250W;ef4b2409808827a48a91627430f3a1dc
+3000W;7b22dce3ff8759040bafb301feb17073
+
+m_OutlineCategory
+Size/CHONK;025c21c8a2dfa3749a45e5a0dd8d2bd3
+Size/Large;9d86e525c8810ae4aba639a3c615b81f
+Size/Medium;475aad9019b0902419fbf7581a6750d1
+Size/Small;058fbb400267e4440bce13b340c4dc9e
+Gaming PC;2459e25e9dfcdd24c989788c469d3f6c
+HardBlack;f2155471ff9f49243978e4eda9b037de
+MixDark;685864ab40dea3b48844d7c50bbae3d7
+MixLight;bab83c3e18767124186c3aa510563636
+MixMid;5f35334077a58904e986a69b17a8ba73
+Sticker;698721844f79539499094cbbfb38bff1
+
+m_mainCategory
+Skin/Hair/Toon/Black;32ff81958a3e32643b92c786c821193b
+Skin/Hair/Toon/Blonde;319189ffa0363c748ba138ec84c29280
+Skin/Hair/Toon/Brown;db57871b86cca8141b226b49fc8abb86
+Skin/Hair/Toon/Gray;d9015ee4b4a575844b22ed02e5601b61
+Skin/Hair/Toon/Red;e2e83e50477b830498e764f20327f141
+Skin/Hair/Toon/White;bf6a2db3c3979e148b11b012115ccb7d
+Skin/Hair/Black;07e7853b57e0a9b43887048550b24234
+Skin/Hair/Blonde;d027262a7daaefc4f822feb77982a032
+Skin/Hair/Brown;2ad785830e75c9c45966229af30e7158
+Skin/Hair/Gray;b1e0ee328f6e5b74abe8d83c08bfe97c
+Skin/Hair/Red;29e3453f7e8cea74ca27f7bc6c629dca
+Skin/Hair/White;2e6555b126ce5a843bcced30e26ff546
+Gem/Amber;c860e18c2caf11841bc2cfb7998ea5aa
+Gem/Amethyst;f33d94eb1d2b5a8419a44e5ca7d8f110
+Gem/Aquamarine;654e3d8dd52590940868f0be7985c571
+Gem/Citrine;9f77bd5bb72e7a64bbd279cb1bf0690e
+Gem/Diamond;9ee82e29822548f479e974e822ad9d93
+Gem/Emerald;9b4b37e274bfc2c4a971c8a6dfd06d06
+Gem/Garnet;f998a16eb63467b4e88d695a49e88077
+Gem/Peridot;aca670f5b53cd664ab40e06938f36466
+Gem/RoseQuartz;28d009a006c1c5a43b0c5bc26fb204aa
+Gem/Ruby;fb612a49c594ae84c8f4472a5bde1056
+Gem/Sapphire;71dcff5fb629cea4f93fe2028afecfc1
+Inorganic/Black Toner;6baef20b79f21e24a92400d1bc653a69
+Inorganic/Blackboard;4ff9dc5869e7e96429bf801083e28cfe
+Inorganic/Brick;af383e3285508b4479980bb723c43c4a
+Inorganic/Car Paint;85d2476e67e6610419e0265098613b3b
+Inorganic/Car Tire;b894de3c86ef0604eaf447838ba9863b
+Inorganic/Concrete;3f92dadafa574bd4d896feb5a5a6796e
+Inorganic/Printer Paper;d8101154325dd004ca296151d209d8f1
+Inorganic/Snow;b05f62977a1f1c44e97dc068cf81f9bc
+Inorganic/VantaBlack;0735bea753100c44594030ead486c757
+Metal/Aluminum;1e18bd90beaa5dd4c972d2498d822535
+Metal/Brass;ec56a760aa26f734884bbc5a25085b77
+Metal/Copper;7008fdd3a6a933c42a93e9b6b28b5a3d
+Metal/Gold;a4bc9ce072b206643bf68c9b86ea576e
+Metal/Platinum;be2ee8fa1fca9a2458101fee0d0eb3ea
+Metal/Silicon;b307964ceb6fa834aba12812e2e76e84
+Metal/Silver;3dc08d531650c76489a7f5a12f4fc021
+Metal/Titanium;fbd92780e5ce42244bd4061aa459b0fd
+Metal/Tungsten;77a6204fe92387043a3fc4525873b922
+Metal/Zinc;6e3057acc1298364eb787037a5f61e7e
+Organic/Banana;0fddac62422b99f438030398894fd24c
+Organic/Bone;ea5adb6688ed2be47ad1e0c7d1713579
+Organic/Carrot;fbbaa199559a60e439373800769b5262
+Organic/Chocolate;15fd51267d5c2464aa01a0182e3554a4
+Organic/Eggshell;6b9451fb0c1b55d43bf56839aeacffa6
+Organic/Lemon;014007aa7d4da6743804412155792a66
+Organic/Pearl;45a536b06cced25408ffc2ee9ae76747
+Skin/Sclera;f7aeb9ab10b4b6347a95239ed20720fa
+Skin/Skin I;3a4b3cb3767aa55408a9dec7a41dc03c
+Skin/Skin II;4be3c98f061e16d4a96839c6f9b856a3
+Skin/Skin III;67e3f7dbdf2b5b14c992996e1e8418e7
+Skin/Skin IV;b4267f51249b7bb40b2e146308a39cb1
+Skin/Skin V;bb1f601e2b89c02418873c4e72b2c729
+Skin/Skin VI;c98750e14f8836940bd521c31c5fc01b
+Skin/Skin VII;3c3add4a9e3320949aeb81d5a58ef817
+
+m_start_Refraction
+Gem/Amber;c860e18c2caf11841bc2cfb7998ea5aa
+Gem/Amethyst;f33d94eb1d2b5a8419a44e5ca7d8f110
+Gem/Aquamarine;654e3d8dd52590940868f0be7985c571
+Gem/Citrine;9f77bd5bb72e7a64bbd279cb1bf0690e
+Gem/Diamond;9ee82e29822548f479e974e822ad9d93
+Gem/Emerald;9b4b37e274bfc2c4a971c8a6dfd06d06
+Gem/Garnet;f998a16eb63467b4e88d695a49e88077
+Gem/Peridot;aca670f5b53cd664ab40e06938f36466
+Gem/RoseQuartz;28d009a006c1c5a43b0c5bc26fb204aa
+Gem/Ruby;fb612a49c594ae84c8f4472a5bde1056
+Gem/Sapphire;71dcff5fb629cea4f93fe2028afecfc1
+
+m_start_GrabPassAdvanced
+Tinted;9ee82e29822548f479e974e822ad9d93
+
+m_start_brdf
+Basic/Matte Dielectric;92705ecb59916b34688a053666bb8e06
+Basic/Matte Metal;6cde3f698feb24b489a70c044c6c7b36
+Basic/Shiny Dielectric;b8b0618237a2b6b479828b46411a1128
+Basic/Shiny Metal;3812e49545924ae4e8c005ea045d4ec2
+Inorganic/Black Toner;6baef20b79f21e24a92400d1bc653a69
+Inorganic/Blackboard;4ff9dc5869e7e96429bf801083e28cfe
+Inorganic/Brick;af383e3285508b4479980bb723c43c4a
+Inorganic/Car Paint;85d2476e67e6610419e0265098613b3b
+Inorganic/Car Tire;b894de3c86ef0604eaf447838ba9863b
+Inorganic/Concrete;3f92dadafa574bd4d896feb5a5a6796e
+Inorganic/Gem;0f70a47cca5e8f74e9acad7f202e1d8a
+Inorganic/Printer Paper;d8101154325dd004ca296151d209d8f1
+Inorganic/Snow;b05f62977a1f1c44e97dc068cf81f9bc
+Inorganic/VantaBlack;0735bea753100c44594030ead486c757
+Organic/Banana;0fddac62422b99f438030398894fd24c
+Organic/Bone;ea5adb6688ed2be47ad1e0c7d1713579
+Organic/Carrot;fbbaa199559a60e439373800769b5262
+Organic/Chocolate;15fd51267d5c2464aa01a0182e3554a4
+Organic/Eggshell;6b9451fb0c1b55d43bf56839aeacffa6
+Organic/Lemon;014007aa7d4da6743804412155792a66
+Organic/Pearl;45a536b06cced25408ffc2ee9ae76747
+Skin/Sclera;f7aeb9ab10b4b6347a95239ed20720fa
+Skin/Skin I;3a4b3cb3767aa55408a9dec7a41dc03c
+Teeh's Fallback;d8e3c66db574ae04c8efa46fcc233130
+
+m_start_clearCoat
+Inorganic/Car Paint;85d2476e67e6610419e0265098613b3b
+Inorganic/Gem;0f70a47cca5e8f74e9acad7f202e1d8a
+Teeh's Fallback;d8e3c66db574ae04c8efa46fcc233130
+
+m_start_blending
+Add;cde15326d0e161d46a3c9fe4ea0e93a4
+Multiply;7f0324ef5db34f44b954a644e8c8193d
+Multiply x2;2a13aa1779b0ae044bc46c66898482c2
+Normal;8eff5d5cba8eea74787c87c32862327b
+Premultiplied;2dd94173e54970145bcc2ba39c5f1d86
+Soft Additive;fad3358ee9df81e408cc3e4370c165e1
+
+m_start_alphaBlending
+RenderTargetsAlphaFix;b21f570f1367a714eac67faeb82bb5d0
+
+m_start_Aniso
+Hair Realistic;2ad785830e75c9c45966229af30e7158
+Hair Toon;db57871b86cca8141b226b49fc8abb86
+
+m_start_DetailOptions
+Hair Realistic;2ad785830e75c9c45966229af30e7158
+
+m_start_CubeMap
+Add Fake Reflections;96fd1f4c49b942647b8851a0e9d7970c
+Skybox;d81ca65a9d60213408b2809b50d034ca
+
+m_start_PoiShading
+Add Pass/ToonHard;6ab708189f12c864b872e8df6a2ee79b
+Add Pass/UTS Style;d6d1c75edfd0ec94ab3a549a6bdcef28
+
+m_start_Matcap2
+AudioLink/10W;c0880ad625af101439c2010fe559c70b
+AudioLink/2000W;20c11aecc28938d4998d41560aa967b1
+AudioLink/250W;c95a9bc7749242640a7217af09ef3bb4
+Iridescence;3ad1ae4010aa7124fa46fada6c006deb
+
+m_start_Matcap3
+AudioLink/10W;c0880ad625af101439c2010fe559c70b
+AudioLink/2000W;20c11aecc28938d4998d41560aa967b1
+AudioLink/250W;c95a9bc7749242640a7217af09ef3bb4
+Iridescence;3ad1ae4010aa7124fa46fada6c006deb
+
+m_start_Matcap4
+AudioLink/10W;c0880ad625af101439c2010fe559c70b
+AudioLink/2000W;20c11aecc28938d4998d41560aa967b1
+AudioLink/250W;c95a9bc7749242640a7217af09ef3bb4
+Iridescence;3ad1ae4010aa7124fa46fada6c006deb
+
+m_start_matcap
+AudioLink/10W;c0880ad625af101439c2010fe559c70b
+AudioLink/2000W;20c11aecc28938d4998d41560aa967b1
+AudioLink/250W;c95a9bc7749242640a7217af09ef3bb4
+Iridescence;3ad1ae4010aa7124fa46fada6c006deb
+
+m_start_RimAudioLink
+10W;59e992582e0872c4486edd6e6948399b
+250W;29d17db0a4cb270459ef013577be02dd
+3000W;5db7e0ca7bf8eb144ae38ccdfb03c04d
+
+m_start_rim2LightOptions
+RimLight/Medium;cd543b8385a6fc64c9f2a6a132dd5e35
+RimLight/Rich;bcb812225818dc8499854c25e422d5f9
+RimLight/Soft;4695a0bd29dbef449a3e3ed8a034d9af
+RimLight/White;082e6ce312cb36240ac99221be09b383
+RimShade/Black;89e19e7cef2a12543a2f69609b3430fc
+RimShade/Dark;d1384a280fe1437428c77c08894641af
+RimShade/Medium;0ccb38b2c23d92c45b411cde37a69228
+RimShade/Rich;3e66e9878d3627740a6be1867f20c362
+RimShade/Soft;5a69b9d805922cd4ca6d397cc26f25a4
+Shape/Fat;daf3de261fcbd804999827caa85e06c6
+Shape/Soft;eaad09f045806194f885f7ca3402a774
+Shape/Toon;ca3c16976bcbb8941bdac9151420af93
+Shape/Vague;dc8b5c6210105f244a16ac66c4bf2c9b
+
+m_start_rimLight1Options
+RimLight/Medium;cd543b8385a6fc64c9f2a6a132dd5e35
+RimLight/Rich;bcb812225818dc8499854c25e422d5f9
+RimLight/Soft;4695a0bd29dbef449a3e3ed8a034d9af
+RimLight/White;082e6ce312cb36240ac99221be09b383
+RimShade/Black;89e19e7cef2a12543a2f69609b3430fc
+RimShade/Dark;d1384a280fe1437428c77c08894641af
+RimShade/Medium;0ccb38b2c23d92c45b411cde37a69228
+RimShade/Rich;3e66e9878d3627740a6be1867f20c362
+RimShade/Soft;5a69b9d805922cd4ca6d397cc26f25a4
+Shape/Fat;daf3de261fcbd804999827caa85e06c6
+Shape/Soft;eaad09f045806194f885f7ca3402a774
+Shape/Toon;ca3c16976bcbb8941bdac9151420af93
+Shape/Vague;dc8b5c6210105f244a16ac66c4bf2c9b
+
+m_start_reflectionRim
+Example;11ce4bd1b7b381f4abef3a8d553a0cc8
+
+m_start_stylizedSpec
+lil Style;fffc9a264f0cea34e98d4ce8bcac38cd
+Teeh's Fallback;d8e3c66db574ae04c8efa46fcc233130
+UTS Style;520c0c3795796fb439a68661b0844ffc
+
+m_start_poiSSAO
+Masking / Write SSAO to Global Mask 4B;66f7fcad117c7004c996e76130140098
+Animation Cels;1e9adbdc238838e468e43866c87229b1
+Genshin Lite;75d263e6e3f35724ca3382292f9883b6
+Realistic;901169f46aee6f1499541dd3f1e80db6
+RGBSSAOFTW;373cd0213376b804cb8cd79eadd924d0
+Toony;2343add4b71cbbe468e9eaf1f3e0a880
+
+m_start_depthFX
+Color near object;bd29ab85020ea064fa51ead19d707a8e
+
+m_start_dissolve
+Acid;43b9b34b6d13c6e42b797482b23be0af
+Cute;33f8d183175c68244ad2fa34d946b2c9
+Fire;554747b459de1d444a771ab695fa9f9a
+Gaming PC;ac91eb1f4fca8694da6dab0fec5a1bf7
+Magic;ad404daa174b1b54e93d3fd35c494644
+Simple;bcab8dd901918cb4eb4acd2d903ce1cb
+Tech;2f77c60633c72274cb06cecda3287280
+
+m_start_dissolveHueShift
+Gaming PC;ac91eb1f4fca8694da6dab0fec5a1bf7
+
+m_start_flipBook
+Example 1;22d90c2db55caeb4cb66beb25e2c8821
+Example 2;05876963e63ea1d4ca48f7331a07be97
+
+m_start_mirrorOptions
+Hide in both;6377fd56d0d1ebe4b89449c751a61166
+Hide in camera;875f091e17ef9e543b0d724d35217dff
+Hide in mirror;aaf4b3a8db5ab774da2f891e803dd97c
+Only show in camera and mirror;d12af220903388446bd961e8c9ea281b
+
+m_start_pathing
+Example;c4e75bdfe85bdfb42a5bc0a488037569
+
+m_start_FXProximityColor
+Proximity Shadowing;d3df37b475fdd45479b0245063eb32e4
+
+m_start_Text
+Roboto Medium;a3665acad4265154d91456049f7e958e
+
+m_start_TextFPS
+Example;a3665acad4265154d91456049f7e958e
+
+m_start_TextInstanceTime
+Example;a3665acad4265154d91456049f7e958e
+
+m_start_TextNumeric
+Nice.;a3665acad4265154d91456049f7e958e
+
+m_start_TextPosition
+Example;a3665acad4265154d91456049f7e958e
+
+m_start_OutlineStencil
+Eyes over hair / Body (RenderQueue must be less than Hair);2d376c758a7e2b242aeb13083a455c9c
+Eyes over hair / Eye (RenderQueue must be less than hair);5cf16c95560282047908bcfff06e446c
+Eyes over hair / Hair (RenderQueue 2000);e174c5d3a58ccc94485ccecee53382be
+Stencilled Outline;d0965c132fc7cd14cbe2fdab2f6c8f27
+
+m_start_StencilPassOptions
+Eyes over hair / Body (RenderQueue must be less than Hair);2d376c758a7e2b242aeb13083a455c9c
+Eyes over hair / Eye (RenderQueue must be less than hair);5cf16c95560282047908bcfff06e446c
+Eyes over hair / Hair (RenderQueue 2000);e174c5d3a58ccc94485ccecee53382be
+Stencilled Outline;d0965c132fc7cd14cbe2fdab2f6c8f27

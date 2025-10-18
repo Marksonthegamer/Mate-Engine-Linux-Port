@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Tomlyn</id>
+    <version>0.19.0</version>
+    <authors>Alexandre Mutel</authors>
+    <license type="expression">BSD-2-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-2-Clause</licenseUrl>
+    <icon>logo.png</icon>
+    <readme>readme.md</readme>
+    <projectUrl>https://github.com/xoofx/Tomlyn</projectUrl>
+    <description>Tomlyn is a TOML parser, validator and authoring library for .NET.</description>
+    <releaseNotes>https://github.com/xoofx/Tomlyn/releases/tag/0.19.0</releaseNotes>
+    <copyright>Alexandre Mutel</copyright>
+    <tags>toml parser</tags>
+    <repository type="git" url="https://github.com/xoofx/Tomlyn" commit="ee3e3ca5b1f016b0db21ceb74d6c85d28a08ca16" />
+    <dependencies>
+      <group targetFramework="net8.0" />
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+</package>

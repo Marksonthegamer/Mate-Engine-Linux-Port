@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 9e025a77f3638fdff8ae005bd38bfc18
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Samples/KnowledgeBaseGame/LICENSE.md
+  uploadId: 754381

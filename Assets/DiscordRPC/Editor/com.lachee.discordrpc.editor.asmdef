@@ -1,0 +1,12 @@
+{
+    "name": "com.lachee.discordrpc.editor",
+    "references": [
+        "com.lachee.discordrpc.runtime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

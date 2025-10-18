@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 354c2418b0d6913efbfb73dccd540d23
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Runtime/RAG/SentenceSplitter.cs
+  uploadId: 754381

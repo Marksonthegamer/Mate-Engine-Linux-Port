@@ -1,0 +1,122 @@
+trackSelection = true
+refreshSearchWindowsInPlayMode = false
+pickerAdvancedUI = false
+fetchPreview = true
+defaultFlags = 0
+keepOpen = false
+queryFolder = "Assets"
+onBoardingDoNotAskAgain = true
+showPackageIndexes = false
+showStatusBar = false
+scopes = {
+	"picker_window_position_offset.075BCD15" = "-32;450;518;550"
+	"picker_visibility_flags.075BCD15" = "264"
+	"picker_item_size.075BCD15" = "31"
+	"picker_inspector.075BCD15" = "0"
+	"picker_window_position_offset.00000000" = "298;490;518;550"
+	"picker_visibility_flags.00000000" = "0"
+	"picker_item_size.00000000" = "96"
+	"picker_inspector.00000000" = "0"
+	"OpenInspectorPreview.66F56946" = "0"
+	"currentGroup.66F56946" = "menu"
+}
+providers = {
+	asset = {
+		active = true
+		priority = 25
+		defaultAction = null
+	}
+	scene = {
+		active = true
+		priority = 50
+		defaultAction = null
+	}
+	adb = {
+		active = false
+		priority = 2500
+		defaultAction = null
+	}
+	find = {
+		active = true
+		priority = 25
+		defaultAction = null
+	}
+	packages = {
+		active = false
+		priority = 90
+		defaultAction = null
+	}
+	profilermarkers = {
+		active = false
+		priority = 100
+		defaultAction = null
+	}
+	store = {
+		active = false
+		priority = 100
+		defaultAction = null
+	}
+	performance = {
+		active = false
+		priority = 100
+		defaultAction = null
+	}
+	log = {
+		active = false
+		priority = 210
+		defaultAction = null
+	}
+	presets_provider = {
+		active = false
+		priority = -10
+		defaultAction = null
+	}
+	at = {
+		active = true
+		priority = 100
+		defaultAction = null
+	}
+	st = {
+		active = true
+		priority = 100
+		defaultAction = null
+	}
+}
+objectSelectors = {
+}
+recentSearches = [
+	"st: sakur"
+	"st: retro"
+	"st: INPUT_AI_SYSTEM_PROMP"
+	"st: INPUT_AI_SYSTEM_PROMPT"
+	"st: LIGHT:_"
+	"st: LIGHT_"
+	"st: enable_l"
+	"st: ambi_3"
+	"st: ambi_2"
+	"st: ambi_^1"
+	"st: alarm"
+	"st: scree"
+	"st: debug"
+	"st: ambie"
+	"st: screen"
+	"st: spine"
+	"st: language"
+	"st: finish"
+	"st: LANGUAGE"
+	"st: d"
+]
+searchItemFavorites = [
+]
+savedSearchesSortOrder = 0
+showSavedSearchPanel = false
+hideTabs = false
+expandedQueries = [
+]
+queryBuilder = true
+ignoredProperties = "id;name;classname;imagecontentshash"
+helperWidgetCurrentArea = "all"
+disabledIndexers = ""
+minIndexVariations = 2
+findProviderIndexHelper = true
+itemIconSize = 1

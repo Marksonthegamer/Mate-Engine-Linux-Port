@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 59a450dedee4c89b5b3d89439158f437
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Samples/KnowledgeBaseGame/Dialogues/chef.csv
+  uploadId: 754381

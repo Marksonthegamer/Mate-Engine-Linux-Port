@@ -1,0 +1,8 @@
+NOTICE
+
+This software includes third-party components:
+
+- Qwen 2.5 1.5b LLM (Apache License 2.0)
+  Source: https://huggingface.co/Qwen/Qwen2.5-1.5B
+
+See Third Party Licenses/Qwen 2.5 1.5b/LICENSE.txt for full license text.

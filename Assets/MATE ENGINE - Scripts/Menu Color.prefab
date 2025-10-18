@@ -1,0 +1,169 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3592155530443515751
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4690763143857460399}
+  - component: {fileID: 9046104539210078639}
+  m_Layer: 0
+  m_Name: Menu Color
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &4690763143857460399
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3592155530443515751}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 517.6425, y: 66.00902, z: -188.34698}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4005995454037845977}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9046104539210078639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3592155530443515751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21e5c54347ac4e74697992b8879ea120, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  backgroundPanelColor: {r: 0.29803923, g: 0.2509804, b: 0.3882353, a: 1}
+  menuPanel: {fileID: 0}
+  titleTextColor: {r: 0.8980392, g: 0.84313726, b: 1, a: 1}
+  titleTextObject: {fileID: 0}
+  sliderNormalColor: {r: 0.827451, g: 0.7764706, b: 1, a: 1}
+  sliderHighlightedColor: {r: 0.5686275, g: 0.44705883, b: 1, a: 1}
+  sliderPressedColor: {r: 0.70980394, g: 0.627451, b: 1, a: 1}
+  sliderSelectedColor: {r: 0.827451, g: 0.7764706, b: 1, a: 1}
+  sliderDisabledColor: {r: 1, g: 0, b: 0, a: 0.5019608}
+  sliderLabelColor: {r: 0.92941177, g: 0.69411767, b: 1, a: 1}
+  sliderBackgroundColor: {r: 0.6, g: 0.49411765, b: 0.77254903, a: 1}
+  sliderFillColor: {r: 0.81960785, g: 0.69411767, b: 1, a: 1}
+  toggleNormalColor: {r: 0.827451, g: 0.7764706, b: 1, a: 1}
+  toggleHighlightedColor: {r: 0.5686275, g: 0.44705883, b: 1, a: 1}
+  togglePressedColor: {r: 0.70980394, g: 0.627451, b: 1, a: 1}
+  toggleSelectedColor: {r: 0.827451, g: 0.7764706, b: 1, a: 1}
+  toggleDisabledColor: {r: 1, g: 0, b: 0, a: 0.5019608}
+  toggleLabelColor: {r: 0.92941177, g: 0.69411767, b: 1, a: 1}
+  toggleBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
+  buttonNormalColor: {r: 0.29803923, g: 0.2509804, b: 0.3882353, a: 1}
+  buttonHighlightedColor: {r: 0.22352941, g: 0.18431373, b: 0.29411766, a: 1}
+  buttonPressedColor: {r: 0.4745098, g: 0.39607844, b: 0.62352943, a: 1}
+  buttonSelectedColor: {r: 0.29803923, g: 0.2509804, b: 0.3882353, a: 1}
+  buttonDisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+  buttonTextColor: {r: 0.8980392, g: 0.84313726, b: 1, a: 1}
+  scrollbarNormalColor: {r: 1, g: 0, b: 1, a: 1}
+  scrollbarHighlightedColor: {r: 1, g: 1, b: 1, a: 1}
+  scrollbarPressedColor: {r: 1, g: 1, b: 1, a: 1}
+  scrollbarSelectedColor: {r: 1, g: 1, b: 1, a: 1}
+  scrollbarDisabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  scrollbarHandleColor: {r: 0.8, g: 0.6, b: 1, a: 1}
+  scrollbarBackgroundColor: {r: 0.3, g: 0.2, b: 0.4, a: 1}
+  dropdownNormalColor: {r: 1, g: 0, b: 1, a: 1}
+  dropdownHighlightedColor: {r: 1, g: 1, b: 1, a: 1}
+  dropdownPressedColor: {r: 1, g: 1, b: 1, a: 1}
+  dropdownSelectedColor: {r: 1, g: 1, b: 1, a: 1}
+  dropdownDisabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  dropdownBackgroundColor: {r: 0.3, g: 0.2, b: 0.4, a: 1}
+  dropdownTextColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!1 &7689312660969449461
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4005995454037845977}
+  - component: {fileID: 5501242794216804765}
+  m_Layer: 0
+  m_Name: Grey Night Color
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4005995454037845977
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7689312660969449461}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4690763143857460399}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5501242794216804765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7689312660969449461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21e5c54347ac4e74697992b8879ea120, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  backgroundPanelColor: {r: 0.12615699, g: 0.1566, b: 0.1981132, a: 1}
+  menuPanel: {fileID: 0}
+  titleTextColor: {r: 0.84313726, g: 0.85736454, b: 1, a: 1}
+  titleTextObject: {fileID: 0}
+  sliderNormalColor: {r: 0.54509807, g: 0.61960787, b: 0.7176471, a: 1}
+  sliderHighlightedColor: {r: 0.11764707, g: 0.16078432, b: 0.21960786, a: 1}
+  sliderPressedColor: {r: 0.20469919, g: 0.27774733, b: 0.3773585, a: 1}
+  sliderSelectedColor: {r: 0.31367925, g: 0.39413598, b: 0.5, a: 1}
+  sliderDisabledColor: {r: 1, g: 0, b: 0, a: 0.5019608}
+  sliderLabelColor: {r: 0.84313726, g: 0.85882354, b: 1, a: 1}
+  sliderBackgroundColor: {r: 0.3137255, g: 0.39607844, b: 0.5019608, a: 1}
+  sliderFillColor: {r: 0.84313726, g: 0.85882354, b: 1, a: 1}
+  toggleNormalColor: {r: 0.5444999, g: 0.6199604, b: 0.7169812, a: 1}
+  toggleHighlightedColor: {r: 0.11764706, g: 0.16078432, b: 0.21960784, a: 1}
+  togglePressedColor: {r: 0.20392157, g: 0.2784314, b: 0.3764706, a: 1}
+  toggleSelectedColor: {r: 0.3137255, g: 0.39607844, b: 0.5019608, a: 1}
+  toggleDisabledColor: {r: 1, g: 0, b: 0, a: 0.5019608}
+  toggleLabelColor: {r: 0.84313726, g: 0.85882354, b: 1, a: 1}
+  toggleBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
+  buttonNormalColor: {r: 0.11764706, g: 0.16078432, b: 0.21960784, a: 1}
+  buttonHighlightedColor: {r: 0.20392157, g: 0.2784314, b: 0.3764706, a: 1}
+  buttonPressedColor: {r: 0.3137255, g: 0.39607844, b: 0.5019608, a: 1}
+  buttonSelectedColor: {r: 0.3137255, g: 0.39607844, b: 0.5019608, a: 1}
+  buttonDisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+  buttonTextColor: {r: 0.84313726, g: 0.85882354, b: 1, a: 1}
+  scrollbarNormalColor: {r: 0.84313726, g: 0.85882354, b: 1, a: 1}
+  scrollbarHighlightedColor: {r: 1, g: 1, b: 1, a: 1}
+  scrollbarPressedColor: {r: 1, g: 1, b: 1, a: 1}
+  scrollbarSelectedColor: {r: 1, g: 1, b: 1, a: 1}
+  scrollbarDisabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  scrollbarHandleColor: {r: 0.84313726, g: 0.85882354, b: 1, a: 1}
+  scrollbarBackgroundColor: {r: 0.3, g: 0.2, b: 0.4, a: 1}
+  dropdownNormalColor: {r: 1, g: 1, b: 1, a: 1}
+  dropdownHighlightedColor: {r: 1, g: 1, b: 1, a: 1}
+  dropdownPressedColor: {r: 1, g: 1, b: 1, a: 1}
+  dropdownSelectedColor: {r: 1, g: 1, b: 1, a: 1}
+  dropdownDisabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  dropdownBackgroundColor: {r: 0.11764706, g: 0.16078432, b: 0.21960784, a: 1}
+  dropdownTextColor: {r: 1, g: 1, b: 1, a: 1}

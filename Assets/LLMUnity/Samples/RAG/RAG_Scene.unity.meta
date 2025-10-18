@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 4ee0034669d1095f99f880a6b08c69a4
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Samples/RAG/RAG_Scene.unity
+  uploadId: 754381

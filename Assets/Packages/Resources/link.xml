@@ -1,0 +1,13 @@
+<linker>
+    <assembly fullname="VRM" preserve="all">
+        <type fullname="VRM.VRMImporterContext" preserve="all"/>
+    </assembly>
+
+    <assembly fullname="VRMShaders">
+        <type fullname="VRM.MToon.MToon" preserve="all"/>
+    </assembly>
+
+    <assembly fullname="UniGLTF" preserve="all"/>
+    <assembly fullname="UniVRM" preserve="all"/>
+    <assembly fullname="UnityEngine" preserve="all"/>
+</linker>

@@ -1,0 +1,593 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Languages (UI)_fr
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: fr
+  m_SharedData: {fileID: 11400000, guid: 698e167bd107c3a40a5376082f2e2f35, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 96968105984
+    m_Localized: MATE ENGINE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11105833312256
+    m_Localized: 'Temps de changement d''animation
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11236599128064
+    m_Localized: "Dur\xE9e de la transition entre les animations\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11239019241472
+    m_Localized: 'Seuil de volume pour danser
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11241108004864
+    m_Localized: 'Avatar toujours au premier plan
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11243918188544
+    m_Localized: 'L''avatar peut danser
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11244643803136
+    m_Localized: "La t\xEAte suit la souris\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11245205839872
+    m_Localized: 'Taille de l''avatar
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11245612687360
+    m_Localized: 'Sauvegarder
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11320741060608
+    m_Localized: "R\xE9initialiser\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11321303097344
+    m_Localized: 'Polygones
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11321839968256
+    m_Localized: 'Os
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11796140253184
+    m_Localized: 'Limite FPS
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23418267230208
+    m_Localized: "Param\xE8tres\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23684911718400
+    m_Localized: 'Vol. du compagnon
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24123241652224
+    m_Localized: Vol. des effets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24123816271872
+    m_Localized: Vol. du menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24124437028864
+    m_Localized: Graphismes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24125049397248
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24125577879552
+    m_Localized: "Tr\xE8s \xE9lev\xE9\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24126186053632
+    m_Localized: "\xC9lev\xE9\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24126735507456
+    m_Localized: 'Normal
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24509532856320
+    m_Localized: Faible
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24510153613312
+    m_Localized: 'DLC Steam
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24510665318400
+    m_Localized: 'Halo de fleurs
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27326909767680
+    m_Localized: 'Ajouter
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27328117727232
+    m_Localized: 'Supprimer
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37370367827968
+    m_Localized: 'Langue
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494291876667392
+    m_Localized: 'Charger un mod
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494319580045312
+    m_Localized: "Exp\xE9rimental\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494394716807168
+    m_Localized: "Assis sur la fen\xEAtre et la barre des t\xE2ches\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494416451690496
+    m_Localized: "Cette fonction peut entra\xEEner des bannissements dans les jeux
+      avec anti-triche."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971210921435136
+    m_Localized: "Pr\xE9sence enrichie Discord\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971386927013888
+    m_Localized: 'English
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971391947595776
+    m_Localized: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971392559964160
+    m_Localized: "\u65E5\u672C\u8A9E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971393197498368
+    m_Localized: "Espa\xF1ol"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971466828505088
+    m_Localized: "\u4E2D\u6587"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1982288996851712
+    m_Localized: "\uD55C\uAD6D\uC5B4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2011903232565248
+    m_Localized: "Bienvenue sur \u30E1\u30A4\u30C8\u30A8\u30F3\u30B8\u30F3 (MateEngine)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012023386791936
+    m_Localized: "Cette application est en cours de d\xE9veloppement, et de nouvelles
+      fonctionnalit\xE9s pourraient \xEAtre ajout\xE9es au fil du temps. Elle a \xE9t\xE9
+      cr\xE9\xE9e par la communaut\xE9 anime, pour la communaut\xE9 anime. Il peut
+      y avoir quelques petits probl\xE8mes \u2014 si vous en trouvez, vous pouvez
+      les signaler dans le menu Options en faisant un clic droit sur le compagnon
+      et en cliquant sur l'ic\xF4ne de bug."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012176361447424
+    m_Localized: Comment utiliser MateEngine (Speedrun)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012219415977984
+    m_Localized: "Utiliser MateEngine est vraiment simple ! Faites un clic droit
+      pour ouvrir le menu Options. Vous pouvez y modifier la taille de l\u2019avatar,
+      activer ou d\xE9sactiver les effets, mettre en liste blanche les applications
+      autoris\xE9es \xE0 faire danser l\u2019avatar, ou charger des mods et des fichiers
+      de mod\xE8les VRM/ME personnalis\xE9s. \xC0 l\u2019\xE9tape suivante, je vous
+      expliquerai comment charger un avatar personnalis\xE9."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012314333077504
+    m_Localized: "Utiliser des mod\xE8les personnalis\xE9s 1/2"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012317843709952
+    m_Localized: "Pour utiliser votre propre mod\xE8le personnalis\xE9, vous avez
+      besoin d\u2019un fichier .VRM. Vous pouvez en t\xE9l\xE9charger depuis des
+      sites comme Booth.jp ou VRoidHub. Une fois le fichier obtenu, ouvrez le menu
+      Options et cliquez sur le bouton \"VRM\". Cela ouvrira l\u2019explorateur de
+      fichiers o\xF9 vous pourrez s\xE9lectionner votre fichier."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012431912001536
+    m_Localized: "Utiliser des mod\xE8les personnalis\xE9s 2/2"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012464099090432
+    m_Localized: "Il arrive qu\u2019un fichier .VRM ne se charge pas correctement.
+      Ce n\u2019est g\xE9n\xE9ralement pas un probl\xE8me li\xE9 \xE0 MateEngine,
+      mais plut\xF4t \xE0 une mauvaise configuration des shaders ou de l\u2019armature
+      lors de l\u2019exportation. Si cela se produit, consultez la documentation
+      officielle d\u2019UniVRM. Certaines applications essaient de corriger les mod\xE8les
+      d\xE9fectueux, mais MateEngine ne le fait pas (et ne le fera pas). Il vous
+      revient de vous assurer que votre VRM est bien export\xE9."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024289331044352
+    m_Localized: "Language - \u8A00\u8A9E (Gengo) - \u042F\u0437\u044B\u043A (Yazyk)
+      - Idioma - \u8A9E\u8A00 (Y\u01D4y\xE1n) - Sprache - Langue - \uC5B8\uC5B4 (Eoneo)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024320264036352
+    m_Localized: Passer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024395421769728
+    m_Localized: Finir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024529517862912
+    m_Localized: "Pr\xE9c\xE9dent"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024532080582656
+    m_Localized: Suivant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781828886781952
+    m_Localized: "Mix anim./suivi pour la t\xEAte"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781852853035008
+    m_Localized: "Mix anim./suivi pour la colone vert\xE9brale"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781877666537472
+    m_Localized: Suivi des mains
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781899598553088
+    m_Localized: Couleur du menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781916468043776
+    m_Localized: Saturation du menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781941810028544
+    m_Localized: "Mod\xE8les"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781977230925824
+    m_Localized: Charger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9724442586374144
+    m_Localized: Corriger l'image
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9725012508401664
+    m_Localized: Envoyer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9722136935522304
+    m_Localized: Le fichier PNG doit faire moins de 700 Ko.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9844627515367424
+    m_Localized: Mix anim./suivi pour les yeux
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11144201018269696
+    m_Localized: "Cin\xE9matique Inverse pour les pieds"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11144228465795072
+    m_Localized: "La plupart des mod\xE8les auront une meilleure apparence avec la
+      cin\xE9matique inverse des pieds activ\xE9e. Sinon, d\xE9sactivez-la pour un
+      style de mouvement plus f\xE9minin."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11147404514418688
+    m_Localized: Occlusion Ambiante
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13999268343832576
+    m_Localized: "\xC9conomiseur d\u2019\xE9cran"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13999269778284544
+    m_Localized: "Apr\xE8s un certain temps, la mascotte de bureau appara\xEEt en
+      grand \xE0 l\u2019\xE9cran et joue une animation d\u2019attente jusqu\u2019\xE0
+      ce que vous reveniez et cliquiez."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037793143513088
+    m_Localized: "Minuterie d'\xE9conomiseur d'\xE9cran"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037795504906240
+    m_Localized: "D\xE9bogage (debug)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037796842889216
+    m_Localized: Forcer GC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037800621957120
+    m_Localized: "Effectue un nettoyage de la m\xE9moire forc\xE9 (Garbage Collection).
+      Il s\u2019agit d\u2019une fonction de d\xE9bogage (debug) \u2013 ne l'utilisez
+      que si vous savez ce que vous faites."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21396842692468736
+    m_Localized: "Activer l\u2019alarme"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21396846479925248
+    m_Localized: "Fonctionnalit\xE9 Exp\xE9rimentale :\nL'alarme va se couper une
+      fois qu'elle a \xE9t\xE9 d\xE9clench\xE9e une fois."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397663471624192
+    m_Localized: "Lumi\xE8re ambiante"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397935245746176
+    m_Localized: "AMBI 1 Intensit\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397936617283584
+    m_Localized: AMBI 1 Saturation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397937200291840
+    m_Localized: AMBI 1 Couleur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397937758134272
+    m_Localized: "AMBI 2 Intensit\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397938295005184
+    m_Localized: AMBI 2 Saturation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397938898984960
+    m_Localized: AMBI 2 Couleur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397939494576128
+    m_Localized: "AMBI 3 Intensit\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21398132755521536
+    m_Localized: AMBI 3 Saturation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21398134148030464
+    m_Localized: AMBI 3 Couleur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21399717254520832
+    m_Localized: "Activer la lumi\xE8re ambiante"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21399718462480384
+    m_Localized: "Activer les lumi\xE8res"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400106955694080
+    m_Localized: "Lumi\xE8re globale"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400294541746176
+    m_Localized: "Intensit\xE9 lumineuse"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400296517263360
+    m_Localized: Saturation lumineuse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400297775554560
+    m_Localized: "Couleur de la lumi\xE8re"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 63722729174507520
+    m_Localized: "Mise \xE0 jour"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64079105226743808
+    m_Localized: "Kyaa~ repose moi par terre \u2026!!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086005318197248
+    m_Localized: "Arr\xEAte de me porter comme \xE7a, c\u2019est trop embarrassant
+      ~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086006849118208
+    m_Localized: S'il te plait ... repose moi doucement au sol ~
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086008195489792
+    m_Localized: Kyaa ! C'est trop haut ! Repose moi sur le sol !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086009676079104
+    m_Localized: ahhhhhhh..!!! >_<
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086226806808576
+    m_Localized: "Ce n'est pas comme \xE7a qu'on porte une princesse ~! Laisse moi
+      descendre ~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086278308667392
+    m_Localized: Laisse moi descendre !!>_<!!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086678092947456
+    m_Localized: Hehe, regarde moi tourner~ je suis pas mignone ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086768543113216
+    m_Localized: "Eee~ regarde mes mouvements, ma\xEEtre ~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087092846698496
+    m_Localized: "Kyaa, je ne peut pas arr\xEAter de bouger~ trop amusant!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087094838992896
+    m_Localized: "Ufufu~ C'est moi ton idole sur sc\xE8ne maintenant\u266A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087097229746176
+    m_Localized: Bataille de danse ?! je n'ai jamais perdu~!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087099624693760
+    m_Localized: Danse Danse Danse !! >_<
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087382320783360
+    m_Localized: "C'est l'heure de se d\xE9tendre ! enfin une pause !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087412918231040
+    m_Localized: Hehe, je vais juste m'assoir et te regarder travailler.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087414772113408
+    m_Localized: "Mmm \u2026 quel endroit confortable, ne fais pas attention \xE0
+      moi ~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087416336588800
+    m_Localized: "Je vais t'encourager pendant que tu es occup\xE9, ma\xEEtre ~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087417628434432
+    m_Localized: Nyaa~ je reste ici gentiment, promis~
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087418794450944
+    m_Localized: Tu travailles dur ? Je te tiens compagnie ~!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088019687219200
+    m_Localized: "Shhh \u2026 ne me d\xE9range pas, je recharge mon charme ~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088020911955968
+    m_Localized: "Tous les compagnons m\xE9ritent bien un coussin macaron pour la
+      sieste, non ?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088021570461696
+    m_Localized: "Ehehe ~ mon coussin sent le sucre \u2026 le r\xEAve ~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088022228967424
+    m_Localized: "Trop moelleux \u2026 je disparais dedans ~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088022841335808
+    m_Localized: "Doux r\xEAves sur un coussin moelleux, ehehe~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088023474675712
+    m_Localized: "Mmm \u2026 ce macaron est si doux ~ je pourrais dormir pour toujours
+      \u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485837908254720
+    m_Localized: Halo de fleurs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485839854411776
+    m_Localized: Halo Retro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485841104314368
+    m_Localized: "Messages Bas\xE9s sur les \xE9v\xE9nements"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486049066295296
+    m_Localized: Activer les transitions entre les danses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486115202080768
+    m_Localized: Temps pour changer de danse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486115827032064
+    m_Localized: "Dur\xE9e de la transition entre deux danses"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486267505647616
+    m_Localized: "D\xE9marrer avec l'ordinateur"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486353119780864
+    m_Localized: "Prompt pour le Syst\xE8me IA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486586960617472
+    m_Localized: Supprimer l'Historique de Discussion
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

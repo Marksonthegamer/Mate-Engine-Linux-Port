@@ -1,0 +1,545 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Languages (UI)_es
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: es
+  m_SharedData: {fileID: 11400000, guid: 698e167bd107c3a40a5376082f2e2f35, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 96968105984
+    m_Localized: MATE ENGINE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11105833312256
+    m_Localized: "Tiempo de cambio de animaci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11236599128064
+    m_Localized: "Tiempo de trans. de animaci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11239019241472
+    m_Localized: Umbral de Volumen para bailar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11241108004864
+    m_Localized: Avatar siempre al frente
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11243918188544
+    m_Localized: Avatar puede bailar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11244643803136
+    m_Localized: Cabeza sigue al mouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11245205839872
+    m_Localized: "Tama\xF1o del avatar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11245612687360
+    m_Localized: Guardar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11321839968256
+    m_Localized: Huesos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11796140253184
+    m_Localized: "L\xEDmite FPS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11320741060608
+    m_Localized: Restablecer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11321303097344
+    m_Localized: "Pol\xEDgo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23418267230208
+    m_Localized: Ajustes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23684911718400
+    m_Localized: Vol. de mascota
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24123241652224
+    m_Localized: Vol. de efectos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24123816271872
+    m_Localized: "Vol. del men\xFA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24124437028864
+    m_Localized: "Gr\xE1ficos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24125049397248
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24125577879552
+    m_Localized: Muy alto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24126186053632
+    m_Localized: Alto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24126735507456
+    m_Localized: Normal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24509532856320
+    m_Localized: Bajo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24510153613312
+    m_Localized: DLC de Steam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24510665318400
+    m_Localized: Aureola floral
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27326909767680
+    m_Localized: "A\xF1adir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27328117727232
+    m_Localized: Eliminar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37370367827968
+    m_Localized: Idioma
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494291876667392
+    m_Localized: Cargar mod
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494416451690496
+    m_Localized: "Esta funci\xF3n puede causar baneos en juegos con anti-trampas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494394716807168
+    m_Localized: Sentado en la ventana o la barra de tareas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494319580045312
+    m_Localized: "Configuraci\xF3n experimental"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971210921435136
+    m_Localized: Discord Presencia Enriquecida
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971386927013888
+    m_Localized: English
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971392559964160
+    m_Localized: "\u65E5\u672C\u8A9E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971393197498368
+    m_Localized: "Espa\xF1ol"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971466828505088
+    m_Localized: "\u4E2D\u6587"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971391947595776
+    m_Localized: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1982288996851712
+    m_Localized: "\uD55C\uAD6D\uC5B4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2011903232565248
+    m_Localized: "Bienvenido a \u30E1\u30A4\u30C8\u30A8\u30F3\u30B8\u30F3 (MateEngine)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012023386791936
+    m_Localized: "Esta aplicaci\xF3n est\xE1 en desarrollo y se le podr\xEDan a\xF1adir
+      nuevas funciones con el tiempo. Fue creada por la comunidad de anime, para
+      la comunidad de anime. Puede haber algunos peque\xF1os errores \u2014 si encuentras
+      alguno, puedes reportarlo desde el men\xFA de Opciones haciendo clic derecho
+      sobre la mascota y luego en el \xEDcono del error."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012176361447424
+    m_Localized: "C\xF3mo usar MateEngine (Gu\xEDa r\xE1pida)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012219415977984
+    m_Localized: "\xA1Usar MateEngine es muy f\xE1cil! Solo haz clic derecho para
+      abrir el men\xFA de Opciones. All\xED puedes cambiar el tama\xF1o del avatar,
+      activar o desactivar efectos, poner en lista blanca las apps que pueden hacer
+      bailar a tu avatar, o cargar mods y modelos VRM/ME personalizados. En el siguiente
+      paso, te mostrar\xE9 c\xF3mo cargar avatares personalizados."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012314333077504
+    m_Localized: Uso de modelos personalizados 1/2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012317843709952
+    m_Localized: "Para usar tu propio modelo personalizado, necesitas un archivo
+      .VRM. Puedes descargar modelos VRM personalizados desde sitios como Booth.jp
+      y VRoidHub. Una vez que tengas el archivo .VRM, abre el men\xFA de Opciones
+      y haz clic en el bot\xF3n \"VRM\". Esto abrir\xE1 el explorador de archivos,
+      donde podr\xE1s seleccionar tu archivo VRM."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012431912001536
+    m_Localized: Uso de modelos personalizados 2/2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012464099090432
+    m_Localized: "A veces, un archivo .VRM puede no cargarse correctamente. Esto
+      generalmente no es un problema de MateEngine, sino un error de configuraci\xF3n
+      en los shaders o en el esqueleto al exportar. Si ocurre esto, consulta la documentaci\xF3n
+      oficial de UniVRM. Algunas aplicaciones usan soluciones alternativas para modelos
+      da\xF1ados, pero MateEngine no lo hace (ni lo har\xE1). Es tu responsabilidad
+      asegurarte de que tu VRM est\xE9 correctamente exportado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024289331044352
+    m_Localized: "Language - \u8A00\u8A9E (Gengo) - \u042F\u0437\u044B\u043A (Yazyk)
+      - Idioma - \u8A9E\u8A00 (Y\u01D4y\xE1n) - Sprache - Langue - \uC5B8\uC5B4 (Eoneo)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024320264036352
+    m_Localized: Omitir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024395421769728
+    m_Localized: Finalizar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024529517862912
+    m_Localized: "Atr\xE1s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024532080582656
+    m_Localized: Siguiente
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781828886781952
+    m_Localized: Mezcla de cabeza
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781852853035008
+    m_Localized: Mezcla de columna
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781877666537472
+    m_Localized: Seguimiento de manos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781899598553088
+    m_Localized: "Color del men\xFA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781916468043776
+    m_Localized: "Saturaci\xF3n del men\xFA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781941810028544
+    m_Localized: Modelos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781977230925824
+    m_Localized: Cargar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9724442586374144
+    m_Localized: Arreglar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9725012508401664
+    m_Localized: Subir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9722136935522304
+    m_Localized: El archivo PNG debe pesar menos de 700 KB.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9844627515367424
+    m_Localized: Mezcla de ojos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11144201018269696
+    m_Localized: "Pies con Cinem\xE1tica Inversa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11144228465795072
+    m_Localized: "La mayor\xEDa de los modelos se ver\xE1n mejor con los IK Feet
+      activados. Si no, desact\xEDvalos para un estilo de movimiento m\xE1s femenino."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11147404514418688
+    m_Localized: "Oclusi\xF3n Ambiental"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13999268343832576
+    m_Localized: Protector de pantalla
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13999269778284544
+    m_Localized: "Despu\xE9s de un tiempo, la mascota del escritorio aparece en grande
+      en la pantalla y reproduce una animaci\xF3n de espera hasta que regreses y
+      hagas clic."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037793143513088
+    m_Localized: emporizador de protector de pantalla
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037795504906240
+    m_Localized: "Depuraci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037796842889216
+    m_Localized: Forzar GC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037800621957120
+    m_Localized: "Ejecuta una recolecci\xF3n de basura forzada. Esta funci\xF3n es
+      solo para depuraci\xF3n; no la uses a menos que sepas lo que est\xE1s haciendo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21396842692468736
+    m_Localized: Activar alarma
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21396846479925248
+    m_Localized: "Experimental: \xA1La funci\xF3n de alarma es nueva!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397663471624192
+    m_Localized: Luz AMBI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397935245746176
+    m_Localized: AMBI 1 Intensidad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397936617283584
+    m_Localized: "AMBI 1 Saturaci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397937200291840
+    m_Localized: AMBI 1 Color
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397937758134272
+    m_Localized: AMBI 2 Intensidad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397938295005184
+    m_Localized: "AMBI 2 Saturaci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397938898984960
+    m_Localized: AMBI 2 Color
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397939494576128
+    m_Localized: AMBI 3 Intensidad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21398132755521536
+    m_Localized: "AMBI 3 Saturaci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21398134148030464
+    m_Localized: AMBI 3 Color
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21399717254520832
+    m_Localized: Activar luz AMBI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21399718462480384
+    m_Localized: Activar luces
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400106955694080
+    m_Localized: Luz global
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400294541746176
+    m_Localized: Intensidad de luz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400296517263360
+    m_Localized: "Saturaci\xF3n de luz"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400297775554560
+    m_Localized: Color de luz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 63722729174507520
+    m_Localized: Actualizacion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64079105226743808
+    m_Localized: "Kyaa~  bajame\u2026!!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086005318197248
+    m_Localized: No me levantes asi, es vergonzoso~!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086006849118208
+    m_Localized: "Porfavor\u2026 ponme con cuidado en el suelo~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086008195489792
+    m_Localized: Kyaa! esta muy alto! Hey, bajame!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086009676079104
+    m_Localized: ahhhhhhh..!!! >_<
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086226806808576
+    m_Localized: "This isn\u2019t a princess carry~! Let me down~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086278308667392
+    m_Localized: Let me down!! >_<!!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086678092947456
+    m_Localized: jeje, Mirame girar~ soy linda?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086768543113216
+    m_Localized: Eee~ mira como me muevo, amo~!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087092846698496
+    m_Localized: Kyaa, no puedo parar~ que divertido!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087094838992896
+    m_Localized: "Ufufu~ soy tu idol en el escenario ahora\u266A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087097229746176
+    m_Localized: "\xBFbatalla de baile?! yo nunca pierdo~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087099624693760
+    m_Localized: Baile Baile Baile!! >_<
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087382320783360
+    m_Localized: Hora de relajarse~ alfin un descanso!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087412918231040
+    m_Localized: Jeje, solo estare aqui y te vere trabajar.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087414772113408
+    m_Localized: "Mmm\u2026 ~ Un lugar comodo, no me hagas caso~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087416336588800
+    m_Localized: Voy a apoyarte mientras estas ocupado amo~!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087417628434432
+    m_Localized: Nyaa~ Me quedare aqui en silencio te lo prometo~
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087418794450944
+    m_Localized: "\xBFTrabajando duro? Te hare compa\xF1ia~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088019687219200
+    m_Localized: "Shhh\u2026 No me interrumpas, estoy recargando mi ternura~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088020911955968
+    m_Localized: Todas las mascotas merecen una siesta en el macaron, cierto?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088021570461696
+    m_Localized: "Ehehe~ mi almohada huele a azucar\u2026 tan so\xF1ador~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088022228967424
+    m_Localized: "Tan suave\u2026 me derrito en el~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088022841335808
+    m_Localized: "Dulces sue\xF1os en una dulce almohada, jejeje~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088023474675712
+    m_Localized: "Mmm\u2026 Este macaron es tan sueve~ podria dormir por siempre\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485837908254720
+    m_Localized: Halo Sakura
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485839854411776
+    m_Localized: Halo Retro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485841104314368
+    m_Localized: Mensajes basados en eventos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486049066295296
+    m_Localized: Habilitar transiciones de baile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486115202080768
+    m_Localized: Tiempo de cambio de baile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486115827032064
+    m_Localized: "Tiempo de transici\xF3n de baile"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486267505647616
+    m_Localized: Iniciar con el sistema
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486353119780864
+    m_Localized: Indicador del sistema de IA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486586960617472
+    m_Localized: Eliminar historial de chat
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

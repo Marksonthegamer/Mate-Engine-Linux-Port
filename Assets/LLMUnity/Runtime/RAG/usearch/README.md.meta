@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e64a900087d96cf7fbdefd8a24819eb8
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Runtime/RAG/usearch/README.md
+  uploadId: 754381

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Flare6cg
+  m_Shader: {fileID: 4800000, guid: 8a83b8ffa4c6d7a44999e8b099ea3f4e, type: 3}
+  m_Parent: {fileID: 2100000, guid: de3c6c4e1e6cb6f419be68ef4932dbdc, type: 2}
+  m_ModifiedSerializedProperties: 6
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - _ALPHABLEND_ON
+  - _USEDEPTH_ON
+  m_LightmapFlags: 0
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - GRABPASS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: fb60f4826d03c644c80d10aace44bfcb, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _CullMode: 0
+    - _DstBlend: 1
+    - _Mode: 4
+    - _RimFactor: 0
+    - _RimLift: 0
+    - _RimReverse: 0
+    - _SrcBlend: 5
+    - _ZWrite: 0
+    m_Colors:
+    - _Color: {r: 3.223504, g: 2.5985174, b: 4.3376827, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

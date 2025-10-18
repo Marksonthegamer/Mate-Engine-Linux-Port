@@ -1,0 +1,128 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: BubbleMat 1
+  m_Shader: {fileID: 4800000, guid: 1edc932a80f11584eb993be711727c8f, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - _ENABLEOUTLINE_ON
+  - _OUTLINESHIMMER_ON
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OverlayTex:
+        m_Texture: {fileID: 2800000, guid: 60d224affeaecf84ead5a8b24c6c9995, type: 3}
+        m_Scale: {x: 0, y: 0}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BubbleOutline: 0
+    - _BumpScale: 1
+    - _CornerRadius: 0.28
+    - _Cutoff: 0.5
+    - _DetailNormalMapScale: 1
+    - _DstBlend: 0
+    - _EdgeSoftness: 0.01
+    - _EnableOutline: 1
+    - _FadeBottomEnd: 0.322
+    - _FadeBottomStart: 0.01
+    - _FadeEnd: 0.632
+    - _FadeStart: 0
+    - _FadeTopEnd: 0.742
+    - _FadeTopStart: 0.643
+    - _GlassBlurRadius: 7.67
+    - _GlassDistort: 0.15
+    - _GlassEnabled: 0
+    - _GlassOpacity: 0.65
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
+    - _Metallic: 0
+    - _Mode: 0
+    - _OcclusionStrength: 1
+    - _OutlineAlign: 0
+    - _OutlineAmount: 0.35
+    - _OutlineIntensity: 2
+    - _OutlinePulseSpeed: 0
+    - _OutlinePulseStrength: 0
+    - _OutlineRepeat: 4
+    - _OutlineShimmer: 1
+    - _OutlineSoftness: 1
+    - _OutlineSpeed: 5
+    - _OutlineThickness: 2
+    - _OutlineWidth: 20
+    - _OverlayHueShift: 0.94100326
+    - _OverlayOpacity: 0
+    - _OverlaySatMul: 1.9990169
+    - _OverlayShare: 0.261
+    - _OverlaySpaceMode: 0
+    - _OverlayUseLuma: 0
+    - _Parallax: 0.02
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _UVSec: 0
+    - _ZWrite: 1
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _FillColor: {r: 0.11999995, g: 0.11999995, b: 0.19999996, a: 1}
+    - _GlassTint: {r: 1, g: 1, b: 1, a: 0.35}
+    - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OverlayColor: {r: 0.23082057, g: 0.3331257, b: 0.5377358, a: 1}
+    - _OverlayOffset: {r: 0, g: 0, b: 0, a: 0}
+    - _OverlayScale: {r: 1, g: 1, b: 0, a: 0}
+    - _OverlaySpeed: {r: 0.25, g: 0.25, b: 0, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 040c4d89ae7e163b1acb6566718fe5c6
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.0
+  assetPath: Assets/LLMUnity/Samples/ChatBot/Scene.unity
+  uploadId: 744322

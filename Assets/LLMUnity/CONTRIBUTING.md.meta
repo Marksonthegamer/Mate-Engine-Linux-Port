@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0cf827c3ba62e4d598d999b5d39345b5
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/CONTRIBUTING.md
+  uploadId: 754381

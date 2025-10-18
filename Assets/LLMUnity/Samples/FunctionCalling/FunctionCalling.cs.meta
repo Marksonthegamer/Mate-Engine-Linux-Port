@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 162e77d443c2df77b8297c1dcdfbfdce
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Samples/FunctionCalling/FunctionCalling.cs
+  uploadId: 754381

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4e535bdf3689369408cc4d078260ef6a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 10110
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16743
+  packageName: Dynamic Bone
+  packageVersion: 1.3.4
+  assetPath: Assets/DynamicBone/Scripts/DynamicBonePlaneCollider.cs
+  uploadId: 662028

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 53b6e1e6db0e47a1f8fb1e06835ed543
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Runtime/RAG/Chunking.cs
+  uploadId: 754381

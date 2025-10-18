@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: df335783a8d8a4e53bbe626c147d010f
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/CODE_OF_CONDUCT.md
+  uploadId: 754381

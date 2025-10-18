@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 145dfa55295462fa4bc804a75d8ba9c1
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Samples/RAG/hamlet_project_gutenberg.txt
+  uploadId: 754381

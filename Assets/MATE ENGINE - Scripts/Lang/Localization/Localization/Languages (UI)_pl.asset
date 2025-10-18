@@ -1,0 +1,558 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Languages (UI)_pl
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: pl
+  m_SharedData: {fileID: 11400000, guid: 698e167bd107c3a40a5376082f2e2f35, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 96968105984
+    m_Localized: MATE ENGINE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11105833312256
+    m_Localized: Czas zmiany animacji
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11236599128064
+    m_Localized: "Czas przej\u015Bcia animacji"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11239019241472
+    m_Localized: "Pocz\u0105tek ta\u0144ca pr\xF3g dzwi\u0119ku"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11241108004864
+    m_Localized: Awatar zawsze z przodu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11243918188544
+    m_Localized: "Awatar mo\u017Ce ta\u0144czy\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11244643803136
+    m_Localized: "Go\u0142owa pod\u0105\u017Ca za myszk\u0105"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11245205839872
+    m_Localized: "Wielko\u015B\u0107 awatara"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11245612687360
+    m_Localized: Zapisz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11320741060608
+    m_Localized: Zresetuj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11321303097344
+    m_Localized: Poligony
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11321839968256
+    m_Localized: "Ko\u015Bci"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11796140253184
+    m_Localized: Limit FPS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23418267230208
+    m_Localized: Ustawienia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23684911718400
+    m_Localized: "G\u0142o\u015Bno\u015B\u0107 zwierzaka"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24123241652224
+    m_Localized: "G\u0142o\u015Bno\u015B\u0107 efekt\xF3w"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24123816271872
+    m_Localized: "G\u0142o\u015Bno\u015B\u0107 menu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24124437028864
+    m_Localized: Grafika
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24125049397248
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24125577879552
+    m_Localized: Bardzo wysoka
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24126186053632
+    m_Localized: Wysoka
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24126735507456
+    m_Localized: Normalna
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24509532856320
+    m_Localized: Niska
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24510153613312
+    m_Localized: DLC z Steam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24510665318400
+    m_Localized: Kwiatowa Aureola
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27326909767680
+    m_Localized: Dodaj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27328117727232
+    m_Localized: "Usu\u0144"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37370367827968
+    m_Localized: "J\u0119zyk"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494291876667392
+    m_Localized: "Za\u0142aduj Mod"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494319580045312
+    m_Localized: Eksperymentalne
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494394716807168
+    m_Localized: "Siadanie na oknach i pasku zada\u0144"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494416451690496
+    m_Localized: "Ta opcja mo\u017Ce powodowa\u0107 bany w grach z systemami Anti-Cheat"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971210921435136
+    m_Localized: "Wzbogacona obecno\u015B\u0107 na Discordzie"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971386927013888
+    m_Localized: English
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971391947595776
+    m_Localized: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971392559964160
+    m_Localized: "\u65E5\u672C\u8A9E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971393197498368
+    m_Localized: "Espa\xF1ol"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971466828505088
+    m_Localized: "\u4E2D\u6587"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1982288996851712
+    m_Localized: "\uD55C\uAD6D\uC5B4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2011903232565248
+    m_Localized: "Witamy w \u30E1\u30A4\u30C8\u30A8\u30F3\u30B8\u30F3 (MateEngine)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012023386791936
+    m_Localized: "Prace nad t\u0105 aplikacj\u0105 dalej trwaj\u0105 i nowe funkcje
+      mog\u0105 zosta\u0107 dodane w przysz\u0142o\u015Bci. Zosta\u0142a stworzona
+      przez spo\u0142eczno\u015B\u0107 anime, dla spo\u0142eczno\u015Bci anime. Do
+      czasu do czasu mog\u0105 wyst\u0119powa\u0107 b\u0142\u0119dy - je\u015Bli
+      jakie\u015B znajdziesz, mo\u017Cesz je zg\u0142osi\u0107 wchodz\u0105c w menu
+      Opcji, klikaj\u0105c prawym przyciskiem myszy na stworzonko, i klikaj\u0105c
+      ikon\u0119 buga."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012176361447424
+    m_Localized: "Jak korzysta\u0107 z MateEngine (Speedrun)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012219415977984
+    m_Localized: "Korzystanie z MateEngine jest proste! Kliknij prawym przyciskiem
+      myszy aby otworzy\u0107 menu. Tam mo\u017Cesz zmieni\u0107 rozmiar awatara,
+      prze\u0142\u0105czy\u0107 efekty, ustali\u0107 kt\xF3re aplikacje powoduj\u0105
+      taniec, lub \u0142adowa\u0107 mody i modele VRM/ME. W nast\u0119pnym kroku
+      obja\u015Bni\u0119 jak za\u0142adowa\u0107 nowego awatara."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012314333077504
+    m_Localized: "U\u017Cywanie innych modeli 1/2"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012317843709952
+    m_Localized: "Aby u\u017Cy\u0107 w\u0142asnego modelu, potrzebujesz pliku .VRM/
+      Mo\u017Cesz takie pliki pobra\u0107 ze stron jak Booth.jp i VroidHub. Kiedy
+      ju\u017C znajdziesz plik .VRM, otw\xF3rz menu i kliknij przycisk \u201EVRM\u201D.
+      To otworzy eksplorator plik\xF3w, gdzie mo\u017Cesz wybra\u0107 sw\xF3j plik
+      .VRM."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012431912001536
+    m_Localized: "U\u017Cywanie innych modeli 2/2"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012464099090432
+    m_Localized: "W niekt\xF3rych przypadkach, plik .VRM mo\u017Ce si\u0119 nie \u0142adowa\u0107.
+      Nie jest to zwykle problem z MateEngine, a z niepoprawnym ustawieniem shader\xF3w
+      b\u0105d\u017A szkieletu podczas eksportu. W takim przypadku, sprawd\u017A
+      oficjaln\u0105 dokumentacj\u0119 UniVRM. Niekt\xF3re aplikacje maj\u0105 w\u0142asne
+      sposoby naprawiania modeli, ale MateEngine ich nie posiada (i nie b\u0119dzie
+      posiada\u0142). Jeste\u015B odpowiedzialny za poprawny eksport swoich VRM\xF3w."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024289331044352
+    m_Localized: "Language - \u8A00\u8A9E (Gengo) - \u042F\u0437\u044B\u043A (Yazyk)
+      - Idioma - \u8A9E\u8A00 (Y\u01D4y\xE1n) - Sprache - Langue - \uC5B8\uC5B4 (Eoneo)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024320264036352
+    m_Localized: "Pomi\u0144"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024395421769728
+    m_Localized: "Zako\u0144cz"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024529517862912
+    m_Localized: Poprzedni
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024532080582656
+    m_Localized: "Nast\u0119pny"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781828886781952
+    m_Localized: "Ruchliwo\u015B\u0107 G\u0142owy"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781852853035008
+    m_Localized: "Ruchliwo\u015B\u0107 Torsu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781877666537472
+    m_Localized: "Ruchliwo\u015B\u0107 Oczu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781899598553088
+    m_Localized: Kolor menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781916468043776
+    m_Localized: Nasycenie koloru menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781941810028544
+    m_Localized: Modele
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781977230925824
+    m_Localized: Wczytaj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9722136935522304
+    m_Localized: "Plik PNG nie mo\u017Ce przekracza\u0107 wi\u0119cej ni\u017C 700
+      KB."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9724442586374144
+    m_Localized: Napr. obraz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9725012508401664
+    m_Localized: "Prze\u015Blij"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9844627515367424
+    m_Localized: Mieszanie oczu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11144201018269696
+    m_Localized: "Odwrotna kinematyka st\xF3p"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11144228465795072
+    m_Localized: "Wi\u0119kszo\u015B\u0107 modeli b\u0119dzie wygl\u0105da\u0107
+      lepiej po w\u0142\u0105czeniu funkcji OK st\xF3p. Je\u015Bli efekt ko\u0144cowy
+      b\u0119dzie niezadowalaj\u0105cy, wy\u0142\u0105cz j\u0105, aby uzyska\u0107
+      bardziej kobiecy styl ruchu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11147404514418688
+    m_Localized: Okluzja otoczenia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13999268343832576
+    m_Localized: Wygaszacz ekranu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13999269778284544
+    m_Localized: "Po pewnym czasie posta\u0107 pojawia si\u0119 na ekranie i odtwarza
+      animacj\u0119 bezczynno\u015Bci, do momentu, gdy b\u0119dziesz zn\xF3w aktywny,
+      klikaj\u0105c na ni\u0105."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037793143513088
+    m_Localized: Miernik czasowy wygaszacza ekranu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037795504906240
+    m_Localized: Debugowanie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037796842889216
+    m_Localized: "Wyko\u0144cz GC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037800621957120
+    m_Localized: "Uruchamia wymuszone zbieranie \u015Bmieci (garbage collection).
+      Jest to funkcja debugowania \u2014 u\u017Cywaj jej, tylko wtedy je\u015Bli
+      jest to konieczne oraz je\u015Bli wiesz, co robisz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21396842692468736
+    m_Localized: Uruchom budzik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21396846479925248
+    m_Localized: "FUNKCJA EKSPERYMENTALNA:\nBUDZIK WY\u0141\u0104CZY SI\u0118 PO
+      TYM JAK ZOSTANIE JEDNORAZOWO URUCHOMIONY."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397663471624192
+    m_Localized: "\u015Awiat\u0142o ambientowe/nastrojowe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397935245746176
+    m_Localized: "Intensywno\u015B\u0107 AMBI 1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397936617283584
+    m_Localized: Nasycenie AMBI 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397937200291840
+    m_Localized: Kolor AMBI 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397937758134272
+    m_Localized: "Intensywno\u015B\u0107 AMBI 2"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397938295005184
+    m_Localized: Nasycenie AMBI2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397938898984960
+    m_Localized: Kolor AMBI 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397939494576128
+    m_Localized: "Intensywno\u015B\u0107 AMBI 3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21398132755521536
+    m_Localized: Nasycenie AMBI 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21398134148030464
+    m_Localized: Kolor AMBI 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21399717254520832
+    m_Localized: "W\u0142\u0105cz \u015Bwiat\u0142o ambientowe/nastrojowe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21399718462480384
+    m_Localized: "W\u0142\u0105cz \u015Bwiat\u0142o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400106955694080
+    m_Localized: "\u015Awiat\u0142o og\xF3lne"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400294541746176
+    m_Localized: "Intensywno\u015B\u0107 \u015Bwiat\u0142a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400296517263360
+    m_Localized: "Nasycenie \u015Bwiat\u0142a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400297775554560
+    m_Localized: "Kolor \u015Bwiat\u0142a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 63722729174507520
+    m_Localized: Aktualizacja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64079105226743808
+    m_Localized: "Ej~ Od\u0142\xF3\u017C mnie...!!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086005318197248
+    m_Localized: "Nie podno\u015B mnie tak, to mnie zawstydza~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086006849118208
+    m_Localized: "Prosz\u0119... delikatnie po\u0142\xF3\u017C mnie z powrotem na
+      pod\u0142odze~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086008195489792
+    m_Localized: "Ojejku! Jest za wysoko! Hej, pu\u015B\u0107 mnie!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086009676079104
+    m_Localized: ahhhhhhh..!!! >_<
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086226806808576
+    m_Localized: "To nie jest podnoszenie ksi\u0119\u017Cniczki~! Pu\u015B\u0107
+      mnie~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086278308667392
+    m_Localized: "Pu\u015B\u0107 mnie!! >_<!!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086678092947456
+    m_Localized: "Hehe, sp\xF3jrz jak si\u0119 kr\u0119c\u0119~ czy jestem s\u0142odzutka?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086768543113216
+    m_Localized: Eee~ patrz na moje ruchy, mistrzu~!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087092846698496
+    m_Localized: "Ojej, nie mog\u0119 przesta\u0107 si\u0119 rusza\u0107~ tak jest
+      zabawnie!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087094838992896
+    m_Localized: "Ufufu~ Teraz jestem twoj\u0105 idolk\u0105 na scenie\u266A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087097229746176
+    m_Localized: Bitwa taneczna?! Nigdy nie przegram~!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087099624693760
+    m_Localized: Taniec, taniec, taniec!! >_<
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087382320783360
+    m_Localized: "Czas pochillowa\u0107~ w ko\u0144cu przerwa!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087412918231040
+    m_Localized: "Hehe, po prostu posiedz\u0119 tu i popatrz\u0119, jak pracujesz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087414772113408
+    m_Localized: "Mmm... wygodne miejsce, nie przejmuj si\u0119 mn\u0105~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087416336588800
+    m_Localized: "B\u0119d\u0119 ci kibicowa\u0107, kiedy b\u0119dziesz zaj\u0119ty,
+      mistrzu~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087417628434432
+    m_Localized: "Nyaa~ B\u0119d\u0119 cichutko jak myszka, obiecuj\u0119~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087418794450944
+    m_Localized: "Ci\u0119\u017Cko pracujesz? Dotrzymam ci towarzystwa~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088019687219200
+    m_Localized: "Ciii... nie przeszkadzaj mi, \u0142aduj\u0119 sw\u0105 s\u0142odko\u015B\u0107~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088020911955968
+    m_Localized: "Ka\u017Cdy z ludzik\xF3w zas\u0142uguje na miejsce do drzemki na
+      makaroniku, prawda?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088021570461696
+    m_Localized: Ehehe~ moja poduszka pachnie cukrem... tak cudownie~
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088022228967424
+    m_Localized: "Tak mi\u0119kka... wtapiam si\u0119 w ni\u0105~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088022841335808
+    m_Localized: "S\u0142odkich sn\xF3w na s\u0142odkiej poduszce, ehehe~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088023474675712
+    m_Localized: "Mmm... ten makaronik jest taki puszysty~ Mog\u0142abym drzema\u0107
+      w niesko\u0144czono\u015B\u0107..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485837908254720
+    m_Localized: Aureola Sakura
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485839854411776
+    m_Localized: Aureola Retro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485841104314368
+    m_Localized: "Wiadomo\u015Bci oparte na wydarzeniach"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486049066295296
+    m_Localized: "W\u0142\u0105cz przej\u015Bcia taneczne"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486115202080768
+    m_Localized: "Czas zmiany ta\u0144ca"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486115827032064
+    m_Localized: "Czas przej\u015Bcia ta\u0144ca"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486267505647616
+    m_Localized: Uruchom wraz z systemem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486353119780864
+    m_Localized: Prompt systemu AI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486586960617472
+    m_Localized: "Usu\u0144 histori\u0119 czatu"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

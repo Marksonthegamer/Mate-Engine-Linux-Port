@@ -1,0 +1,30 @@
+{
+  "name": "com.lachee.discordrpc",
+  "version": "1.1.1",
+  "displayName": "Discord Rich Presence",
+  "description": "Implements the RPC Protocol for discord using Discord RPC CSharp",
+  "unity": "2018.4",
+  "documentationUrl": "https://lachee.github.io/discord-rpc-unity/",
+  "changelogUrl": "https://github.com/Lachee/discord-rpc-unity/commits/master",
+  "license": "MIT",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.3"
+  },
+  "samples": [
+    {
+      "displayName": "Basic Usage",
+      "description": "How to use the basic functionality of the discord manager",
+      "path": "Samples~/Rich Presence" 
+    }
+  ],
+  "keywords": [
+    "Discord",
+    "Rich Presence",
+    "discord-rpc-csharp",
+    "RPC"
+  ],
+  "author": {
+    "name": "Lachee",
+    "url": "https://lachee.dev"
+  }
+}

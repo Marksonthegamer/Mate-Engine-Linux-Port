@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ad2a563eea670b7e2a6dc1eac5cb4caf
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Third Party Notices.md
+  uploadId: 754381

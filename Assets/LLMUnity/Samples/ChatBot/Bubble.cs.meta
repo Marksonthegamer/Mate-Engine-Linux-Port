@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 0f0c03a4070911d0c95049ba460c9acf
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.0
+  assetPath: Assets/LLMUnity/Samples/ChatBot/Bubble.cs
+  uploadId: 744322

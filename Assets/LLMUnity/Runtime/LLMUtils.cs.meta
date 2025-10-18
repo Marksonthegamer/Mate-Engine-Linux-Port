@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2ae6a2ce57e8af0fc876d0c380ed8a2f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Runtime/LLMUtils.cs
+  uploadId: 754381

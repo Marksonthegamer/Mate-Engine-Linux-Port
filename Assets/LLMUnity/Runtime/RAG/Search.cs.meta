@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 98f7725a31f2e7d8485b2cdf541fc8d4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Runtime/RAG/Search.cs
+  uploadId: 754381

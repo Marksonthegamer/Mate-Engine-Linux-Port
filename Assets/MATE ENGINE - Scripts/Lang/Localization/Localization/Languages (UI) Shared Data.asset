@@ -1,0 +1,528 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Languages (UI) Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: Languages (UI)
+  m_TableCollectionNameGuidString: 698e167bd107c3a40a5376082f2e2f35
+  m_Entries:
+  - m_Id: 96968105984
+    m_Key: TITLE_APP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11105833312256
+    m_Key: ANIMATION_CHANGE_TIME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11236599128064
+    m_Key: ANIMATION_TRANSITION_TIME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11239019241472
+    m_Key: DANCE_VOLUME_THRESHOLD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11241108004864
+    m_Key: AVATAR_ALWAYS_IN_FRONT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11243918188544
+    m_Key: AVATAR_CAN_DANCE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11244643803136
+    m_Key: HEAD_FOLLOWS_MOUSE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11245205839872
+    m_Key: AVATAR_SIZE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11245612687360
+    m_Key: SAVE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11320741060608
+    m_Key: RESET
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11321303097344
+    m_Key: POLY_COUNT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11321839968256
+    m_Key: BONE_COUNT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11796140253184
+    m_Key: FPS_LIMIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23418267230208
+    m_Key: SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23684911718400
+    m_Key: PET_VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24123241652224
+    m_Key: EFFECTS_VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24123816271872
+    m_Key: MENU_VOLUME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24124437028864
+    m_Key: GRAPHICS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24125049397248
+    m_Key: ULTRA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24125577879552
+    m_Key: VERY_HIGH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24126186053632
+    m_Key: HIGH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24126735507456
+    m_Key: NORMAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24509532856320
+    m_Key: LOW
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24510153613312
+    m_Key: STEAM_DLCS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24510665318400
+    m_Key: FLOWER_HALO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27326909767680
+    m_Key: ADD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27328117727232
+    m_Key: REMOVE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37370367827968
+    m_Key: LANGUAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494291876667392
+    m_Key: LOAD_MOD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494319580045312
+    m_Key: EXPERIMENTAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494394716807168
+    m_Key: WINDOW_SITTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494416451690496
+    m_Key: WINDOW_SITTING_WARN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971210921435136
+    m_Key: DISCORD_RPC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971386927013888
+    m_Key: LANG_ENG
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971391947595776
+    m_Key: LANG_RU
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971392559964160
+    m_Key: LANG_JA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971393197498368
+    m_Key: LANG_ES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971466828505088
+    m_Key: LANG_CH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1982288996851712
+    m_Key: LANG_KOREAN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2011903232565248
+    m_Key: TUT_INTRO_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012023386791936
+    m_Key: TUT_INTRO_TEXT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012176361447424
+    m_Key: TUT_HOW_TO_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012219415977984
+    m_Key: TUT_HOW_TO_TEXT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012314333077504
+    m_Key: TUT_VRM_01_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012317843709952
+    m_Key: TUT_VRM_01_TEXT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012431912001536
+    m_Key: TUT_VRM_02_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012464099090432
+    m_Key: TUT_VRM_02_TEXT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024289331044352
+    m_Key: LANGUAGE_INFO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024320264036352
+    m_Key: SKIP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024395421769728
+    m_Key: FINISH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024529517862912
+    m_Key: BACK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024532080582656
+    m_Key: NEXT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781828886781952
+    m_Key: HEAD_BLEND
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781852853035008
+    m_Key: SPINE_BLEND
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781877666537472
+    m_Key: HAND_TRACKING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781899598553088
+    m_Key: MENU_COLOR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781916468043776
+    m_Key: MENU_SATURATION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781941810028544
+    m_Key: MODELS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781977230925824
+    m_Key: LOAD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9722136935522304
+    m_Key: PNG_TOO_BIG
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9724442586374144
+    m_Key: PNG_MISSING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9725012508401664
+    m_Key: UPLOAD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9844627515367424
+    m_Key: EYE_BLEND
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11144201018269696
+    m_Key: IK_FIX
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11144228465795072
+    m_Key: IK_INFO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11147404514418688
+    m_Key: AO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13999268343832576
+    m_Key: SCREEN_SAVER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13999269778284544
+    m_Key: SCREEN_SAVER_INFO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037793143513088
+    m_Key: SCREEN_SAVER_SLIDER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037795504906240
+    m_Key: DEBUGGING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037796842889216
+    m_Key: GC_KILL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037800621957120
+    m_Key: GC_KILL_INFO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21396842692468736
+    m_Key: ENABLE_ALARM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21396846479925248
+    m_Key: ALARM_INFO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397663471624192
+    m_Key: AMBIENT_LIGHTS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397935245746176
+    m_Key: AMBI_1_INT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397936617283584
+    m_Key: AMBI_1_SAT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397937200291840
+    m_Key: AMBI_1_COL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397937758134272
+    m_Key: AMBI_2_INT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397938295005184
+    m_Key: AMBI_2_SAT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397938898984960
+    m_Key: AMBI_2_COL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397939494576128
+    m_Key: AMBI_3_INT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21398132755521536
+    m_Key: AMBI_3_SAT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21398134148030464
+    m_Key: AMBI_3_COL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21399717254520832
+    m_Key: ENABLE_AMBIENT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21399718462480384
+    m_Key: ENABLE_LIGHT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400106955694080
+    m_Key: GLOBAL_LIGHT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400294541746176
+    m_Key: LIGHT_INT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400296517263360
+    m_Key: LIGHT_SAT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400297775554560
+    m_Key: LIGHT_COL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 63722729174507520
+    m_Key: UPDATE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64079105226743808
+    m_Key: ACTION_DRAG_01
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086005318197248
+    m_Key: ACTION_DRAG_02
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086006849118208
+    m_Key: ACTION_DRAG_03
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086008195489792
+    m_Key: ACTION_DRAG_04
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086009676079104
+    m_Key: ACTION_DRAG_05
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086226806808576
+    m_Key: ACTION_DRAG_06
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086278308667392
+    m_Key: ACTION_DRAG_07
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086678092947456
+    m_Key: ACTION_DANCE_01
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086768543113216
+    m_Key: ACTION_DANCE_02
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087092846698496
+    m_Key: ACTION_DANCE_03
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087094838992896
+    m_Key: ACTION_DANCE_04
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087097229746176
+    m_Key: ACTION_DANCE_05
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087099624693760
+    m_Key: ACTION_DANCE_06
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087382320783360
+    m_Key: ACTION_WINDOWSIT_01
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087412918231040
+    m_Key: ACTION_WINDOWSIT_02
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087414772113408
+    m_Key: ACTION_WINDOWSIT_03
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087416336588800
+    m_Key: ACTION_WINDOWSIT_04
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087417628434432
+    m_Key: ACTION_WINDOWSIT_05
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087418794450944
+    m_Key: ACTION_WINDOWSIT_06
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088019687219200
+    m_Key: ACTION_SITTING_01
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088020911955968
+    m_Key: ACTION_SITTING_02
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088021570461696
+    m_Key: ACTION_SITTING_03
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088022228967424
+    m_Key: ACTION_SITTING_04
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088022841335808
+    m_Key: ACTION_SITTING_05
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088023474675712
+    m_Key: ACTION_SITTING_06
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485837908254720
+    m_Key: ITEM_SAKURA_HALO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485839854411776
+    m_Key: ITEM_RETRO_HALO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485841104314368
+    m_Key: OPTION_EVENT_MESSAGES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486049066295296
+    m_Key: OPTION_DANCE_TRANSITIONS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486115202080768
+    m_Key: OPTION_DANCE_TRANSITIONS_CHANGE_TIME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486115827032064
+    m_Key: OPTION_DANCE_TRANSITIONS_TRANSITION_TIME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486267505647616
+    m_Key: OPTION_START_WITH_SYSTEM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486353119780864
+    m_Key: INPUT_AI_SYSTEM_PROMPT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486586960617472
+    m_Key: BUTTON_DELETE_CHAT_HISTORY
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 5634504711162560726
+  references:
+    version: 2
+    RefIds:
+    - rid: 5634504711162560726
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1744142464445

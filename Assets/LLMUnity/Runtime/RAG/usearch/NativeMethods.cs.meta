@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: eec2de19e997c7c9e81c4c1f3dd6b78f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Runtime/RAG/usearch/NativeMethods.cs
+  uploadId: 754381

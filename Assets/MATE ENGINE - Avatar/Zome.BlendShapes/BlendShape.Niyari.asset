@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37562b39ff933b245ac2f35d87edbcd6, type: 3}
+  m_Name: BlendShape.Niyari
+  m_EditorClassIdentifier: VRM::VRM.BlendShapeClip
+  m_prefab: {fileID: 0}
+  BlendShapeName: Niyari
+  Preset: 0
+  Values:
+  - RelativePath: Face
+    Index: 16
+    Weight: 22.6
+  - RelativePath: Face
+    Index: 25
+    Weight: 50.7
+  - RelativePath: Face
+    Index: 50
+    Weight: 100
+  - RelativePath: Face
+    Index: 53
+    Weight: 32.2
+  - RelativePath: Face
+    Index: 54
+    Weight: 20
+  - RelativePath: Face
+    Index: 63
+    Weight: 27.4
+  - RelativePath: Face
+    Index: 64
+    Weight: 30
+  - RelativePath: Face
+    Index: 68
+    Weight: 40
+  - RelativePath: Face
+    Index: 69
+    Weight: 40
+  - RelativePath: Face
+    Index: 70
+    Weight: 40
+  MaterialValues: []
+  IsBinary: 0

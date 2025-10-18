@@ -1,0 +1,541 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Languages (UI)_en
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 698e167bd107c3a40a5376082f2e2f35, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 96968105984
+    m_Localized: MATE ENGINE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11321839968256
+    m_Localized: Bones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11796140253184
+    m_Localized: FPS Limit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11245612687360
+    m_Localized: Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11320741060608
+    m_Localized: Reset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11321303097344
+    m_Localized: Polys
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11245205839872
+    m_Localized: Avatar Size
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11244643803136
+    m_Localized: Head Follows Mouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11243918188544
+    m_Localized: Avatar Can Dance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11241108004864
+    m_Localized: Avatar Always In Front
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11239019241472
+    m_Localized: Start Dancing Vol. Threshold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11236599128064
+    m_Localized: Animation Transition Time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11105833312256
+    m_Localized: Animation Change Time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23418267230208
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23684911718400
+    m_Localized: Pet Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24123241652224
+    m_Localized: Effects Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24123816271872
+    m_Localized: Menu Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24124437028864
+    m_Localized: Graphics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24125049397248
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24125577879552
+    m_Localized: Very High
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24126186053632
+    m_Localized: High
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24126735507456
+    m_Localized: Normal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24509532856320
+    m_Localized: Low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24510153613312
+    m_Localized: Steam DLCs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24510665318400
+    m_Localized: Flower Halo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27326909767680
+    m_Localized: Add
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27328117727232
+    m_Localized: Remove
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37370367827968
+    m_Localized: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494319580045312
+    m_Localized: Experimental
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494291876667392
+    m_Localized: Load Mod
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494394716807168
+    m_Localized: Window and Taskbar Sitting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1494416451690496
+    m_Localized: This feature may cause bans in games with anti-cheat software.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971210921435136
+    m_Localized: Discord Rich Presence
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971386927013888
+    m_Localized: English
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971392559964160
+    m_Localized: "\u65E5\u672C\u8A9E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971393197498368
+    m_Localized: "Espa\xF1ol"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971466828505088
+    m_Localized: "\u4E2D\u6587"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1971391947595776
+    m_Localized: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1982288996851712
+    m_Localized: "\uD55C\uAD6D\uC5B4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2011903232565248
+    m_Localized: "Welcome to \u30E1\u30A4\u30C8\u30A8\u30F3\u30B8\u30F3 (MateEngine)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012023386791936
+    m_Localized: "This is a work-in-progress app, and new features may be added over
+      time. It was made by the anime community, for the anime community. There might
+      be some small issues here and there \u2014 if you find any, you can report
+      them from the Options menu by right-clicking the pet and clicking the bug icon."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012176361447424
+    m_Localized: How to Use MateEngine (Speedrun)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012219415977984
+    m_Localized: "Using MateEngine is really easy! Just right-click to open the Options
+      menu. There, you can change the avatar size, enable or disable effects, whitelist
+      apps that can make your avatar dance, or load mods and custom VRM/ME model
+      files. In the next step, I\u2019ll explain how to load custom avatars."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012314333077504
+    m_Localized: Using Custom Models 1/2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012317843709952
+    m_Localized: To use your own custom model, you need a .VRM file. You can download
+      custom .VRM models from websites like Booth.jp and VRoidHub. Once you have
+      a .VRM file, open the Options menu and click the 'VRM' button. This will open
+      the file explorer, where you can select your VRM file.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012431912001536
+    m_Localized: Using Custom Models 2/2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2012464099090432
+    m_Localized: "Sometimes a .VRM file might fail to load. This usually isn\u2019t
+      a MateEngine issue, it\u2019s often due to incorrect shaders or armature setup
+      during export. If this happens, check the official UniVRM documentation. Some
+      apps use fallback methods to fix broken models, but MateEngine doesn't (and
+      won\u2019t). You're responsible for making sure your VRM is properly exported."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024320264036352
+    m_Localized: Skip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024395421769728
+    m_Localized: Finish
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024529517862912
+    m_Localized: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024532080582656
+    m_Localized: Next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2024289331044352
+    m_Localized: "Language - \u8A00\u8A9E (Gengo) - \u042F\u0437\u044B\u043A (Yazyk)
+      - Idioma - \u8A9E\u8A00 (Y\u01D4y\xE1n) - Sprache - Langue - \uC5B8\uC5B4 (Eoneo)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781941810028544
+    m_Localized: Models
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781828886781952
+    m_Localized: Head Blend
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781852853035008
+    m_Localized: Spine Blend
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781877666537472
+    m_Localized: Hand Tracking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781899598553088
+    m_Localized: Menu Color
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781916468043776
+    m_Localized: Menu Saturation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7781977230925824
+    m_Localized: Load
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9722136935522304
+    m_Localized: PNG file must be under 700 KB.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9724442586374144
+    m_Localized: FIX IMG
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9725012508401664
+    m_Localized: UPLOAD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9844627515367424
+    m_Localized: Eye Blend
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11144201018269696
+    m_Localized: Inverse Kinematics Feet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11144228465795072
+    m_Localized: Most models will look better with IK Feet enabled. If not, disable
+      it for a more feminine movement style.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11147404514418688
+    m_Localized: Ambient Occlusion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13999268343832576
+    m_Localized: Screen Saver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13999269778284544
+    m_Localized: After some time, the desktop mascot appears large on the screen
+      and plays an idle animation until you return and click.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037793143513088
+    m_Localized: Screen Saver Timer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037795504906240
+    m_Localized: Debugging
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037796842889216
+    m_Localized: GC KILL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14037800621957120
+    m_Localized: "Runs a forced garbage collection task. This is a debug function\u2014do
+      not use it unless you know what you're doing."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21396842692468736
+    m_Localized: Enable Alarm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21396846479925248
+    m_Localized: "EXPERIMENTAL FEATURE: \nTHE ALARM WILL TURN OFF ONCE IT WAS TRIGGERED
+      ONE TIME."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397663471624192
+    m_Localized: Ambient Lights
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397935245746176
+    m_Localized: AMBI 1 INTENSITY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397937758134272
+    m_Localized: AMBI 2 INTENSITY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397939494576128
+    m_Localized: AMBI 3 INTENSITY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397936617283584
+    m_Localized: AMBI 1 SATURATION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397938295005184
+    m_Localized: AMBI 2 SATURATION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21398132755521536
+    m_Localized: AMBI 3 SATURATION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397937200291840
+    m_Localized: AMBI 1 COLOR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21397938898984960
+    m_Localized: AMBI 2 COLOR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21398134148030464
+    m_Localized: AMBI 3 COLOR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21399717254520832
+    m_Localized: Enable Ambient Light
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21399718462480384
+    m_Localized: Enable Light
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400106955694080
+    m_Localized: Global Light
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400294541746176
+    m_Localized: Light Intensity
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400296517263360
+    m_Localized: Light Saturation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21400297775554560
+    m_Localized: Light Color
+    m_Metadata:
+      m_Items: []
+  - m_Id: 63722729174507520
+    m_Localized: Update
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64079105226743808
+    m_Localized: "Kyaa~ put me down\u2026!!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086005318197248
+    m_Localized: "Don\u2019t lift me up like that, it\u2019s embarrassing~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086006849118208
+    m_Localized: "Please\u2026 set me gently back on the floor~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086008195489792
+    m_Localized: "Kyaa! It\u2019s too high! Hey, let me down!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086009676079104
+    m_Localized: ahhhhhhh..!!! >_<
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086226806808576
+    m_Localized: "This isn\u2019t a princess carry~! Let me down~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086278308667392
+    m_Localized: Let me down!! >_<!!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086678092947456
+    m_Localized: Hehe, look at me spin~ am I cute?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64086768543113216
+    m_Localized: Eee~ watch my moves, master~!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087092846698496
+    m_Localized: "Kyaa, I can\u2019t stop moving~ so fun!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087094838992896
+    m_Localized: "Ufufu~ I\u2019m your idol on stage now\u266A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087097229746176
+    m_Localized: "Dance battle?! I\u2019ll never lose~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087099624693760
+    m_Localized: Dance Dance Dance!! >_<
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087382320783360
+    m_Localized: Relaxing time~ finally a break!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087412918231040
+    m_Localized: "Hehe, I\u2019ll just sit here and watch you work."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087414772113408
+    m_Localized: "Mmm\u2026 comfy spot, don\u2019t mind me~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087416336588800
+    m_Localized: "I\u2019ll cheer for you while you\u2019re busy, master~!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087417628434432
+    m_Localized: "Nyaa~ I\u2019ll stay here quietly, promise~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64087418794450944
+    m_Localized: "Working hard? I\u2019ll keep you company~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088019687219200
+    m_Localized: "Shhh\u2026 don\u2019t disturb me, I\u2019m recharging cuteness~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088020911955968
+    m_Localized: Every pet deserves a macaron nap spot, right?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088021570461696
+    m_Localized: "Ehehe~ my pillow smells like sugar\u2026 so dreamy~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088022228967424
+    m_Localized: "So soft\u2026 I\u2019m melting into it~"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088022841335808
+    m_Localized: Sweet dreams on a sweet pillow, ehehe~
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64088023474675712
+    m_Localized: "Mmm\u2026 this macaron is so fluffy~ I could nap forever\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485837908254720
+    m_Localized: Sakura Halo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485839854411776
+    m_Localized: Retro Halo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64485841104314368
+    m_Localized: Event Based Messages
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486049066295296
+    m_Localized: Enable Dance transitions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486115202080768
+    m_Localized: Dance Change Time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486115827032064
+    m_Localized: Dance transition Time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486267505647616
+    m_Localized: Start With System
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486353119780864
+    m_Localized: AI System Prompt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64486586960617472
+    m_Localized: Del. CHAT HISTORY
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

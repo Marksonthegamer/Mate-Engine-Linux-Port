@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ccc294e1dbf3b4085b6b5fd68c5c5cc7
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Samples/FunctionCalling/Scene.unity
+  uploadId: 754381

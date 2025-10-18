@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37562b39ff933b245ac2f35d87edbcd6, type: 3}
+  m_Name: BlendShape.Sorrow
+  m_EditorClassIdentifier: VRM::VRM.BlendShapeClip
+  m_prefab: {fileID: 0}
+  BlendShapeName: Sorrow
+  Preset: 10
+  Values:
+  - RelativePath: Body
+    Index: 25
+    Weight: 100
+  - RelativePath: Body
+    Index: 26
+    Weight: 74.7
+  - RelativePath: Body
+    Index: 27
+    Weight: 21.6
+  - RelativePath: Body
+    Index: 49
+    Weight: 100
+  - RelativePath: Body
+    Index: 50
+    Weight: 55.4
+  - RelativePath: Body
+    Index: 52
+    Weight: 100
+  - RelativePath: Body
+    Index: 55
+    Weight: 94.7
+  MaterialValues: []
+  IsBinary: 0

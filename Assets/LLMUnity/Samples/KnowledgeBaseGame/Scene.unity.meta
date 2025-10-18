@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 79327dadc0b96d29bb1603b0001f405e
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Samples/KnowledgeBaseGame/Scene.unity
+  uploadId: 754381

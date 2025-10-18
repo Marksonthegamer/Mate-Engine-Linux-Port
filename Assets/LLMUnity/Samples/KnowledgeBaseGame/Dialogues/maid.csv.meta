@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 70839d4b753f9ff66a48a0d931db2629
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Samples/KnowledgeBaseGame/Dialogues/maid.csv
+  uploadId: 754381

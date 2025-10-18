@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: fde8f7694420c760aabb639016d2d168
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 273604
+  packageName: LLM for Unity
+  packageVersion: 2.5.1
+  assetPath: Assets/LLMUnity/Samples/RAG/RAGAndLLM_Sample.cs
+  uploadId: 754381

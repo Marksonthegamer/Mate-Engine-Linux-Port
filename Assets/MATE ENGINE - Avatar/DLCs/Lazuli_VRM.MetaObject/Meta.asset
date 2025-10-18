@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63b589176a34b344b9ccbee2b7e7114a, type: 3}
+  m_Name: Meta
+  m_EditorClassIdentifier: VRM::VRM.VRMMetaObject
+  ExporterVersion: UniVRM-0.128.1
+  Title: "\u30E9\u30BA\u30EA-Lazuli-"
+  Version: v2.0.2
+  Author: Elychiffon
+  ContactInformation: 
+  Reference: https://elychiffon.booth.pm/items/5255692
+  Thumbnail: {fileID: 2800000, guid: e7cc32f9924f5544ba93f132aa467f55, type: 3}
+  AllowedUser: 2
+  ViolentUssage: 1
+  SexualUssage: 1
+  CommercialUssage: 0
+  OtherPermissionUrl: 
+  LicenseType: 0
+  OtherLicenseUrl: 
