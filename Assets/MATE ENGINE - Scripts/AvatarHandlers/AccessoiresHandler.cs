@@ -1,17 +1,18 @@
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class AccessoiresHandler : MonoBehaviour
 {
-    [System.Serializable]
+    [Serializable]
     public class AccessoryRule
     {
         public string ruleName;
-        public bool isEnabled = false;
+        public bool isEnabled;
         public HumanBodyBones targetBone;
         public GameObject linkedObject;
-        [Range(0f, 1f)] public float smoothness = 0f;
-        public bool steamExclusive = false;
+        [Range(0f, 1f)] public float smoothness;
+        public bool steamExclusive;
         public Vector3 positionOffset = Vector3.zero;
     }
     public Animator animator;

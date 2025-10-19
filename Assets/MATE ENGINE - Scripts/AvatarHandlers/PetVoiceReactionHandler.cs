@@ -1,9 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class PetVoiceReactionHandler : MonoBehaviour
 {
-    [System.Serializable]
+    [Serializable]
     public class VoiceRegion
     {
         public string name;
@@ -98,7 +101,7 @@ public class PetVoiceReactionHandler : MonoBehaviour
         if (bigScreen != null)
         {
             var isBig = bigScreen.GetType()
-                .GetField("isBigScreenActive", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .GetField("isBigScreenActive", BindingFlags.NonPublic | BindingFlags.Instance)
                 ?.GetValue(bigScreen) as bool?;
             bigScreenBlocked = isBig == true;
         }
@@ -256,7 +259,7 @@ public class PetVoiceReactionHandler : MonoBehaviour
 
 public static class ListExt
 {
-    public static T MinByOrDefault<T, TKey>(this List<T> list, System.Func<T, TKey> selector) where TKey : System.IComparable<TKey>
+    public static T MinByOrDefault<T, TKey>(this List<T> list, Func<T, TKey> selector) where TKey : IComparable<TKey>
     {
         if (list == null || list.Count == 0) return default;
         int minIdx = 0;

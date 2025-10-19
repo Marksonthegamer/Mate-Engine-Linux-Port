@@ -1,22 +1,24 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using X11;
+using Random = UnityEngine.Random;
 
 public class AvatarWindowHandler : MonoBehaviour
 {
-    public int snapThreshold = 30, verticalOffset = 0;
+    public int snapThreshold = 30, verticalOffset;
     public float desktopScale = 1f;
     [Header("Pink Snap Zone (Unity-side)")]
     public Vector2 snapZoneOffset = new(0, -5);
-    public Vector2 snapZoneSize = new(100, 10);[Header("Window Sit BlendTree")]
+    public Vector2 snapZoneSize = new(100, 10);
+    [Header("Window Sit BlendTree")]
     public int totalWindowSitAnimations = 4;
     private static readonly int windowSitIndexParam = Animator.StringToHash("WindowSitIndex");
-    private bool _wasSitting = false;
+    private bool wasSitting;
 
     [Header("User Y-Offset Slider")]
     [Range(-0.015f, 0.015f)]
-    public float windowSitYOffset = 0f;
+    public float windowSitYOffset;
 
     [Header("Fine-Tune")]
     float snapFraction;
@@ -28,11 +30,11 @@ public class AvatarWindowHandler : MonoBehaviour
     Vector2 lastDesktopPosition;
     readonly List<WindowEntry> cachedWindows = new();
     Rect pinkZoneDesktopRect;
-// float snapFraction, baseScale = 1f, baseOffset = 40f;
+
     Animator animator;
     AvatarAnimatorController controller;
 
-    private float lastCacheUpdateTime = 0f;
+    private float lastCacheUpdateTime;
     private const float CacheUpdateCooldown = 0.05f; // Optional cooldown during dragging
 
     void Start()
@@ -48,12 +50,12 @@ public class AvatarWindowHandler : MonoBehaviour
         if (!SaveLoadHandler.Instance.data.enableWindowSitting) return;
 
         bool isSittingNow = animator != null && animator.GetBool("isWindowSit");
-        if (isSittingNow && !_wasSitting)
+        if (isSittingNow && !wasSitting)
         {
-            int sitIdx = UnityEngine.Random.Range(0, totalWindowSitAnimations);
+            int sitIdx = Random.Range(0, totalWindowSitAnimations);
             animator.SetFloat(windowSitIndexParam, sitIdx);
         }
-        _wasSitting = isSittingNow;
+        wasSitting = isSittingNow;
 
         var unityPos = GetUnityWindowPosition();
         UpdatePinkZone(unityPos);
@@ -98,22 +100,20 @@ public class AvatarWindowHandler : MonoBehaviour
             }
             snappedHWND = IntPtr.Zero;
             SetTopMost(true);
-            return;
         }
     }
     void UpdateCachedWindows()
     {
         cachedWindows.Clear();
-        var allWindows = X11Manager.Instance.GetAllWindows();
+        var allWindows = X11Manager.Instance.GetAllVisibleWindows();
         foreach (var hWnd in allWindows)
         {
-            if (!X11Manager.Instance.IsWindowVisible(hWnd)) continue;
             if (!X11Manager.Instance.GetWindowRect(hWnd, out Rect r)) continue;
             string cls = X11Manager.Instance.GetClassName(hWnd);
             bool isTaskbar = X11Manager.Instance.IsDock(hWnd);
             if (!isTaskbar)
             {
-                if ((r.width - r.x) < 100 || (r.height - r.y) < 100) continue;
+                if (r.width < 100 || r.height < 100) continue;
                 if (cls.Length == 0) continue;
                 if (X11Manager.Instance.IsDesktop(hWnd)) continue;
             }
@@ -131,21 +131,17 @@ public class AvatarWindowHandler : MonoBehaviour
 
     void TrySnap(Vector2 unityWindowPosition)
     {
-        if (Time.time < lastCacheUpdateTime + CacheUpdateCooldown) return; // Optional: skip if recently updated
+        if (Time.time < lastCacheUpdateTime + CacheUpdateCooldown) return;
         UpdateCachedWindows();
 
         foreach (var win in cachedWindows)
         {
             if (win.hwnd == unityHWND) continue;
-            //float barMidX = win.rect.x + (win.rect.width - win.rect.x) / 2, barY = win.rect.y + 2;
-            //var pt = new Vector2() { x = barMidX, y = barY };
-            //IntPtr pointWin = X11Manager.Instance.WindowFromPoint(pt);
-            //if (X11Manager.Instance.GetTopLevelParent(pointWin) != win.hwnd) continue;
-            var topBar = new Rect(win.rect.x, win.rect.y, win.rect.width - win.rect.x, 5);
+            var topBar = new Rect(win.rect.x, win.rect.y, win.rect.width, 5);
             if (!pinkZoneDesktopRect.Overlaps(topBar)) continue;
             lastDesktopPosition = GetUnityWindowPosition();
             snappedHWND = win.hwnd;
-            float winWidth = win.rect.width - win.rect.x, unityWidth = GetUnityWindowWidth();
+            float winWidth = win.rect.width, unityWidth = GetUnityWindowWidth();
             float petCenterX = unityWindowPosition.x + unityWidth * 0.5f;
             snapFraction = (petCenterX - win.rect.x) / winWidth;
             snapOffset.y = GetUnityWindowHeight() + snapZoneOffset.y + snapZoneSize.y * 0.5f;
@@ -164,7 +160,7 @@ public class AvatarWindowHandler : MonoBehaviour
         }
 
         var unityPos = GetUnityWindowPosition();
-        float winWidth = winRect.width - winRect.x, unityWidth = GetUnityWindowWidth();
+        float winWidth = winRect.width, unityWidth = GetUnityWindowWidth();
         float petCenterX = unityPos.x + unityWidth * 0.5f;
         snapFraction = (petCenterX - winRect.x) / winWidth;
         float newCenterX = winRect.x + snapFraction * winWidth;
@@ -186,7 +182,7 @@ public class AvatarWindowHandler : MonoBehaviour
             return;
         }
 
-        float winWidth = winRect.width - winRect.x, unityWidth = GetUnityWindowWidth();
+        float winWidth = winRect.width, unityWidth = GetUnityWindowWidth();
         float newCenterX = winRect.x + snapFraction * winWidth;
         int targetX = Mathf.RoundToInt(newCenterX - unityWidth * 0.5f);
         float yOffset = GetUnityWindowHeight() + snapZoneOffset.y + snapZoneSize.y * 0.5f;
@@ -202,13 +198,13 @@ public class AvatarWindowHandler : MonoBehaviour
         {
             return false;
         }
-        return pinkZoneDesktopRect.Overlaps(new Rect(winRect.x, winRect.y, winRect.width - winRect.x, 5));
+        return pinkZoneDesktopRect.Overlaps(new Rect(winRect.x, winRect.y, winRect.width, 5));
     }
 
     struct WindowEntry { public IntPtr hwnd; public Rect rect; }
 
     void SetTopMost(bool en) => X11Manager.Instance.SetTopmost(en);
-    Vector2 GetUnityWindowPosition() { Vector2 r = X11Manager.Instance.GetWindowPosition(); return new Vector2(r.x, r.y); }
+    Vector2 GetUnityWindowPosition() { Vector2 r = X11Manager.Instance.GetWindowPosition(); return new(r.x, r.y); }
     int GetUnityWindowWidth() { Vector2 r = X11Manager.Instance.GetWindowSize(); return (int)r.x; }
     int GetUnityWindowHeight() { Vector2 r = X11Manager.Instance.GetWindowSize(); return (int)r.y; }
     void SetUnityWindowPosition(float x, float y) => X11Manager.Instance.SetWindowPosition(x, y);
@@ -217,8 +213,8 @@ public class AvatarWindowHandler : MonoBehaviour
     {
         if (!X11Manager.Instance.GetWindowRect(hwnd, out Rect rect)) return false;
 
-        float width = rect.width - rect.x;
-        float height = rect.height - rect.y;
+        float width = rect.width;
+        float height = rect.height;
         int screenWidth = Display.main.systemWidth;
         int screenHeight = Display.main.systemHeight;
         int tolerance = 2; 
@@ -237,11 +233,11 @@ public class AvatarWindowHandler : MonoBehaviour
         float basePixel = 1000f / desktopScale;
         Gizmos.color = Color.magenta; DrawDesktopRect(pinkZoneDesktopRect, basePixel);
         X11Manager.Instance.GetWindowRect(unityHWND, out Rect uRect);
-        Gizmos.color = Color.green; DrawDesktopRect(new Rect(uRect.x, uRect.height - 5, uRect.width - uRect.x, 5), basePixel);
+        Gizmos.color = Color.green; DrawDesktopRect(new Rect(uRect.x, uRect.height - 5, uRect.width, 5), basePixel);
         foreach (var win in cachedWindows)
         {
             if (win.hwnd == unityHWND) continue;
-            float w = win.rect.width - win.rect.x, h = win.rect.height - win.rect.y;
+            float w = win.rect.width, h = win.rect.height;
             Gizmos.color = Color.red; DrawDesktopRect(new Rect(win.rect.x, win.rect.y, w, 5), basePixel);
             Gizmos.color = Color.yellow; DrawDesktopRect(new Rect(win.rect.x, win.rect.y, w, h), basePixel);
         }

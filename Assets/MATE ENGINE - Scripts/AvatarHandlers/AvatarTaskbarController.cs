@@ -16,7 +16,7 @@ public class AvatarTaskbarController : MonoBehaviour
     [Header("Attach Settings")]
     public GameObject attachTarget;
     public HumanBodyBones attachBone = HumanBodyBones.Head;
-    public bool keepOriginalRotation = false;
+    public bool keepOriginalRotation;
 
     [Header("Spawn / Despawn Animation")]
     public float spawnScaleTime = 0.2f;
@@ -37,11 +37,11 @@ public class AvatarTaskbarController : MonoBehaviour
     private Transform originalAttachParent;
 
     private Vector3 originalScale = Vector3.one;
-    private float scaleLerpT = 0f;
-    private bool isScaling = false;
-    private bool scalingUp = false;
+    private float scaleLerpT;
+    private bool isScaling;
+    private bool scalingUp;
 
-    private bool wasAllowSpawn = false;
+    private bool wasAllowSpawn;
 
 
     private static readonly int IsSitting = Animator.StringToHash("isSitting");

@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using VRM;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UniVRM10;
-using System.Collections.Generic;
+using VRM;
 
 [DisallowMultipleComponent]
 public class UniversalBlendshapes : MonoBehaviour
@@ -17,16 +17,14 @@ public class UniversalBlendshapes : MonoBehaviour
     private readonly Dictionary<string, BlendState> states = new();
     private readonly List<KeyValuePair<BlendShapeKey, float>> reusableList = new();
 
-    private static readonly string[] keys = new[]
-    {
+    private static readonly string[] keys = {
         "Blink", "Blink_L", "Blink_R",
         "LookUp", "LookDown", "LookLeft", "LookRight",
         "Neutral", "A", "I", "U", "E", "O",
         "Joy", "Angry", "Sorrow", "Fun"
     };
 
-    private static readonly BlendShapePreset[] vrm0Presets = new[]
-    {
+    private static readonly BlendShapePreset[] vrm0Presets = {
         BlendShapePreset.Blink, BlendShapePreset.Blink_L, BlendShapePreset.Blink_R,
         BlendShapePreset.LookUp, BlendShapePreset.LookDown, BlendShapePreset.LookLeft, BlendShapePreset.LookRight,
         BlendShapePreset.Neutral,

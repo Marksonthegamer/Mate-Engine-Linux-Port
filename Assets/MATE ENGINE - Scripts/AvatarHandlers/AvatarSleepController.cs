@@ -1,25 +1,24 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class AvatarSleepController : MonoBehaviour
 {
     [Header("Enable Sleep Feature")]
-    public bool enableSleep = false;
+    public bool enableSleep;
 
     [Header("Sleep Timer (seconds)")]
     [Range(30f, 360f)]
     public float sleepTimer = 60f;
 
     [Header("Allowed States (Whitelist)")]
-    public string[] allowedStates = new string[] { "Idle", "Sleeping" };
+    public string[] allowedStates = { "Idle", "Sleeping" };
 
     [Header("Wake Up If Any Of These Animator Bools Is True")]
-    public string[] wakeUpBools = new string[] { "isDragging" };
+    public string[] wakeUpBools = { "isDragging" };
 
     [Header("Debug Info (Read Only)")]
-    [SerializeField] private float idleTime = 0f;
+    [SerializeField] private float idleTime;
     [SerializeField] private string currentState = "";
-    [SerializeField] private bool isSleeping = false;
+    [SerializeField] private bool isSleeping;
 
     private Animator animator;
     private static readonly int isSleepingParam = Animator.StringToHash("IsSleeping");

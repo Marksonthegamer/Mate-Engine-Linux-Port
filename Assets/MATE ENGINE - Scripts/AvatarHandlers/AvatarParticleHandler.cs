@@ -1,13 +1,14 @@
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class AvatarParticleHandler : MonoBehaviour
 {
-    [System.Serializable]
+    [Serializable]
     public class ParticleRule
     {
         public string stateOrParameterName;
-        public bool useParameter = false;
+        public bool useParameter;
         public HumanBodyBones targetBone;
         public List<GameObject> linkedObjects = new();
     }
@@ -25,7 +26,7 @@ public class AvatarParticleHandler : MonoBehaviour
         public string stateName;
     }
 
-    private RuleCache[] cache = System.Array.Empty<RuleCache>();
+    private RuleCache[] cache = Array.Empty<RuleCache>();
     private AnimatorControllerParameter[] animParams;
 
     void Start()

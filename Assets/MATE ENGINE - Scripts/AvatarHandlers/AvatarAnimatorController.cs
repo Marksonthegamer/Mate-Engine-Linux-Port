@@ -1,8 +1,9 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using PulseAudio;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class AvatarAnimatorController : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class AvatarAnimatorController : MonoBehaviour
     public float DANCE_SWITCH_TIME = 15f;
     public float DANCE_TRANSITION_TIME = 2f;       
 
-    public bool BlockDraggingOverride = false;
+    public bool BlockDraggingOverride;
 
     private static readonly int danceIndexParam = Animator.StringToHash("DanceIndex");
     private static readonly int isIdleParam = Animator.StringToHash("isIdle");
@@ -36,9 +37,11 @@ public class AvatarAnimatorController : MonoBehaviour
     public bool isDragging, isDancing, isIdle;
 
     [Header("Character Mode")]
-    public bool enableHusbandoMode = false;
+    public bool enableHusbandoMode;
     private static readonly int isMaleParam = Animator.StringToHash("isMale");
     private static readonly int isFemaleParam = Animator.StringToHash("isFemale");
+
+    public bool eventMessages;
 
 
     void OnEnable()
@@ -99,7 +102,7 @@ public class AvatarAnimatorController : MonoBehaviour
         }
     }
 
-    private IEnumerator IsValidAppPlayingCoroutine(System.Action<bool> onComplete)
+    private IEnumerator IsValidAppPlayingCoroutine(Action<bool> onComplete)
     {
         bool result = false;
         List<AudioProgram> audioPrograms = new List<AudioProgram>();
@@ -123,7 +126,7 @@ public class AvatarAnimatorController : MonoBehaviour
             {
                 for (int j = 0; j < allowedApps.Count; j++)
                 {
-                    if (audioPrograms[i].Name.StartsWith(allowedApps[j], System.StringComparison.OrdinalIgnoreCase) && audioPrograms[i].volume > SOUND_THRESHOLD)
+                    if (audioPrograms[i].Name.StartsWith(allowedApps[j], StringComparison.OrdinalIgnoreCase) && audioPrograms[i].volume > SOUND_THRESHOLD)
                     {
                         result = true;
                         break;

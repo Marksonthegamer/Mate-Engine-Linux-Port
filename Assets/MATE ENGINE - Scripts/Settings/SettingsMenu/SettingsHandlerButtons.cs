@@ -18,7 +18,6 @@ public class SettingsHandlerButtons : MonoBehaviour
     public SettingsHandlerBigScreen bigScreenHandler;
 
     public VRMLoader vrmLoader;
-    public GameObject uniWindowControllerObject;
 
     private void Start()
     {

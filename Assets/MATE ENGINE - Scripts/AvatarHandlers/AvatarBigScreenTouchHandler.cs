@@ -1,5 +1,9 @@
-using UnityEngine;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using UniVRM10;
+using VRM;
 
 public class AvatarBigScreenTouchHandler : MonoBehaviour
 {
@@ -11,9 +15,9 @@ public class AvatarBigScreenTouchHandler : MonoBehaviour
     private Camera mainCamera;
 
     private GameObject mouseColliderObj;
-    private VRM.VRMSpringBoneColliderGroup mouseSpringColliderGroupVRM0;
-    private UniVRM10.VRM10SpringBoneColliderGroup mouseSpringColliderGroupVRM1;
-    private UniVRM10.VRM10SpringBoneCollider mouseSpringColliderVRM1;
+    private VRMSpringBoneColliderGroup mouseSpringColliderGroupVRM0;
+    private VRM10SpringBoneColliderGroup mouseSpringColliderGroupVRM1;
+    private VRM10SpringBoneCollider mouseSpringColliderVRM1;
 
     void Awake()
     {
@@ -47,7 +51,7 @@ public class AvatarBigScreenTouchHandler : MonoBehaviour
     bool IsBigScreenActive()
     {
         var type = bigScreenHandler.GetType();
-        var field = type.GetField("isBigScreenActive", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var field = type.GetField("isBigScreenActive", BindingFlags.NonPublic | BindingFlags.Instance);
         return field != null && (bool)field.GetValue(bigScreenHandler);
     }
 
@@ -59,20 +63,20 @@ public class AvatarBigScreenTouchHandler : MonoBehaviour
             mouseColliderObj.hideFlags = HideFlags.HideAndDontSave;
 
             // VRM0
-            var vrmSpringBones = avatarAnimator.GetComponentsInChildren<VRM.VRMSpringBone>();
+            var vrmSpringBones = avatarAnimator.GetComponentsInChildren<VRMSpringBone>();
             if (vrmSpringBones != null && vrmSpringBones.Length > 0)
             {
-                mouseSpringColliderGroupVRM0 = mouseColliderObj.AddComponent<VRM.VRMSpringBoneColliderGroup>();
-                var sc = new VRM.VRMSpringBoneColliderGroup.SphereCollider
+                mouseSpringColliderGroupVRM0 = mouseColliderObj.AddComponent<VRMSpringBoneColliderGroup>();
+                var sc = new VRMSpringBoneColliderGroup.SphereCollider
                 {
                     Offset = Vector3.zero,
                     Radius = mouseColliderRadius
                 };
-                mouseSpringColliderGroupVRM0.Colliders = new VRM.VRMSpringBoneColliderGroup.SphereCollider[] { sc };
+                mouseSpringColliderGroupVRM0.Colliders = new[] { sc };
 
                 foreach (var sb in vrmSpringBones)
                 {
-                    var list = sb.ColliderGroups?.ToList() ?? new System.Collections.Generic.List<VRM.VRMSpringBoneColliderGroup>();
+                    var list = sb.ColliderGroups?.ToList() ?? new List<VRMSpringBoneColliderGroup>();
                     if (!list.Contains(mouseSpringColliderGroupVRM0))
                     {
                         list.Add(mouseSpringColliderGroupVRM0);
@@ -81,19 +85,19 @@ public class AvatarBigScreenTouchHandler : MonoBehaviour
                 }
             }
             // VRM1
-            var vrm10SpringBones = avatarAnimator.GetComponentsInChildren<UniVRM10.VRM10SpringBoneJoint>();
+            var vrm10SpringBones = avatarAnimator.GetComponentsInChildren<VRM10SpringBoneJoint>();
             if (vrm10SpringBones != null && vrm10SpringBones.Length > 0)
             {
-                mouseSpringColliderGroupVRM1 = mouseColliderObj.AddComponent<UniVRM10.VRM10SpringBoneColliderGroup>();
+                mouseSpringColliderGroupVRM1 = mouseColliderObj.AddComponent<VRM10SpringBoneColliderGroup>();
                 mouseSpringColliderGroupVRM1.Name = "MouseColliderGroup";
-                mouseSpringColliderGroupVRM1.Colliders = new System.Collections.Generic.List<UniVRM10.VRM10SpringBoneCollider>();
-                mouseSpringColliderVRM1 = mouseColliderObj.AddComponent<UniVRM10.VRM10SpringBoneCollider>();
-                mouseSpringColliderVRM1.ColliderType = UniVRM10.VRM10SpringBoneColliderTypes.Sphere;
+                mouseSpringColliderGroupVRM1.Colliders = new List<VRM10SpringBoneCollider>();
+                mouseSpringColliderVRM1 = mouseColliderObj.AddComponent<VRM10SpringBoneCollider>();
+                mouseSpringColliderVRM1.ColliderType = VRM10SpringBoneColliderTypes.Sphere;
                 mouseSpringColliderVRM1.Offset = Vector3.zero;
                 mouseSpringColliderVRM1.Radius = mouseColliderRadius;
                 mouseSpringColliderGroupVRM1.Colliders.Add(mouseSpringColliderVRM1);
 
-                var vrm10Root = avatarAnimator.GetComponentInParent<UniVRM10.Vrm10Instance>();
+                var vrm10Root = avatarAnimator.GetComponentInParent<Vrm10Instance>();
                 if (vrm10Root != null && vrm10Root.SpringBone != null)
                 {
                     if (!vrm10Root.SpringBone.ColliderGroups.Contains(mouseSpringColliderGroupVRM1))
@@ -102,7 +106,7 @@ public class AvatarBigScreenTouchHandler : MonoBehaviour
             }
         }
 
-        // ColliderObjekt an Mausposition setzen (auf 3D-Position in Avatarnähe)
+        // ColliderObjekt an Mausposition setzen (auf 3D-Position in Avatarnï¿½he)
         Vector3 mouse = Input.mousePosition;
         float zDist = 1.0f;
         if (bigScreenHandler.attachBone != HumanBodyBones.LastBone)
@@ -126,10 +130,10 @@ public class AvatarBigScreenTouchHandler : MonoBehaviour
             // VRM0
             if (mouseSpringColliderGroupVRM0 != null && avatarAnimator != null)
             {
-                var vrmSpringBones = avatarAnimator.GetComponentsInChildren<VRM.VRMSpringBone>();
+                var vrmSpringBones = avatarAnimator.GetComponentsInChildren<VRMSpringBone>();
                 foreach (var sb in vrmSpringBones)
                 {
-                    var list = sb.ColliderGroups?.ToList() ?? new System.Collections.Generic.List<VRM.VRMSpringBoneColliderGroup>();
+                    var list = sb.ColliderGroups?.ToList() ?? new List<VRMSpringBoneColliderGroup>();
                     if (list.Contains(mouseSpringColliderGroupVRM0))
                     {
                         list.Remove(mouseSpringColliderGroupVRM0);
@@ -140,7 +144,7 @@ public class AvatarBigScreenTouchHandler : MonoBehaviour
             // VRM1
             if (mouseSpringColliderGroupVRM1 != null && avatarAnimator != null)
             {
-                var vrm10Root = avatarAnimator.GetComponentInParent<UniVRM10.Vrm10Instance>();
+                var vrm10Root = avatarAnimator.GetComponentInParent<Vrm10Instance>();
                 if (vrm10Root != null && vrm10Root.SpringBone != null &&
                     vrm10Root.SpringBone.ColliderGroups.Contains(mouseSpringColliderGroupVRM1))
                 {

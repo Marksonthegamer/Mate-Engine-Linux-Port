@@ -1,6 +1,7 @@
-using UnityEngine;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,7 +10,7 @@ using UnityEditor;
 public class BigScreenToggleSetting
 {
     public string componentTypeName;
-    public bool disableInBigScreen = false;
+    public bool disableInBigScreen;
 }
 
 public class AvatarBigScreenToggleHandler : MonoBehaviour
@@ -29,7 +30,7 @@ public class AvatarBigScreenToggleHandler : MonoBehaviour
         if (!bigScreenHandler) return;
 
         bool isBigScreenActive = false;
-        var field = typeof(AvatarBigScreenHandler).GetField("isBigScreenActive", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var field = typeof(AvatarBigScreenHandler).GetField("isBigScreenActive", BindingFlags.NonPublic | BindingFlags.Instance);
         if (field != null)
             isBigScreenActive = (bool)field.GetValue(bigScreenHandler);
 
@@ -79,7 +80,7 @@ public class AvatarBigScreenToggleHandlerEditor : Editor
             var entry = tgt.settings.Find(e => e.componentTypeName == b.GetType().FullName);
             if (entry == null)
             {
-                entry = new BigScreenToggleSetting() { componentTypeName = b.GetType().FullName, disableInBigScreen = false };
+                entry = new BigScreenToggleSetting { componentTypeName = b.GetType().FullName, disableInBigScreen = false };
                 tgt.settings.Add(entry);
             }
             EditorGUILayout.BeginHorizontal();

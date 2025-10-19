@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using LLMUnity;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,7 @@ public class AISystemPromptBinder : MonoBehaviour
 {
     [Header("References")]
     public InputField input;
-    public LLMUnity.LLMCharacter target;
+    public LLMCharacter target;
 
     [Header("Behavior")]
     public bool liveSave = true;
@@ -16,7 +17,7 @@ public class AISystemPromptBinder : MonoBehaviour
     void Reset()
     {
         if (!input) input = GetComponent<InputField>();
-        if (!target) target = FindObjectOfType<LLMUnity.LLMCharacter>();
+        if (!target) target = FindObjectOfType<LLMCharacter>();
     }
 
     void Awake()
@@ -80,7 +81,7 @@ public class AISystemPromptBinder : MonoBehaviour
 
     void ApplyToLLM(string s)
     {
-        if (target != null) target.SetPrompt(s, true);
+        if (target != null) target.SetPrompt(s);
     }
 
     static string GetFixedPromptPath()

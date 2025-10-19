@@ -22,7 +22,6 @@ public class SettingsHandlerToggles : MonoBehaviour
     public GameObject bloomObject;
     public GameObject dayNightObject;
     public GameObject ambientOcclusionObject;
-    public GameObject uniWindowControllerObject;
     
     private AvatarParticleHandler _currentParticleHandler;
 

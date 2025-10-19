@@ -249,7 +249,7 @@ namespace LLMUnity
         static async Task InitializeOnLoad()
         {
             LoadPlayerPrefs();
-            //await DownloadLibrary();
+            await DownloadLibrary();
         }
 
 #else

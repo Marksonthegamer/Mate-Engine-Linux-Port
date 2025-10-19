@@ -1,9 +1,10 @@
-﻿using UnityEngine;
-using UnityEngine.Localization.Settings;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Localization.Tables;
+using LLMUnitySamples;
+using UnityEngine;
+using UnityEngine.Localization.Settings;
+using Random = UnityEngine.Random;
 
 [Serializable]
 public class AvatarMessage
@@ -12,8 +13,8 @@ public class AvatarMessage
     public string text = "Hello!";
     public string locKey = "";
     public string state = "Idle";
-    public bool onActive = false;
-    public bool isHusbando = false;
+    public bool onActive;
+    public bool isHusbando;
 }
 
 public class AvatarRandomMessages : MonoBehaviour
@@ -42,17 +43,17 @@ public class AvatarRandomMessages : MonoBehaviour
     [Range(5, 100)] public int streamSpeed = 35;
     public AudioSource streamAudioSource;
 
-    public bool useAllowedStatesWhitelist = false;
+    public bool useAllowedStatesWhitelist;
     public string[] allowedStates = { "Idle" };
     public List<GameObject> blockObjects = new();
 
     [SerializeField] private string inspectorEvent;
 
-    private LLMUnitySamples.Bubble activeBubble;
+    private Bubble activeBubble;
     private Coroutine streamCoroutine;
     private Coroutine despawnCoroutine;
     private Coroutine loopCoroutine;
-    private bool isBubbleActive = false;
+    private bool isBubbleActive;
 
     private Animator avatarAnimator;
     private string lastAnimatorStateName = "";
@@ -93,9 +94,9 @@ public class AvatarRandomMessages : MonoBehaviour
                 var candidates = messages.FindAll(m => m.onActive && !string.IsNullOrEmpty(m.state) && current.IsName(m.state) && IsMessageAllowedByGender(m));
                 if (candidates.Count > 0)
                 {
-                    if (UnityEngine.Random.Range(0, 100) < onActiveChance)
+                    if (Random.Range(0, 100) < onActiveChance)
                     {
-                        AvatarMessage chosen = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+                        AvatarMessage chosen = candidates[Random.Range(0, candidates.Count)];
                         ShowSpecificMessage(chosen);
                     }
                 }
@@ -106,7 +107,7 @@ public class AvatarRandomMessages : MonoBehaviour
 
     private bool GetGlobalEnabled()
     {
-        return SaveLoadHandler.Instance != null ? SaveLoadHandler.Instance.data.enableRandomMessages : enableRandomMessages;
+        return SaveLoadHandler.Instance ? SaveLoadHandler.Instance.data.enableRandomMessages : enableRandomMessages;
     }
 
     private void ApplyEnableStateImmediate(bool enabled)
@@ -129,7 +130,7 @@ public class AvatarRandomMessages : MonoBehaviour
             if (!enableRandomMessages) { yield return null; continue; }
             if (!isBubbleActive && messages.Count > 0)
             {
-                float wait = UnityEngine.Random.Range(minDelay, maxDelay + 1);
+                float wait = Random.Range(minDelay, maxDelay + 1);
                 yield return new WaitForSeconds(wait);
 
                 if (!enableRandomMessages) continue;
@@ -147,7 +148,7 @@ public class AvatarRandomMessages : MonoBehaviour
         if (!enableRandomMessages) return;
         var idlePool = messages.FindAll(m => !m.onActive && IsMessageAllowedByGender(m));
         if (idlePool.Count == 0) return;
-        ShowSpecificMessage(idlePool[UnityEngine.Random.Range(0, idlePool.Count)]);
+        ShowSpecificMessage(idlePool[Random.Range(0, idlePool.Count)]);
     }
 
     void ShowSpecificMessage(AvatarMessage msg)
@@ -156,7 +157,7 @@ public class AvatarRandomMessages : MonoBehaviour
         if (chatContainer == null || msg == null) return;
         RemoveBubble();
 
-        var ui = new LLMUnitySamples.BubbleUI
+        var ui = new BubbleUI
         {
             sprite = bubbleSprite,
             font = font,
@@ -173,7 +174,7 @@ public class AvatarRandomMessages : MonoBehaviour
 
         string finalText = ResolveText(msg);
 
-        activeBubble = new LLMUnitySamples.Bubble(chatContainer, ui, "RandomBubble", "");
+        activeBubble = new Bubble(chatContainer, ui, "RandomBubble", "");
         isBubbleActive = true;
 
         if (streamAudioSource != null) { streamAudioSource.Stop(); streamAudioSource.Play(); }

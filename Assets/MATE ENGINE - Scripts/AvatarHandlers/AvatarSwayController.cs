@@ -1,6 +1,3 @@
-using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class AvatarSwayController : MonoBehaviour
@@ -17,8 +14,8 @@ public class AvatarSwayController : MonoBehaviour
     public bool useWindowVelocity = true;
     public bool fallbackToMouse = true;
     public float mouseSensitivity = 0.6f;
-    public bool invertHorizontal = false;
-    public bool invertVertical = false;
+    public bool invertHorizontal;
+    public bool invertVertical;
 
     [Header("Sway Physics")]
     public float horizontalVelocityToLean = 0.25f;
@@ -30,10 +27,10 @@ public class AvatarSwayController : MonoBehaviour
     public float blendSpeed = 8f;
 
     [Header("Limb Additive")]
-    [Range(0f, 1f)] public float armsAdditive = 0f;
-    [Range(0f, 1f)] public float legsAdditive = 0f;
-    public bool invertArms = false;
-    public bool invertLegs = false;
+    [Range(0f, 1f)] public float armsAdditive;
+    [Range(0f, 1f)] public float legsAdditive;
+    public bool invertArms;
+    public bool invertLegs;
     public float armsMaxZ = 18f;
     public float armsMaxX = 8f;
     public float legsMaxZ = 12f;
@@ -41,9 +38,9 @@ public class AvatarSwayController : MonoBehaviour
     public float limbLag = 6f;
 
     [Header("State Whitelist")]
-    public bool useAllowedStatesWhitelist = false;
+    public bool useAllowedStatesWhitelist;
     public string[] allowedStates = { "Drag" };
-    public int stateLayerIndex = 0;
+    public int stateLayerIndex;
 
     Animator anim;
     int draggingHash;

@@ -1,10 +1,10 @@
-﻿using UnityEngine;
-using System;
-using X11;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using UnityEngine;
+using X11;
 
 public class AvatarBigScreenHandler : MonoBehaviour
 {
@@ -18,7 +18,7 @@ public class AvatarBigScreenHandler : MonoBehaviour
     [Header("Camera")]
     public Camera MainCamera;
     [Tooltip("Override for Zoom: Camera FOV (Perspective) or Size (Orthographic). 0 = auto.")]
-    public float TargetZoom = 0f;
+    public float TargetZoom;
     public float ZoomMoveSpeed = 10f;
     [Tooltip("Y-Offset to bone position (meters, before scaling)")]
     public float YOffset = 0.08f;
@@ -32,19 +32,19 @@ public class AvatarBigScreenHandler : MonoBehaviour
     public GameObject moveCanvas;
 
     private IntPtr unityHWND = IntPtr.Zero;
-    private bool isBigScreenActive = false;
+    private bool isBigScreenActive;
     private Vector3 originalCamPos;
     private Quaternion originalCamRot;
     private float originalFOV;
     private float originalOrthoSize;
     private Rect originalWindowRect;
-    private bool originalRectSet = false;
+    private bool originalRectSet;
     private Transform bone;
     private AvatarAnimatorController avatarAnimatorController;
-    private bool moveCanvasWasActive = false;
+    private bool moveCanvasWasActive;
     private Coroutine fadeCoroutine;
-    private bool isFading = false;
-    private bool isInDesktopTransition = false;
+    private bool isFading;
+    private bool isInDesktopTransition;
 
     [DllImport("user32.dll")]
     private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
@@ -251,8 +251,6 @@ public class AvatarBigScreenHandler : MonoBehaviour
             if (moveCanvas != null && moveCanvasWasActive) moveCanvas.SetActive(true);
             if (unityHWND != IntPtr.Zero && originalRectSet)
             {
-                int w = (int)(originalWindowRect.width - originalWindowRect.x);
-                int h = (int)(originalWindowRect.height - originalWindowRect.y);
                 X11Manager.Instance.SetWindowPosition(new Vector2(originalWindowRect.x, originalWindowRect.y));
             }
             if (MainCamera != null)
@@ -317,9 +315,9 @@ public class AvatarBigScreenHandler : MonoBehaviour
             if (X11Manager.Instance.GetWindowRect(unityHWND, out Rect windowRect))
             {
                 Rect targetScreen = FindBestMonitorRect(windowRect);
-                float sw = targetScreen.width - targetScreen.x, sh = targetScreen.height - targetScreen.y;
                 X11Manager.Instance.SetWindowPosition(targetScreen.x, targetScreen.y);
-                originalWindowRect = windowRect; originalRectSet = true;
+                originalWindowRect = windowRect;
+                originalRectSet = true;
             }
         }
         if (!toFadeY && MainCamera != null)

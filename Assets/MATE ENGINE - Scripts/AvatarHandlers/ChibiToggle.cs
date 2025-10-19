@@ -1,6 +1,6 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
 public class ChibiToggle : MonoBehaviour
@@ -23,7 +23,7 @@ public class ChibiToggle : MonoBehaviour
     private Transform armatureRoot, head, leftFoot, rightFoot;
     private Transform leftUpperLeg, rightUpperLeg;
 
-    private bool isChibi = false;
+    private bool isChibi;
     private Vector3 originalArmaturePosition;
 
     void Start()

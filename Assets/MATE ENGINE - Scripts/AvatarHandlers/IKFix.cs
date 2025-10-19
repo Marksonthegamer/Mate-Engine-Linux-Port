@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,7 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class IKFix : MonoBehaviour
 {
-    [System.Serializable]
+    [Serializable]
     public class IKFixState
     {
         public string stateName;
@@ -22,7 +23,7 @@ public class IKFix : MonoBehaviour
     public float blendSpeed = 5f;
 
     private Animator animator;
-    private float currentIKWeight = 0f;
+    private float currentIKWeight;
 
     private void Awake()
     {

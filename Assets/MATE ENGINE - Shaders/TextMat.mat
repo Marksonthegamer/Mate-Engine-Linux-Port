@@ -101,9 +101,9 @@ Material:
     - _OutlineSpeed: 1
     - _OutlineThickness: 2
     - _OutlineWidth: 1
-    - _OverlayHueShift: 0.936
+    - _OverlayHueShift: 0
     - _OverlayOpacity: 0
-    - _OverlaySatMul: 0.468
+    - _OverlaySatMul: 1
     - _OverlayShare: 0
     - _OverlaySpaceMode: 0
     - _OverlayUseLuma: 0

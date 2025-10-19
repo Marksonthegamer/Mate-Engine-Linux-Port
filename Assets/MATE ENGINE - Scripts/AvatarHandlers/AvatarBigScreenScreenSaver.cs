@@ -1,14 +1,15 @@
-using UnityEngine;
 using System.Runtime.InteropServices;
+using UnityEditor;
+using UnityEngine;
 using X11;
 
 public class AvatarBigScreenScreenSaver : MonoBehaviour
 {
     [Header("Enable BigScreen Screensaver Feature")]
-    public bool enableBigScreenScreenSaver = false;
+    public bool enableBigScreenScreenSaver;
 
     [Header("Timeout Step (Slider 0-10, set by SettingsMenu)")]
-    public int timeoutStep = 0;
+    public int timeoutStep;
 
     [Header("Mouse movement threshold (pixels)")]
     public float minMoveDistance = 2f;
@@ -17,7 +18,7 @@ public class AvatarBigScreenScreenSaver : MonoBehaviour
     public string[] allowedStates = { "Idle" };
 
     [Header("Click disables BigScreen completely")]
-    public bool clickDisablesBoth = false;
+    public bool clickDisablesBoth;
 
     [Header("Live Status (Inspector)")]
     [SerializeField] private float inspectorTime;
@@ -32,7 +33,7 @@ public class AvatarBigScreenScreenSaver : MonoBehaviour
     private AvatarBigScreenHandler bigScreenHandler;
     private Animator avatarAnimator;
     private Vector2 lastMousePos;
-    private float idleTimer = 0f;
+    private float idleTimer;
 
     [StructLayout(LayoutKind.Sequential)]
     public struct POINT
@@ -200,7 +201,7 @@ public class AvatarBigScreenScreenSaver : MonoBehaviour
         return false;
     }
 
-    private bool lastGlobalMouseDown = false;
+    private bool lastGlobalMouseDown;
     private bool IsGlobalUserInput()
     {
         bool mouseDown = Input.GetMouseButton(0 | 1);
@@ -214,8 +215,8 @@ public class AvatarBigScreenScreenSaver : MonoBehaviour
 }
 
 #if UNITY_EDITOR
-[UnityEditor.CustomEditor(typeof(AvatarBigScreenScreenSaver))]
-public class AvatarBigScreenScreenSaverEditor : UnityEditor.Editor
+[CustomEditor(typeof(AvatarBigScreenScreenSaver))]
+public class AvatarBigScreenScreenSaverEditor : Editor
 {
     public override void OnInspectorGUI()
     {
