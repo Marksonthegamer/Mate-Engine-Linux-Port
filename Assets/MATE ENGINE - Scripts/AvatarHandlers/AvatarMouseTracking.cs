@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniVRM10;
+using X11;
 
 [Serializable]
 public class TrackingPermission
@@ -141,7 +142,9 @@ public class AvatarMouseTracking : MonoBehaviour
     void DoHead()
     {
         if (!headBone || !headDriver) return;
-        var mouse = Input.mousePosition;
+        var oriMouse = X11Manager.Instance.GetMousePosition();
+        var winPos = X11Manager.Instance.GetWindowPosition();
+        var mouse = new Vector2(oriMouse.x - winPos.x, Screen.height - oriMouse.y + winPos.y);
         var world = mainCam.ScreenToWorldPoint(new Vector3(mouse.x, mouse.y, mainCam.nearClipPlane));
         var dir = (world - headDriver.position).normalized;
         var localDir = headDriver.parent.InverseTransformDirection(dir);

@@ -63,7 +63,9 @@ namespace X11
             {
                 _unityWindow = windows[0]; // Typically the first is the main window
                 Debug.Log($"Unity window handle: 0x{_unityWindow.ToInt64():X}");
+#if !UNITY_EDITOR
                 SetWindowBorderless();
+#endif
             }
             else
             {
@@ -113,11 +115,11 @@ namespace X11
                 SetTopmost(false);
 #endif
 #if !UNITY_EDITOR_LINUX
-        if (damage != IntPtr.Zero)
-        {
-            XDamageDestroy(_display, damage);
-            damage = IntPtr.Zero;
-        }
+            if (damage != IntPtr.Zero)
+            {
+                XDamageDestroy(_display, damage);
+                damage = IntPtr.Zero;
+            }
 #endif
                 XSync(_display, false);
                 XCloseDisplay(_display);
