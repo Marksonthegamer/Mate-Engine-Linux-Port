@@ -10,6 +10,8 @@
 This is an **unofficial** Linux port of shinyflvre's MateEngine - A free Desktop Mate alternative with a lightweight interface and custom VRM support.
 Tested on Ubuntu 24.04 LTS.
 
+![](https://i.ibb.co/B5MWsHqx/Screenshot.png)
+
 #### Usage
 Open the project in Unity 6000.2.6f2 and build the player, or simply grab a prebuilt one in [Releases](https://github.com/Marksonthegamer/Mate-Engine-Linux-Port/releases/) page. Then, run the `launch.sh` script in the output directory (This script is necessary for window transparency. For KDE, you also need to **disable "Allow applications to block compositing"** in `systemsettings`).
 
@@ -64,6 +66,8 @@ This project lacks further testing and updates. Feel free to make PRs to contrib
 # Mate-Engine-Linux-Port
 这是一个非官方的MateEngine Linux移植版 - 一个免费的Desktop Mate替代品（桌宠软件），具有轻量级界面和自定义VRM支持。
 已在Ubuntu 24.04 LTS上测试。
+
+![](https://i.ibb.co/B5MWsHqx/Screenshot.png)
 
 #### 用法
 使用 Unity 6000.2.6f2 打开此项目然后构建Player，或者在[Releases](https://github.com/Marksonthegamer/Mate-Engine-Linux-Port/releases/)页面获取预构建版本。必须运行输出目录中的`launch.sh`，否则 MateEngne 将缺少透明窗口背景（对于 KDE Plasma 桌面环境，你还需要在 KDE 系统设置中禁用“允许应用程序阻止显示特效合成”）。
