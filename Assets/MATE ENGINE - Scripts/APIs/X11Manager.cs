@@ -63,6 +63,7 @@ namespace X11
             {
                 _unityWindow = windows[0]; // Typically the first is the main window
                 Debug.Log($"Unity window handle: 0x{_unityWindow.ToInt64():X}");
+                SetWindowBorderless();
             }
             else
             {
@@ -353,6 +354,25 @@ namespace X11
             xClient.data[4] = IntPtr.Zero;
 
             XSendEvent(_display, _rootWindow, false, 0x00100000 | 0x00080000, ref xClient);
+            XFlush(_display);
+        }
+
+        private void SetWindowBorderless()
+        {
+            if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero) return;
+
+            // Remove window decorations using Motif hints
+            IntPtr motifHintsAtom = XInternAtom(_display, "_MOTIF_WM_HINTS", false);
+            XMotifWmHints hints = new XMotifWmHints
+            {
+                flags = (IntPtr)MWM_HINTS_FLAGS,
+                decorations = (IntPtr)MWM_DECORATIONS_NONE,
+                functions = IntPtr.Zero,
+                input_mode = IntPtr.Zero,
+                status = IntPtr.Zero
+            };
+            XChangeProperty(_display, _unityWindow, motifHintsAtom, motifHintsAtom, 32, PropModeReplace, ref hints, 5);
+
             XFlush(_display);
         }
         
@@ -1105,6 +1125,24 @@ namespace X11
                 return unionArea;
             }
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct XMotifWmHints
+        {
+            public IntPtr flags;
+            public IntPtr functions;
+            public IntPtr decorations;
+            public IntPtr input_mode;
+            public IntPtr status;
+        }
+
+        private const long MWM_HINTS_FLAGS = 1L << 1; // Use decorations
+        private const long MWM_DECORATIONS_NONE = 0; // No decorations
+        private const int PropModeReplace = 0;
+
+        [DllImport(LibX11)]
+        private static extern int XChangeProperty(IntPtr display, IntPtr window, IntPtr property, IntPtr type,
+            int format, int mode, ref XMotifWmHints data, int nItems);
 
         [DllImport(LibX11)]
         private static extern int XSelectInput(IntPtr display, IntPtr window, long eventMask);
