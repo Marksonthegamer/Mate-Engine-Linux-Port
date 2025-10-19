@@ -117,7 +117,7 @@ public class LaunchMateEngineInstances : MonoBehaviour
             return;
         }
 
-        string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+        string exePath = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/')) + "/launch.sh";
         if (!File.Exists(exePath))
         {
             UnityEngine.Debug.LogError("[Launcher] Executable not found: " + exePath);
@@ -132,8 +132,8 @@ public class LaunchMateEngineInstances : MonoBehaviour
         {
             var startInfo = new ProcessStartInfo
             {
-                FileName = exePath,
-                Arguments = args,
+                FileName = "/usr/bin/bash",
+                Arguments = exePath + " " + args,
                 UseShellExecute = false,
                 WorkingDirectory = Path.GetDirectoryName(exePath)
             };

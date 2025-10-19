@@ -10,4 +10,4 @@ if [ -z "$output" ]; then
     exit 2
 fi
 visual_id=$(echo "$output" | head -n 1 | awk '{print $1}')
-SDL_VIDEO_X11_VISUALID=$visual_id $(dirname "$(realpath "${BASH_SOURCE[0]}")")/MateEngineX.$(uname -m)
+SDL_VIDEO_X11_VISUALID=$visual_id $(dirname "$(realpath "${BASH_SOURCE[0]}")")/MateEngineX.$(uname -m) "$@"

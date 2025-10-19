@@ -160,7 +160,7 @@ public class SaveLoadHandler : MonoBehaviour
         public int graphicsQualityLevel = 1;
         public Dictionary<string, bool> accessoryStates = new();
 
-        [FormerlySerializedAs("startWithWindows")] public bool startWithX11 = false;
+        public bool startWithX11;
         public bool enableRandomMessages = false;
 
         public string selectedModelPath = "";

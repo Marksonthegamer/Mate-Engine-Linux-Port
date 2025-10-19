@@ -30,7 +30,7 @@ public class SystemStartHandler : MonoBehaviour
             autoStartToggle.onValueChanged.AddListener(OnUIToggleChanged);
 
         LoadFromSaveWithoutNotify();
-        AddStartupEntry(SaveLoadHandler.Instance.data.startWithX11);
+        //AddStartupEntry(SaveLoadHandler.Instance.data.startWithX11);
     }
 
     private void OnDestroy()
@@ -107,7 +107,7 @@ public class SystemStartHandler : MonoBehaviour
         try
         {
             string appName = "MateEngine";
-            string execPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "/launch.sh";
+            string execPath = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/')) + "/launch.sh";
             if (!File.Exists(execPath))
                 throw new FileNotFoundException("Required script for launching is missing.", execPath);
             string desktopFileName = $"{appName}.desktop";
@@ -132,9 +132,10 @@ public class SystemStartHandler : MonoBehaviour
 $@"[Desktop Entry]
 Type=Application
 Name={appName}
-Exec={execPath}
+Exec=bash {execPath}
 Hidden=false
 NoDisplay=false
+Terminal=true
 X-GNOME-Autostart-enabled=true
 Comment=Autostart for {appName}
 ";
