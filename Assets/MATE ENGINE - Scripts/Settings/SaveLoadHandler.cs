@@ -53,6 +53,8 @@ public class SaveLoadHandler : MonoBehaviour
             limiter.ApplyFPSLimit();
         }
     }
+    
+    private static readonly object fileLock = new object();
 
     // Speichern
     public void SaveToDisk()
@@ -64,7 +66,10 @@ public class SaveLoadHandler : MonoBehaviour
                 Directory.CreateDirectory(dir);
 
             string json = JsonConvert.SerializeObject(data, Formatting.Indented);
-            File.WriteAllText(FilePath, json);
+            lock (fileLock)
+            {
+                File.WriteAllText(FilePath, json);
+            }
             Debug.Log("[SaveLoadHandler] Saved settings to: " + FilePath);
         }
         catch (Exception e)
