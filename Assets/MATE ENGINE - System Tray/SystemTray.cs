@@ -19,11 +19,16 @@ public class SystemTray : MonoBehaviour
     [SerializeField] private string iconName;
     [SerializeField] public List<TrayAction> actions = new();
 
-    void Start()
+    private bool trayBuilt;
+
+    private void LateUpdate()
     {
+        if (trayBuilt)
+            return;
         TrayIndicator.Instance.OnBuildMenu = BuildMenu;
         TrayIndicator.Instance.InitializeTrayIcon(iconName);
         TrayIndicator.Instance.AddMenuItem(BuildMenu());
+        trayBuilt = true;
     }
 
     private List<TrayMenuEntry> BuildMenu()

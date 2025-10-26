@@ -155,6 +155,7 @@ namespace X11
             if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
             {
                 XMoveWindow(_display, _unityWindow, (int)position.x, (int)position.y);
+                XMapWindow(_display, _unityWindow);
                 XFlush(_display);
             }
         }
@@ -824,6 +825,9 @@ namespace X11
         private static extern int XMoveWindow(IntPtr display, IntPtr window, int x, int y);
 
         [DllImport(LibX11)]
+        private static extern int XMapWindow(IntPtr display, IntPtr window);
+
+        [DllImport(LibX11)]
         private static extern int XResizeWindow(IntPtr display, IntPtr window, int width, int height);
 
         [DllImport(LibX11)]
@@ -841,7 +845,6 @@ namespace X11
         [DllImport(LibX11)]
         private static extern IntPtr XRootWindow(IntPtr display, int screenNumber);
 
-        // New P/Invoke for XTranslateCoordinates
         [DllImport(LibX11)]
         private static extern bool XTranslateCoordinates(IntPtr display, IntPtr srcW, IntPtr destW,
             int srcX, int srcY, out int destX, out int destY, out IntPtr child);
