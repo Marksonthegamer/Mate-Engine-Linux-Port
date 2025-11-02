@@ -18,17 +18,17 @@ Open the project in Unity 6000.2.6f2 and build the player with executable name "
 ### Requirements
 - A common GNU/Linux distro
 - A common X11 desktop environment which supports compositing (such as KDE, Xfce, GNOME, etc.)
-- `libpulse-dev` and `pipewire-pulse` (if you are using Pipewire as audio server)
+- `libpulse` and `pipewire-pulse` (if you are using Pipewire as audio server)
 - `libgtk-3-dev libglib2.0-dev libappindicator3-dev`
-- `libx11-dev libxext-dev libxrender-dev libxdamage-dev`
+- `libx11-6 libxext6 libxrender1 libxdamage2`
 
 On Ubuntu and other Debian-based Linux:
 ```bash
-sudo apt install libpulse-dev libgtk-3-dev libglib2.0-dev libappindicator3-dev libx11-dev libxext-dev libxrender-dev libxdamage-dev
+sudo apt install libpulse-dev libgtk-3-dev libglib2.0-dev libappindicator3-dev libx11-6 libxext6 libxrender1 libxdamage2
 ```
 On Fedora:
 ```bash
-sudo dnf install pulseaudio-libs-devel gtk3-devel glib2-devel libX11-devel libXext-devel libXrender-devel libXdamage-devel libappindicator-gtk3
+sudo dnf install pulseaudio-libs gtk3 glib2 libX11 libXext libXrender-devel libXdamage libappindicator-gtk3
 ```
 On Arch Linux:
 ```bash
@@ -55,7 +55,6 @@ Note that if you use GNOME, you will need [AppIndicator and KStatusNotifierItem 
 - Window snapping and dock sitting are still kind of buggy, and they don't work on XWayland Interface
 - Crashes at low system performance (`pa_mainloop_iterate`)
 - Limited window moving in KWin (KDE, GNOME)
-- Delayed system tray menu update
 - PulseAudio sometimes returns an empty audio program name
 
 ### Removed
@@ -118,7 +117,6 @@ sudo pacman -S libpulse gtk3 glib2 libx11 libxext libxrender libxdamage libappin
 - 坐在窗口和程序坞上仍然有点bug
 - 系统性能较低时崩溃（`pa_mainloop_iterate`）
 - KWin（KDE）和GNOME中窗口的移动范围有限
-- 系统托盘菜单更新延迟
 - PulseAudio有时会返回空的音频程序名称
 
 ### 已删除
