@@ -359,6 +359,34 @@ namespace X11
             XSendEvent(_display, _rootWindow, false, 0x00100000 | 0x00080000, ref xClient);
             XFlush(_display);
         }
+        
+        public void HideFromTaskbar(bool reallyHide = true)
+        {
+            IntPtr netWmState = XInternAtom(_display, "_NET_WM_STATE", false);
+            IntPtr skipTaskbar = XInternAtom(_display, "_NET_WM_STATE_SKIP_TASKBAR", false);
+
+            if (netWmState == IntPtr.Zero || skipTaskbar == IntPtr.Zero)
+                return;
+
+            XClientMessageEvent msg = new()
+            {
+                type = 33, // ClientMessage
+                display = _display,
+                window = _unityWindow,
+                message_type = netWmState,
+                format = 32,
+                data = new IntPtr[5]
+            };
+            msg.data[0] = new(reallyHide ? 1 : 0);
+            msg.data[1] = skipTaskbar;
+            msg.data[2] = IntPtr.Zero;
+            msg.data[3] = IntPtr.Zero;
+            msg.data[4] = new(1);
+                
+            XSendEvent(_display, _rootWindow, false, 0x10000L | 0x20000L, ref msg);
+            XFlush(_display);
+        }
+
 
         private void SetWindowBorderless()
         {
