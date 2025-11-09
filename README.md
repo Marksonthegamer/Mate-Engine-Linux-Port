@@ -47,7 +47,7 @@ Note that if you use GNOME, you will need [AppIndicator and KStatusNotifierItem 
 - Discord RPC
 - Custom VRM importing
 - Simplified Chinese localization
-- Lower RAM usage than Windows version
+- Lower RAM usage than Windows version (Release 2.2.5)
 
 ![](https://raw.githubusercontent.com/Marksonthegamer/Mate-Engine-Linux-Port/refs/heads/main/RAMComparition.png)
 
@@ -109,7 +109,7 @@ sudo pacman -S libpulse gtk3 glib2 libx11 libxext libxrender libxdamage libappin
 - Discord RPC
 - 自定义 VRM 模型导入
 - 简体中文版汉化
-- 与 Windows 版相比，使用更少内存
+- 与 Windows 版相比，使用更少内存（Release 2.2.5）
 
 ![](https://raw.githubusercontent.com/Marksonthegamer/Mate-Engine-Linux-Port/refs/heads/main/RAMComparition.png)
 

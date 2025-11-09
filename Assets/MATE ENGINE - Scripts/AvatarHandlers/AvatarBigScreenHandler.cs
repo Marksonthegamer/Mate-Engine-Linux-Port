@@ -46,10 +46,6 @@ public class AvatarBigScreenHandler : MonoBehaviour
     private bool isFading;
     private bool isInDesktopTransition;
 
-    [DllImport("user32.dll")]
-    private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
-    private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
-
     public static List<AvatarBigScreenHandler> ActiveHandlers = new List<AvatarBigScreenHandler>();
 
     void OnEnable()
@@ -72,7 +68,7 @@ public class AvatarBigScreenHandler : MonoBehaviour
 
     void Start()
     {
-        unityHWND = Process.GetCurrentProcess().MainWindowHandle;
+        unityHWND = X11Manager.Instance.UnityWindow;
         if (MainCamera == null) MainCamera = Camera.main;
         if (avatarAnimator == null) avatarAnimator = GetComponent<Animator>();
         if (MainCamera != null)
@@ -265,9 +261,9 @@ public class AvatarBigScreenHandler : MonoBehaviour
 
     Rect FindBestMonitorRect(Rect windowRect)
     {
+        /*
         List<Rect> monitorRects = new List<Rect>();
-        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr hMonitor, IntPtr hdc, ref Rect lprcMonitor, IntPtr data) =>
-        { monitorRects.Add(lprcMonitor); return true; }, IntPtr.Zero);
+        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr hMonitor, IntPtr hdc, ref Rect lprcMonitor, IntPtr data) =>{ monitorRects.Add(lprcMonitor); return true; }, IntPtr.Zero);
         int idx = 0, maxArea = 0;
         for (int i = 0; i < monitorRects.Count; i++)
         {
@@ -275,6 +271,8 @@ public class AvatarBigScreenHandler : MonoBehaviour
             if (overlap > maxArea) { idx = i; maxArea = overlap; }
         }
         return monitorRects.Count > 0 ? monitorRects[idx] : new Rect { x = 0, y = 0, width = Screen.currentResolution.width, height = Screen.currentResolution.height };
+        */
+        return new Rect { x = 0, y = 0, width = Screen.currentResolution.width, height = Screen.currentResolution.height };
     }
     int OverlapArea(Rect a, Rect b)
     {

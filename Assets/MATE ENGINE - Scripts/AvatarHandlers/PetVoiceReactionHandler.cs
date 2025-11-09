@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using X11;
 using Random = UnityEngine.Random;
 
 public class PetVoiceReactionHandler : MonoBehaviour
@@ -93,7 +94,7 @@ public class PetVoiceReactionHandler : MonoBehaviour
         if (!hasSetup) TrySetup();
         if (cachedCamera == null || avatarAnimator == null) return;
 
-        Vector2 mouse = Input.mousePosition;
+        Vector2 mouse = X11Manager.Instance.GetMousePosition();
 
         bool menuBlocked = MenuActions.IsReactionBlocked();
         bool bigScreenBlocked = false;

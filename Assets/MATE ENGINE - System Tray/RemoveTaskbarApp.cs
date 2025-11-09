@@ -12,7 +12,7 @@ public class RemoveTaskbarApp : MonoBehaviour
 
     void Start()
     {
-#if UNITY_STANDALONE_LINUX && !UNITY_EDITOR
+#if !UNITY_EDITOR
         _unityHwnd = X11Manager.Instance.UnityWindow;
         if (_unityHwnd != IntPtr.Zero)
         {
@@ -24,20 +24,12 @@ public class RemoveTaskbarApp : MonoBehaviour
 
     public void ToggleAppMode()
     {
-#if UNITY_STANDALONE_WIN && UNITY_EDITOR
-        if (unityHWND == IntPtr.Zero)
+#if !UNITY_EDITOR
+        if (_unityHwnd == IntPtr.Zero)
             return;
 
-        if (_isHidden)
-        {
-            X11Manager.Instance.HideFromTaskbar(false);
-            _isHidden = false;
-        }
-        else
-        {
-            X11Manager.Instance.HideFromTaskbar();
-            _isHidden = true;
-        }
+            _isHidden = !_isHidden;
+            X11Manager.Instance.HideFromTaskbar(_isHidden);
 #endif
     }
 }

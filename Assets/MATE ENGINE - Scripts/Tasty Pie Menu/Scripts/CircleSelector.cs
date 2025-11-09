@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
+using X11;
 
 namespace Xamin
 {
@@ -156,7 +157,7 @@ namespace Xamin
                     _cursor.fillAmount = Mathf.Lerp(_cursor.fillAmount, _desiredFill, 0.2f);
 
                     Vector3 screenBounds = Camera.main.WorldToScreenPoint(transform.position);
-                    Vector2 vector = (Input.mousePosition - screenBounds);
+                    Vector2 vector = Input.mousePosition - screenBounds;
                     if (tiltTowardsMouse)
                     {
                         float x = vector.x / screenBounds.x, y = vector.y / screenBounds.y;

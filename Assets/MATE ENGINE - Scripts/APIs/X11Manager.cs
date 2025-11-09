@@ -800,101 +800,34 @@ namespace X11
         private const int XaAtom = 4;
         private const int IsViewable = 2;
         private const int XaWindow = 33;
+        
+        private bool transparentInputEnabled = false;
+        private int damageEventBase;
+        private IntPtr damage = IntPtr.Zero;
+        private bool running = true;
+        private CancellationTokenSource _shapingCts = new();
+        
+        private const long MWM_HINTS_FLAGS = 1L << 1; // Use decorations
+        private const long MWM_DECORATIONS_NONE = 0; // No decorations
+        private const int PropModeReplace = 0;
+
+        private const long StructureNotifyMask = (1L << 17);
+        private const int ConfigureNotify = 22;
+        private const int DestroyNotify = 17;
+        private const int ShapeBounding = 0;
+        private const int ShapeInput = 2;
+        private const int ShapeSet = 0;
+        private const int PictTypeDirect = 1;
+        private const int XDamageReportNonEmpty = 3;
+        private const ulong GCForeground = (1UL << 2);
+        private const ulong GCBackground = (1UL << 3);
+        private const int ZPixmap = 2;
+        private const ulong AllPlanes = 0xFFFFFFFFFFFFFFFFUL; // For 64-bit
 
         private const string LibX11 = "libX11.so.6";
         private const string LibXExt = "libXext.so.6";
         private const string LibXRender = "libXrender.so.1";
         private const string LibXDamage = "libXdamage.so.1";
-
-        // X11 Library imports
-        [DllImport(LibX11)]
-        private static extern IntPtr XOpenDisplay(string displayName);
-
-        [DllImport(LibX11)]
-        private static extern void XCloseDisplay(IntPtr display);
-
-        [DllImport(LibX11)]
-        private static extern IntPtr XDefaultRootWindow(IntPtr display);
-
-        [DllImport(LibX11)]
-        private static extern IntPtr XInternAtom(IntPtr display, string atomName, bool onlyIfExists);
-
-        [DllImport(LibX11)]
-        private static extern int XGetWindowProperty(IntPtr display, IntPtr window, IntPtr property,
-            long longOffset, long longLength, bool delete, IntPtr reqType,
-            out IntPtr actualTypeReturn, out int actualFormatReturn,
-            out ulong nItemsReturn, out ulong bytesAfterReturn, out IntPtr propReturn);
-
-        [DllImport(LibX11)]
-        private static extern int XGetWindowProperty(IntPtr display, IntPtr w, IntPtr property, long longOffset,
-            long longLength, int delete, IntPtr reqType, out IntPtr actualTypeReturn, out int actualFormatReturn,
-            out IntPtr nItemsReturn, out IntPtr bytesAfterReturn, [Out] out IntPtr propReturn);
-
-        [DllImport(LibX11)]
-        private static extern int XGetGeometry(IntPtr display, IntPtr w, out IntPtr rootReturn, out int x, out int y,
-            out int width, out int height, out int borderWidth, out uint depth);
-
-        public int GetGeometry(out IntPtr rootReturn, out int x, out int y, out int width, out int height,
-            out int borderWidth, out uint depth) => XGetGeometry(_display, _unityWindow, out rootReturn, out x, out y,
-            out width, out height, out borderWidth, out depth);
-
-        [DllImport(LibX11)]
-        private static extern int XFree(IntPtr data);
-
-        [DllImport(LibX11)]
-        private static extern int XQueryTree(IntPtr display, IntPtr window,
-            out IntPtr rootReturn, out IntPtr parentReturn,
-            out IntPtr childrenReturn, out uint nChildrenReturn);
-
-        [DllImport(LibX11)]
-        private static extern int XGetWindowAttributes(IntPtr display, IntPtr window, out XWindowAttributes attributes);
-
-        [DllImport(LibX11)]
-        private static extern int XMoveWindow(IntPtr display, IntPtr window, int x, int y);
-
-        [DllImport(LibX11)]
-        private static extern int XMapWindow(IntPtr display, IntPtr window);
-
-        [DllImport(LibX11)]
-        private static extern int XResizeWindow(IntPtr display, IntPtr window, int width, int height);
-
-        [DllImport(LibX11)]
-        private static extern bool XQueryPointer(IntPtr display, IntPtr window, ref IntPtr windowReturn,
-            ref IntPtr childReturn,
-            ref int rootX, ref int rootY, ref int winX, ref int winY, ref uint mask);
-
-        [DllImport(LibX11)]
-        private static extern int XFlush(IntPtr display);
-
-        [DllImport(LibX11)]
-        private static extern int XSendEvent(IntPtr display, IntPtr window, bool propagate,
-            long eventMask, ref XClientMessageEvent eventSend);
-
-        [DllImport(LibX11)]
-        private static extern IntPtr XRootWindow(IntPtr display, int screenNumber);
-
-        [DllImport(LibX11)]
-        private static extern bool XTranslateCoordinates(IntPtr display, IntPtr srcW, IntPtr destW,
-            int srcX, int srcY, out int destX, out int destY, out IntPtr child);
-
-        [DllImport(LibX11)]
-        private static extern int XGetClassHint(IntPtr display, IntPtr w, out XClassHint classHints);
-
-        [DllImport(LibX11)]
-        private static extern int XGetWMName(IntPtr display, IntPtr w, out XTextProperty textProp);
-
-        [DllImport(LibX11)]
-        private static extern int XConfigureWindow(IntPtr display, IntPtr w, uint valueMask,
-            ref XWindowChanges changes);
-
-        [DllImport(LibX11)]
-        private static extern int XDisplayWidth(IntPtr display, int screen);
-
-        [DllImport(LibX11)]
-        private static extern int XDisplayHeight(IntPtr display, int screen);
-
-        [DllImport(LibX11)]
-        private static extern void XSync(IntPtr display, bool discard);
 
         // X11 Event structures
         [StructLayout(LayoutKind.Sequential)]
@@ -953,40 +886,7 @@ namespace X11
             public int format;
             public ulong nItems;
         }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct XWindowChanges
-        {
-            public int x, y;
-            public int width, height;
-            public int border_width;
-            public IntPtr sibling;
-            public int stack_mode;
-        }
-
-        private const uint CwSibling = (1U << 5);
-        private const uint CwStackMode = (1U << 4);
-        private const int Below = 1;
-
-        private bool transparentInputEnabled = false;
-        private int damageEventBase;
-        private IntPtr damage = IntPtr.Zero;
-        private bool running = true;
-        private CancellationTokenSource _shapingCts = new CancellationTokenSource();
-
-        private const long StructureNotifyMask = (1L << 17);
-        private const int ConfigureNotify = 22;
-        private const int DestroyNotify = 17;
-        private const int ShapeBounding = 0;
-        private const int ShapeInput = 2;
-        private const int ShapeSet = 0;
-        private const int PictTypeDirect = 1;
-        private const int XDamageReportNonEmpty = 3;
-        private const ulong GCForeground = (1UL << 2);
-        private const ulong GCBackground = (1UL << 3);
-        private const int ZPixmap = 2;
-        private const ulong AllPlanes = 0xFFFFFFFFFFFFFFFFUL; // For 64-bit
-
+        
         [StructLayout(LayoutKind.Explicit)]
         private struct XEvent
         {
@@ -995,6 +895,22 @@ namespace X11
             [FieldOffset(0)] public XConfigureEvent configureEvent;
             [FieldOffset(0)] public XDestroyWindowEvent destroyWindowEvent;
             [FieldOffset(0)] public XDamageNotifyEvent damageNotifyEvent;
+            [FieldOffset(0)] public XClientMessageEvent clientMessageEvent;
+            [FieldOffset(0)] public XSelectionEvent selectionEvent;
+        }
+        
+        [StructLayout(LayoutKind.Sequential)]
+        private struct XSelectionEvent
+        {
+            public int type;
+            public ulong serial;
+            public bool send_event;
+            public IntPtr display;
+            public IntPtr requestor;
+            public IntPtr selection;
+            public IntPtr target;
+            public IntPtr property;
+            public ulong time;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -1168,14 +1084,92 @@ namespace X11
             public IntPtr input_mode;
             public IntPtr status;
         }
+        
+        // X11 Library imports
+        [DllImport(LibX11)]
+        private static extern IntPtr XOpenDisplay(string displayName);
 
-        private const long MWM_HINTS_FLAGS = 1L << 1; // Use decorations
-        private const long MWM_DECORATIONS_NONE = 0; // No decorations
-        private const int PropModeReplace = 0;
+        [DllImport(LibX11)]
+        private static extern void XCloseDisplay(IntPtr display);
+
+        [DllImport(LibX11)]
+        private static extern IntPtr XDefaultRootWindow(IntPtr display);
+
+        [DllImport(LibX11)]
+        private static extern IntPtr XInternAtom(IntPtr display, string atomName, bool onlyIfExists);
+
+        [DllImport(LibX11)]
+        private static extern int XGetWindowProperty(IntPtr display, IntPtr window, IntPtr property,
+            long longOffset, long longLength, bool delete, IntPtr reqType,
+            out IntPtr actualTypeReturn, out int actualFormatReturn,
+            out ulong nItemsReturn, out ulong bytesAfterReturn, out IntPtr propReturn);
+
+        [DllImport(LibX11)]
+        private static extern int XGetGeometry(IntPtr display, IntPtr w, out IntPtr rootReturn, out int x, out int y,
+            out int width, out int height, out int borderWidth, out uint depth);
+
+        public int GetGeometry(out IntPtr rootReturn, out int x, out int y, out int width, out int height,
+            out int borderWidth, out uint depth) => XGetGeometry(_display, _unityWindow, out rootReturn, out x, out y,
+            out width, out height, out borderWidth, out depth);
+
+        [DllImport(LibX11)]
+        private static extern int XFree(IntPtr data);
+
+        [DllImport(LibX11)]
+        private static extern int XQueryTree(IntPtr display, IntPtr window,
+            out IntPtr rootReturn, out IntPtr parentReturn,
+            out IntPtr childrenReturn, out uint nChildrenReturn);
+
+        [DllImport(LibX11)]
+        private static extern int XGetWindowAttributes(IntPtr display, IntPtr window, out XWindowAttributes attributes);
+
+        [DllImport(LibX11)]
+        private static extern int XMoveWindow(IntPtr display, IntPtr window, int x, int y);
+
+        [DllImport(LibX11)]
+        private static extern int XMapWindow(IntPtr display, IntPtr window);
+
+        [DllImport(LibX11)]
+        private static extern int XResizeWindow(IntPtr display, IntPtr window, int width, int height);
+
+        [DllImport(LibX11)]
+        private static extern bool XQueryPointer(IntPtr display, IntPtr window, ref IntPtr windowReturn,
+            ref IntPtr childReturn,
+            ref int rootX, ref int rootY, ref int winX, ref int winY, ref uint mask);
+
+        [DllImport(LibX11)]
+        private static extern int XFlush(IntPtr display);
+
+        [DllImport(LibX11)]
+        private static extern int XSendEvent(IntPtr display, IntPtr window, bool propagate,
+            long eventMask, ref XClientMessageEvent eventSend);
+
+        [DllImport(LibX11)]
+        private static extern IntPtr XRootWindow(IntPtr display, int screenNumber);
+
+        [DllImport(LibX11)]
+        private static extern bool XTranslateCoordinates(IntPtr display, IntPtr srcW, IntPtr destW,
+            int srcX, int srcY, out int destX, out int destY, out IntPtr child);
+
+        [DllImport(LibX11)]
+        private static extern int XGetClassHint(IntPtr display, IntPtr w, out XClassHint classHints);
+
+        [DllImport(LibX11)]
+        private static extern int XDisplayWidth(IntPtr display, int screen);
+
+        [DllImport(LibX11)]
+        private static extern int XDisplayHeight(IntPtr display, int screen);
+
+        [DllImport(LibX11)]
+        private static extern void XSync(IntPtr display, bool discard);
 
         [DllImport(LibX11)]
         private static extern int XChangeProperty(IntPtr display, IntPtr window, IntPtr property, IntPtr type,
             int format, int mode, ref XMotifWmHints data, int nItems);
+        
+        [DllImport(LibX11)]
+        private static extern int XChangeProperty(IntPtr display, IntPtr window, IntPtr property, IntPtr type,
+            int format, int mode, ref int data, int nItems);
 
         [DllImport(LibX11)]
         private static extern int XSelectInput(IntPtr display, IntPtr window, long eventMask);

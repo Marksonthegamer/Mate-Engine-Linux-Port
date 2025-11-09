@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using AOT;
+using Unity.Collections;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -172,9 +173,9 @@ namespace PulseAudio
         private IntPtr _context;
         private bool _initialized;
         private bool _contextReady;
-
+        [HideInInspector]
         public bool allSet;
-
+        [HideInInspector]
         public bool callbackRunning;
         
         private readonly object _programsLock = new();

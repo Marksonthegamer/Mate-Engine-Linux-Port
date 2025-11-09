@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using X11;
 
 public class AvatarSwayController : MonoBehaviour
 {
@@ -63,20 +65,16 @@ public class AvatarSwayController : MonoBehaviour
 
     Vector2 filteredDelta;
     Vector2 prevMousePos;
-
-#if UNITY_STANDALONE_WIN
+    
     IntPtr hwnd;
-    Vector2Int prevWinPos;
-#endif
+    Vector2 prevWinPos;
 
-    void Awake()
+    void Start()
     {
         draggingHash = Animator.StringToHash(draggingParam);
-        prevMousePos = Input.mousePosition;
-#if UNITY_STANDALONE_WIN
-        hwnd = Process.GetCurrentProcess().MainWindowHandle;
-        if (hwnd != IntPtr.Zero) prevWinPos = GetWindowPosition(hwnd);
-#endif
+        prevMousePos = X11Manager.Instance.GetMousePosition();
+        hwnd = X11Manager.Instance.UnityWindow;
+        if (hwnd != IntPtr.Zero) prevWinPos = X11Manager.Instance.GetWindowPosition();
     }
 
     void Update()
@@ -90,26 +88,25 @@ public class AvatarSwayController : MonoBehaviour
 
         float dt = Time.deltaTime;
         Vector2 delta = Vector2.zero;
-
-#if UNITY_STANDALONE_WIN
+        
         if (useWindowVelocity && hwnd != IntPtr.Zero)
         {
-            Vector2Int wp = GetWindowPosition(hwnd);
-            Vector2Int d = wp - prevWinPos;
+            Vector2 wp = X11Manager.Instance.GetWindowPosition();
+            Vector2 d = wp - prevWinPos;
             prevWinPos = wp;
             delta = new Vector2(d.x, d.y);
         }
-#endif
+        
         if (delta == Vector2.zero && fallbackToMouse && dragging)
         {
-            Vector2 m = Input.mousePosition;
+            Vector2 m = X11Manager.Instance.GetMousePosition();
             Vector2 md = (m - prevMousePos) * mouseSensitivity;
             prevMousePos = m;
             delta = md;
         }
         else
         {
-            prevMousePos = Input.mousePosition;
+            prevMousePos = X11Manager.Instance.GetMousePosition();
         }
 
         filteredDelta = Vector2.Lerp(filteredDelta, delta, 1f - Mathf.Exp(-12f * dt));
@@ -236,17 +233,4 @@ public class AvatarSwayController : MonoBehaviour
         v += a * dt;
         x += v * dt;
     }
-
-#if UNITY_STANDALONE_WIN
-    [StructLayout(LayoutKind.Sequential)]
-    struct RECT { public int left; public int top; public int right; public int bottom; }
-
-    [DllImport("user32.dll")] static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-
-    static Vector2Int GetWindowPosition(IntPtr hWnd)
-    {
-        GetWindowRect(hWnd, out RECT r);
-        return new Vector2Int(r.left, r.top);
-    }
-#endif
 }

@@ -161,7 +161,7 @@ public class AvatarMouseTracking : MonoBehaviour
         if (!spineBone || !spineDriver) return;
         float targetW = IsAllowed("Spine") ? 1f : 0f;
         spineTrackingWeight = Mathf.MoveTowards(spineTrackingWeight, targetW, Time.deltaTime * spineFadeSpeed);
-        float normY = Mathf.Clamp01(Input.mousePosition.x / Screen.width);
+        float normY = Mathf.Clamp01(X11Manager.Instance.GetMousePosition().x / Screen.width);
         float targetY = Mathf.Lerp(spineMinRotation, spineMaxRotation, normY);
         spineDriver.localRotation = Quaternion.Slerp(spineDriver.localRotation, Quaternion.Euler(0f, -targetY, 0f), Time.deltaTime * spineSmoothness);
         var baseRot = spineBone.localRotation;
@@ -177,7 +177,7 @@ public class AvatarMouseTracking : MonoBehaviour
 
     void DoEye()
     {
-        var mouse = Input.mousePosition;
+        var mouse = X11Manager.Instance.GetMousePosition();
         var world = mainCam.ScreenToWorldPoint(new Vector3(mouse.x, mouse.y, mainCam.nearClipPlane));
         if (vrm10 && vrmLookAtTarget)
         {
