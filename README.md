@@ -54,7 +54,7 @@ Note that if you use GNOME, you will need [AppIndicator and KStatusNotifierItem 
 ### Known Issues
 - Window snapping and dock sitting are still kind of buggy, and they don't work on XWayland Interface
 - Crashes at low system performance (`pa_mainloop_iterate`)
-- Limited window moving in KWin (KDE, GNOME)
+- Limited window moving in Mutter (GNOME)
 - PulseAudio sometimes returns an empty audio program name
 
 ### Removed
@@ -116,7 +116,7 @@ sudo pacman -S libpulse gtk3 glib2 libx11 libxext libxrender libxdamage libappin
 ### 已知问题
 - 坐在窗口和程序坞上仍然有点bug
 - 系统性能较低时崩溃（`pa_mainloop_iterate`）
-- KWin（KDE）和GNOME中窗口的移动范围有限
+- Mutter 合成器（GNOME）中窗口的移动范围有限
 - PulseAudio有时会返回空的音频程序名称
 
 ### 已删除
