@@ -154,6 +154,35 @@ namespace X11
         {
             if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
             {
+                IntPtr atom = XInternAtom(_display, "_NET_MOVERESIZE_WINDOW", true);
+                if (atom == IntPtr.Zero)
+                {
+                    ShowError("Cannot find atom for _NET_MOVERESIZE_WINDOW!");
+                    return;
+                }
+                XClientMessageEvent xClient = new XClientMessageEvent
+                {
+                    type = ClientMessage,
+                    window = _unityWindow,
+                    message_type = atom,
+                    format = 32,
+                    data = new IntPtr[5]
+                };
+                xClient.data[0] = new IntPtr((1 << 12) | (1 << 9) | (1 << 8) | 10);
+                xClient.data[1] = new((int)position.x);
+                xClient.data[2] = new((int)position.y);
+                xClient.data[3] = IntPtr.Zero;
+                xClient.data[4] = IntPtr.Zero;
+
+                XSendEvent(_display, _rootWindow, false, SubstructureRedirectMask | SubstructureNotifyMask, ref xClient);
+                XFlush(_display);
+            }
+        }
+
+        public void SetWindowPositionLegacy(Vector2 position)
+        {
+            if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
+            {
                 XMoveWindow(_display, _unityWindow, (int)position.x, (int)position.y);
                 XMapWindow(_display, _unityWindow);
                 XFlush(_display);
@@ -344,7 +373,7 @@ namespace X11
 
             XClientMessageEvent xClient = new XClientMessageEvent
             {
-                type = 33, // ClientMessage
+                type = ClientMessage,
                 window = _unityWindow,
                 message_type = wmNetWmState,
                 format = 32,
@@ -370,7 +399,7 @@ namespace X11
 
             XClientMessageEvent msg = new()
             {
-                type = 33, // ClientMessage
+                type = ClientMessage,
                 display = _display,
                 window = _unityWindow,
                 message_type = netWmState,
@@ -811,7 +840,10 @@ namespace X11
         private const long MWM_DECORATIONS_NONE = 0; // No decorations
         private const int PropModeReplace = 0;
 
+        private const int ClientMessage = 33;
         private const long StructureNotifyMask = (1L << 17);
+        private const long SubstructureRedirectMask = 0x00080000;
+        private const long SubstructureNotifyMask = 0x00040000;
         private const int ConfigureNotify = 22;
         private const int DestroyNotify = 17;
         private const int ShapeBounding = 0;
