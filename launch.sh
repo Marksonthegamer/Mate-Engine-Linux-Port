@@ -9,7 +9,7 @@ if [ -z "$visual_id" ]; then
 fi
 
 if [ -z "$visual_id" ]; then
-    visual_id=$(xdpyinfo 2>/dev/null | grep "visual id" | grep -B 5 "depth:      32 planes" | grep "visual id" | awk '{print $3}' | head -n1)
+    visual_id=$(glxinfo -v 2>/dev/null | grep "Visual ID" | grep "depth=32" | awk '{print $3}' | head -n1)
 fi
 
 echo "Visual ARGB: $visual_id"
