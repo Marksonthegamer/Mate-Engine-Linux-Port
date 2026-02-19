@@ -5,51 +5,18 @@ using System.Runtime.InteropServices;
 using Gtk;
 using NativeLibraryLoader;
 using UnityEngine;
+using X11;
 using Debug = UnityEngine.Debug;
 
 public static class EarlyEnvSet
 {
-    [DllImport("libc")]
-    private static extern IntPtr setenv(string name, string value, int overwrite);
-    
-    [DllImport(WindowManager.LibX11)]
-    private static extern int XGetWindowAttributes(IntPtr display, IntPtr window, out WindowManager.XWindowAttributes attributes);
-    
-    [DllImport(WindowManager.LibXRender)]
-    private static extern IntPtr XRenderFindVisualFormat(IntPtr display, IntPtr visual);
-    
-    [DllImport(WindowManager.LibX11)]
-    private static extern IntPtr XOpenDisplay(string displayName);
-    
-    [DllImport(WindowManager.LibX11)]
-    private static extern IntPtr XInternAtom(IntPtr display, string atomName, bool onlyIfExists);
-    
-    [DllImport(WindowManager.LibX11)]
-    private static extern IntPtr XDefaultRootWindow(IntPtr display);
-    
-    [DllImport(WindowManager.LibX11)]
-    private static extern int XGetWindowProperty(IntPtr display, IntPtr window, IntPtr property,
-        long longOffset, long longLength, bool delete, IntPtr reqType,
-        out IntPtr actualTypeReturn, out int actualFormatReturn,
-        out ulong nItemsReturn, out ulong bytesAfterReturn, out IntPtr propReturn);
-    
-    [DllImport(WindowManager.LibX11)]
-    private static extern int XGetSelectionOwner(IntPtr display, IntPtr atom);
-    
-    [DllImport(WindowManager.LibX11)]
-    private static extern int XScreenCount(IntPtr display);
-    
-    [DllImport(WindowManager.LibX11)]
-    private static extern int XFree(IntPtr data);
-    
-    
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void InitBeforeAnything()
     {
-        #if UNITY_EDITOR
-        return;
-        #endif
-        setenv("NO_AT_BRIDGE", "1", 0);
+        // #if UNITY_EDITOR
+        // return;
+        // #endif
+        Misc.LibC.setenv("NO_AT_BRIDGE", "1", 0);
         string[] candidates = {"libX11.so.6", "libXext.so.6", "libXrender.so.1", "libXdamage.so.1", "libXrandr.so.2", "libXcursor.so.1", "libXcomposite.so.1", "libpulse.so.0", "libgdk-3.so.0", "libgtk-3.so.0", "libayatana-appindicator3.so.1"};
         List<string> missing = new();
         foreach (var name in candidates)
@@ -71,7 +38,7 @@ public static class EarlyEnvSet
         {
             throw new Exception("Gtk initialization failed.");
         }
-        var display = XOpenDisplay(null);
+        var display = Imports.XOpenDisplay(null);
         if (display == IntPtr.Zero)
         {
             throw new Exception("Cannot open X11 display");
@@ -86,7 +53,7 @@ public static class EarlyEnvSet
             var dialog = new MessageDialog(GtkX11Helper.Instance.DummyParent, DialogFlags.DestroyWithParent, MessageType.Warning, ButtonsType.Ok, false, "Composition is unavailable for this window manager.");
             dialog.SecondaryText = "A compositor is required for MateEngine to show a transparent background.\n\nIf you are running MateEngine on WMs that don't compose (like Openbox), try installing a compositing manager (such as picom) and configure it correctly, or simply switch to Mutter (GNOME), Xfwm4 (Xfce4) and other WMs which natively supports composition.\n\nIf you are running KWin (KDE), please make sure \"Allow applications to block compositing\" is turned off in KDE System Settings (It's in the compositor section of Display and Monitor).";
             dialog.MessageType = MessageType.Warning;
-            var image = new Image(new Gdk.Pixbuf(Resources.Load<Texture2D>("KWinHint").EncodeToPNG()));
+            var image = new Gtk.Image(new Gdk.Pixbuf(Resources.Load<Texture2D>("KWinHint").EncodeToPNG()));
             image.Halign = Align.Center;
             image.Show();
             dialog.ContentArea?.PackStart(image, false, false, 0);
@@ -102,12 +69,12 @@ public static class EarlyEnvSet
     
     private static bool IsCompositionSupported(IntPtr display)
     {
-        for (int screen = 0; screen < XScreenCount(display); screen++)
+        for (int screen = 0; screen < Imports.XScreenCount(display); screen++)
         {
-            IntPtr selectionAtom = XInternAtom(display, "_NET_WM_CM_S" + screen, false);
+            IntPtr selectionAtom = Imports.XInternAtom(display, "_NET_WM_CM_S" + screen, false);
             if (selectionAtom == IntPtr.Zero)
                 continue;
-            return XGetSelectionOwner(display, selectionAtom) != 0;
+            return Imports.XGetSelectionOwner(display, selectionAtom) != 0;
         }
         return false;
     }
@@ -124,7 +91,7 @@ public static class EarlyEnvSet
             unityWindow = windows[0]; // Typically the first is the main window
         }
         GtkX11Helper.Init(unityWindow);
-        if (XGetWindowAttributes(display, unityWindow, out WindowManager.XWindowAttributes attrs) == 0)
+        if (Imports.XGetWindowAttributes(display, unityWindow, out X11.XWindowAttributes attrs) == 0)
         {
             Debug.LogError("Failed to get window attributes");
             return false;
@@ -181,17 +148,17 @@ public static class EarlyEnvSet
     
     private static bool IsArgbVisual(IntPtr display, IntPtr visual)
     {
-        IntPtr formatPtr = XRenderFindVisualFormat(display, visual);
+        IntPtr formatPtr = Imports.XRenderFindVisualFormat(display, visual);
         if (formatPtr == IntPtr.Zero) return false;
 
-        WindowManager.XRenderPictFormat format = Marshal.PtrToStructure<WindowManager.XRenderPictFormat>(formatPtr);
+        XRenderPictFormat format = Marshal.PtrToStructure<XRenderPictFormat>(formatPtr);
         return format.type == 1 && format.direct.alphaMask != 0;
     }
     
     private static List<IntPtr> FindWindowsByPid(IntPtr display, int targetPid)
     {
         var result = new List<IntPtr>();
-        var atom = XInternAtom(display, "_NET_WM_PID", false);
+        var atom = Imports.XInternAtom(display, "_NET_WM_PID", false);
 
         if (atom == IntPtr.Zero)
         {
@@ -199,7 +166,7 @@ public static class EarlyEnvSet
             return result;
         }
 
-        var windows = GetAllVisibleWindows(display, XDefaultRootWindow(display));
+        var windows = GetAllVisibleWindows(display, Imports.XDefaultRootWindow(display));
 
         foreach (var window in windows)
         {
@@ -215,7 +182,7 @@ public static class EarlyEnvSet
     
     private static int GetWindowPid(IntPtr display, IntPtr window, IntPtr pidAtom)
     {
-        int status = XGetWindowProperty(display, window, pidAtom,
+        int status = Imports.XGetWindowProperty(display, window, pidAtom,
             0, 1, false, (IntPtr)6,
             out _, out _,
             out var nItems, out _, out var prop);
@@ -223,7 +190,7 @@ public static class EarlyEnvSet
         if (status == 0 && prop != IntPtr.Zero && nItems > 0)
         {
             int pid = Marshal.ReadInt32(prop);
-            XFree(prop);
+            Imports.XFree(prop);
             return pid;
         }
 
@@ -234,10 +201,10 @@ public static class EarlyEnvSet
     {
         var result = new List<IntPtr>();
 
-        IntPtr clientListAtom = XInternAtom(display, "_NET_CLIENT_LIST", true);
+        IntPtr clientListAtom = Imports.XInternAtom(display, "_NET_CLIENT_LIST", true);
         if (clientListAtom != IntPtr.Zero)
         {
-            int status = XGetWindowProperty(display, rootWindow, clientListAtom, 0, 1024, false, (IntPtr)33,
+            int status = Imports.XGetWindowProperty(display, rootWindow, clientListAtom, 0, 1024, false, (IntPtr)33,
                 out IntPtr actualType, out int actualFormat, out ulong nItems, out _, out IntPtr prop);
 
             if (status == 0 && actualType == (IntPtr)33 && actualFormat == 32 && prop != IntPtr.Zero)
@@ -247,10 +214,10 @@ public static class EarlyEnvSet
                     IntPtr win = Marshal.ReadIntPtr(prop, (int)(i * (ulong)IntPtr.Size));
                     result.Add(win);
                 }
-                XFree(prop);
+                Imports.XFree(prop);
                 return result;
             }
-            if (prop != IntPtr.Zero) XFree(prop);
+            if (prop != IntPtr.Zero) Imports.XFree(prop);
         }
         return result;
     }

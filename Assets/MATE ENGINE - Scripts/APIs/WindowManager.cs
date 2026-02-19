@@ -11,6 +11,10 @@ using UnityEngine.EventSystems;
 using Debug = UnityEngine.Debug;
 using Unity.Burst;
 using Unity.Collections;
+using UnityEngine.SceneManagement;
+using System.Runtime.Remoting.Messaging;
+using Unity.VisualScripting;
+using X11;
 
 public enum DesktopEnvironments
 {
@@ -54,9 +58,18 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private void OnEnable()
     {
         Instance = this;
-        
+        #if !UNITY_EDITOR
         if (Enum.TryParse(Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP"), true, out _currentDesktopEnv))
+        {
+            switch(_currentDesktopEnv)
+            {
+                case DesktopEnvironments.Hyprland:
+                    _windowManagerImplementation = new HyprlandManager();
+                    _windowManagerImplementation.SetXUnityWindow(_unityWindow);
+                    break;
+            }
             return;
+        }
         if (!Enum.TryParse(Environment.GetEnvironmentVariable("XDG_SESSION_TYPE"), true, out _currentSessionType))
         {
             _currentSessionType = SessionTypes.Unknown;
@@ -67,7 +80,12 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             SessionTypes.Wayland => DesktopEnvironments.OtherWayland,
             _ => DesktopEnvironments.Unknown
         };
+        #else
+            _currentDesktopEnv = DesktopEnvironments.Unknown;
+        #endif
     }
+
+    IWindowManagerImplementation _windowManagerImplementation = null;
 
     private Vector2 _lastPos;
 
@@ -77,13 +95,6 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             UpdateCursorState();
         if (_isDragging)
         {
-            if (_currentDesktopEnv == DesktopEnvironments.Hyprland){
-                var current = WaylandUtility.GetMousePositionHyprland();
-                if (current == _lastPos) return;
-                SetWindowPosition(current);
-                _lastPos = current;
-                return;
-            }
             var currentMousePos = GetMousePosition();
             var delta = currentMousePos - _initialMousePos;
             var newPos = _initialWindowPos + delta;
@@ -113,7 +124,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         {
             ShowError("No matching windows found for PID.");
         }
-        XSelectInput(_display, _unityWindow, StructureNotifyMask | EnterWindowMask | LeaveWindowMask | PropertyChangeMask);
+        Imports.XSelectInput(_display, _unityWindow, Constants.StructureNotifyMask | Constants.EnterWindowMask | Constants.LeaveWindowMask | Constants.PropertyChangeMask);
         EnableClickThroughTransparency();
         LoadCursors();
     }
@@ -126,12 +137,16 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         _initialMousePos = GetMousePosition();
         _initialWindowPos = GetWindowPosition();
         _isDragging = true;
+        if (_windowManagerImplementation != null)
+            _windowManagerImplementation.IsDragging = true;
         UpdateCursorState();
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         _isDragging = false;
+        if (_windowManagerImplementation != null)
+            _windowManagerImplementation.IsDragging = true;
         UpdateCursorState();
     }
 
@@ -149,33 +164,33 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private void Init()
     {
 #if !UNITY_EDITOR
-        XInitThreads();
+        Imports.XInitThreads();
 #endif
         // Open X11 display
-        _display = XOpenDisplay(null);
+        _display = Imports.XOpenDisplay(null);
         if (_display == IntPtr.Zero)
         {
             throw new Exception("Cannot open X11 display");
         }
 
-        XSetErrorHandler(ShowError);
-        RegisterExtension();
+        Imports.XSetErrorHandler(ShowError);
+        X11Utils.RegisterExtension(_display);
 
 
-        _rootWindow = XDefaultRootWindow(_display);
+        _rootWindow = Imports.XDefaultRootWindow(_display);
         
-        _netWmState = XInternAtom(_display, "_NET_WM_STATE", false);
-        _netWmStateFullscreen = XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", false);
-        _netWmStateMaxHorz = XInternAtom(_display, "_NET_WM_STATE_MAXIMIZED_HORZ", false);
-        _netWmStateMaxVert = XInternAtom(_display, "_NET_WM_STATE_MAXIMIZED_VERT", false);
-        _netWmWindowType = XInternAtom(_display, "_NET_WM_WINDOW_TYPE", false);
-        _netMoveResizeWindow = XInternAtom(_display, "_NET_MOVERESIZE_WINDOW", false);
-        _netWmStateAbove = XInternAtom(_display, "_NET_WM_STATE_ABOVE", false);
-        _netWmStateSkipTaskbar = XInternAtom(_display, "_NET_WM_STATE_SKIP_TASKBAR", false);
-        _netWmWindowTypeDock = XInternAtom(_display, "_NET_WM_WINDOW_TYPE_DOCK", false);
-        _netWmWindowTypeNormal = XInternAtom(_display, "_NET_WM_WINDOW_TYPE_NORMAL", false);
-        _motifHintsAtom = XInternAtom(_display, "_MOTIF_WM_HINTS", false);
-        _wakeupAtom = XInternAtom(_display, "_SDL_WAKEUP", false);
+        _netWmState = Imports.XInternAtom(_display, "_NET_WM_STATE", false);
+        _netWmStateFullscreen = Imports.XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", false);
+        _netWmStateMaxHorz = Imports.XInternAtom(_display, "_NET_WM_STATE_MAXIMIZED_HORZ", false);
+        _netWmStateMaxVert = Imports.XInternAtom(_display, "_NET_WM_STATE_MAXIMIZED_VERT", false);
+        _netWmWindowType = Imports.XInternAtom(_display, "_NET_WM_WINDOW_TYPE", false);
+        _netMoveResizeWindow = Imports.XInternAtom(_display, "_NET_MOVERESIZE_WINDOW", false);
+        _netWmStateAbove = Imports.XInternAtom(_display, "_NET_WM_STATE_ABOVE", false);
+        _netWmStateSkipTaskbar = Imports.XInternAtom(_display, "_NET_WM_STATE_SKIP_TASKBAR", false);
+        _netWmWindowTypeDock = Imports.XInternAtom(_display, "_NET_WM_WINDOW_TYPE_DOCK", false);
+        _netWmWindowTypeNormal = Imports.XInternAtom(_display, "_NET_WM_WINDOW_TYPE_NORMAL", false);
+        _motifHintsAtom = Imports.XInternAtom(_display, "_MOTIF_WM_HINTS", false);
+        _wakeupAtom = Imports.XInternAtom(_display, "_SDL_WAKEUP", false);
     }
         
     private int ShowError(IntPtr display, IntPtr e)
@@ -197,7 +212,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         var buffer = new byte[256];
 
-        XGetErrorText(_display, error.error_code, buffer, buffer.Length);
+        Imports.XGetErrorText(_display, error.error_code, buffer, buffer.Length);
 
         int count = Array.IndexOf(buffer, (byte)0);
         if (count < 0) count = buffer.Length;
@@ -209,178 +224,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             return $"Unknown error code: {error.error_code}";
         }
     
-        return $"{message}, Module: {GetRequestName(error.request_code)}, minor_code: {error.minor_code}, Resource ID: 0x{error.resourceid:X}";
-    }
-    
-    private Dictionary<int, string> _x11ExtensionsMap = new();
-    
-    private void RegisterExtension()
-    {
-        IntPtr listPtr = XListExtensions(_display, out int count);
-    
-        if (listPtr == IntPtr.Zero || count == 0) return;
-
-        try
-        {
-            for (int i = 0; i < count; i++)
-            {
-                IntPtr strPtr = Marshal.ReadIntPtr(listPtr, i * IntPtr.Size);
-            
-                string name = Marshal.PtrToStringAnsi(strPtr);
-            
-                if (!string.IsNullOrEmpty(name))
-                {
-                    if (XQueryExtension(_display, name, out int opcode, out _, out _) == 0)
-                    {
-                        ShowError($"Cannot query extension {name}");
-                        continue;
-                    }
-                    if (opcode > 0)
-                    {
-                        _x11ExtensionsMap[opcode] = name;
-                    }
-                }
-            }
-        }
-        finally
-        {
-            XFree(listPtr);
-        }
-    }
-    
-    private string GetRequestName(byte requestCode)
-    {
-        int code = requestCode;
-
-        if (_x11ExtensionsMap.TryGetValue(code, out string extName))
-        {
-            return $"[{extName}]";
-        }
-
-        return requestCode switch
-        {
-            1 => "X_CreateWindow",
-            2 => "X_ChangeWindowAttributes",
-            3 => "X_GetWindowAttributes",
-            4 => "X_DestroyWindow",
-            5 => "X_DestroySubwindows",
-            6 => "X_ChangeSaveSet",
-            7 => "X_ReparentWindow",
-            8 => "X_MapWindow",
-            9 => "X_MapSubwindows",
-            10 => "X_UnmapWindow",
-            11 => "X_UnmapSubwindows",
-            12 => "X_ConfigureWindow",
-            13 => "X_CirculateWindow",
-            14 => "X_GetGeometry",
-            15 => "X_QueryTree",
-            16 => "X_InternAtom",
-            17 => "X_GetAtomName",
-            18 => "X_ChangeProperty",
-            19 => "X_DeleteProperty",
-            20 => "X_GetProperty",
-            21 => "X_ListProperties",
-            22 => "X_SetSelectionOwner",
-            23 => "X_GetSelectionOwner",
-            24 => "X_ConvertSelection",
-            25 => "X_SendEvent",
-            26 => "X_GrabPointer",
-            27 => "X_UngrabPointer",
-            28 => "X_GrabButton",
-            29 => "X_UngrabButton",
-            30 => "X_ChangeActivePointerGrab",
-            31 => "X_GrabKeyboard",
-            32 => "X_UngrabKeyboard",
-            33 => "X_GrabKey",
-            34 => "X_UngrabKey",
-            35 => "X_AllowEvents",
-            36 => "X_GrabServer",
-            37 => "X_UngrabServer",
-            38 => "X_QueryPointer",
-            39 => "X_GetMotionEvents",
-            40 => "X_TranslateCoords",
-            41 => "X_WarpPointer",
-            42 => "X_SetInputFocus",
-            43 => "X_GetInputFocus",
-            44 => "X_QueryKeymap",
-            45 => "X_OpenFont",
-            46 => "X_CloseFont",
-            47 => "X_QueryFont",
-            48 => "X_QueryTextExtents",
-            49 => "X_ListFonts",
-            50 => "X_ListFontsWithInfo",
-            51 => "X_SetFontPath",
-            52 => "X_GetFontPath",
-            53 => "X_CreatePixmap",
-            54 => "X_FreePixmap",
-            55 => "X_CreateGC",
-            56 => "X_ChangeGC",
-            57 => "X_CopyGC",
-            58 => "X_SetDashes",
-            59 => "X_SetClipRectangles",
-            60 => "X_FreeGC",
-            61 => "X_ClearArea",
-            62 => "X_CopyArea",
-            63 => "X_CopyPlane",
-            64 => "X_PolyPoint",
-            65 => "X_PolyLine",
-            66 => "X_PolySegment",
-            67 => "X_PolyRectangle",
-            68 => "X_PolyArc",
-            69 => "X_FillPoly",
-            70 => "X_PolyFillRectangle",
-            71 => "X_PolyFillArc",
-            72 => "X_PutImage",
-            73 => "X_GetImage",
-            74 => "X_PolyText8",
-            75 => "X_PolyText16",
-            76 => "X_ImageText8",
-            77 => "X_ImageText16",
-            78 => "X_CreateColormap",
-            79 => "X_FreeColormap",
-            80 => "X_CopyColormapAndFree",
-            81 => "X_InstallColormap",
-            82 => "X_UninstallColormap",
-            83 => "X_ListInstalledColormaps",
-            84 => "X_AllocColor",
-            85 => "X_AllocNamedColor",
-            86 => "X_AllocColorCells",
-            87 => "X_AllocColorPlanes",
-            88 => "X_FreeColors",
-            89 => "X_StoreColors",
-            90 => "X_StoreNamedColor",
-            91 => "X_QueryColors",
-            92 => "X_LookupColor",
-            93 => "X_CreateCursor",
-            94 => "X_CreateGlyphCursor",
-            95 => "X_FreeCursor",
-            96 => "X_RecolorCursor",
-            97 => "X_QueryBestSize",
-            98 => "X_QueryExtension",
-            99 => "X_ListExtensions",
-            100 => "X_ChangeKeyboardMapping",
-            101 => "X_GetKeyboardMapping",
-            102 => "X_ChangeKeyboardControl",
-            103 => "X_GetKeyboardControl",
-            104 => "X_Bell",
-            105 => "X_ChangePointerControl",
-            106 => "X_GetPointerControl",
-            107 => "X_SetScreenSaver",
-            108 => "X_GetScreenSaver",
-            109 => "X_ChangeHosts",
-            110 => "X_ListHosts",
-            111 => "X_SetAccessControl",
-            112 => "X_SetCloseDownMode",
-            113 => "X_KillClient",
-            114 => "X_RotateProperties",
-            115 => "X_ForceScreenSaver",
-            116 => "X_SetPointerMapping",
-            117 => "X_GetPointerMapping",
-            118 => "X_SetModifierMapping",
-            119 => "X_GetModifierMapping",
-            127 => "X_NoOperation",
-            _ => $"Request_{requestCode}"
-        };
+        return $"{message}, Module: {X11Utils.GetRequestName(error.request_code)}, minor_code: {error.minor_code}, Resource ID: 0x{error.resourceid:X}";
     }
     
     private IntPtr _wakeupAtom;
@@ -391,11 +235,14 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         _running = false;
         _closing = true;
 
+        if(_windowManagerImplementation is IDisposable disposable)
+            disposable?.Dispose();
+
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero && _wakeupAtom != IntPtr.Zero)
         {
-            XCompositeUnredirectWindow(_display, _unityWindow, CompositeRedirectAutomatic);
-            XStoreName(_display, _unityWindow, "Closing...");
-            XFlush(_display);
+            Imports.XCompositeUnredirectWindow(_display, _unityWindow, Constants.CompositeRedirectAutomatic);
+            Imports.XStoreName(_display, _unityWindow, "Closing...");
+            Imports.XFlush(_display);
         }
         if (_x11EventThread is { IsAlive: true })
         {
@@ -409,20 +256,20 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 #if !UNITY_EDITOR
             if (_damage != IntPtr.Zero)
             {
-                XDamageDestroy(_display, _damage);
+                Imports.XDamageDestroy(_display, _damage);
                 _damage = IntPtr.Zero;
             }
 #endif
             if (_useShm)
             {
-                XShmDetach(_display, ref _shmInfo);
-                shmdt(_shmInfo.shmaddr);
+                Imports.XShmDetach(_display, ref _shmInfo);
+                Imports.shmdt(_shmInfo.shmaddr);
             }
-            XSync(_display, false);
-            if (_defaultCursor != IntPtr.Zero) { XFreeCursor(_display, _defaultCursor); _defaultCursor = IntPtr.Zero; }
-            if (_grabCursor != IntPtr.Zero) { XFreeCursor(_display, _grabCursor); _grabCursor = IntPtr.Zero; }
-            if (_grabbingCursor != IntPtr.Zero) { XFreeCursor(_display, _grabbingCursor); _grabbingCursor = IntPtr.Zero; }
-            XCloseDisplay(_display);
+            Imports.XSync(_display, false);
+            if (_defaultCursor != IntPtr.Zero) { Imports.XFreeCursor(_display, _defaultCursor); _defaultCursor = IntPtr.Zero; }
+            if (_grabCursor != IntPtr.Zero) { Imports.XFreeCursor(_display, _grabCursor); _grabCursor = IntPtr.Zero; }
+            if (_grabbingCursor != IntPtr.Zero) { Imports.XFreeCursor(_display, _grabbingCursor); _grabbingCursor = IntPtr.Zero; }
+            Imports.XCloseDisplay(_display);
             _display = IntPtr.Zero;
         }
     }
@@ -444,10 +291,12 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         
     public Vector2Int GetWindowPosition()
     {
+        if (_windowManagerImplementation != null)
+            return _windowManagerImplementation.GetWindowPosition();
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
         {
             // Use XTranslateCoordinates to get absolute position
-            if (XTranslateCoordinates(_display, _unityWindow, _rootWindow, 0, 0, out var absX, out var absY, out _))
+            if (Imports.XTranslateCoordinates(_display, _unityWindow, _rootWindow, 0, 0, out var absX, out var absY, out _))
             {
                 return new Vector2Int(absX, absY);
             }
@@ -472,8 +321,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         }
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
         {
-            if (_currentDesktopEnv == DesktopEnvironments.Hyprland){
-                WaylandUtility.SetWindowPositionHyprland(position);
+            if (_windowManagerImplementation != null)
+            {
+                _windowManagerImplementation.SetWindowPosition(position);
                 return;
             }
             if (_currentDesktopEnv == DesktopEnvironments.Kde && _currentSessionType == SessionTypes.Wayland)
@@ -488,7 +338,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             }
             var xClient = new XClientMessageEvent
             {
-                type = ClientMessage,
+                type = Constants.ClientMessage,
                 window = _unityWindow,
                 message_type = _netMoveResizeWindow,
                 format = 32,
@@ -499,8 +349,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             xClient.data3 = IntPtr.Zero;
             xClient.data4 = IntPtr.Zero;
 
-            XSendEvent(_display, _rootWindow, false, SubstructureRedirectMask | SubstructureNotifyMask, ref xClient);
-            XFlush(_display);
+            Imports.XSendEvent(_display, _rootWindow, false, Constants.SubstructureRedirectMask | Constants.SubstructureNotifyMask, ref xClient);
+            Imports.XFlush(_display);
         }
     }
 
@@ -508,8 +358,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     {
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
         {
-            XMoveWindow(_display, _unityWindow, position.x, position.y);
-            XFlush(_display);
+            Imports.XMoveWindow(_display, _unityWindow, position.x, position.y);
+            Imports.XFlush(_display);
         }
     }
 
@@ -549,65 +399,72 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     {
         if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero || _closing) return;
     
-        XSetTransientForHint(_display, _unityWindow, parentWindow);
-        XFlush(_display);
+        Imports.XSetTransientForHint(_display, _unityWindow, parentWindow);
+        Imports.XFlush(_display);
     }
     
     public void QueryMonitors()
     {
         _monitors = new();
         _monitors.Clear();
+        if(_windowManagerImplementation != null)
+        {
+            foreach(var m in _windowManagerImplementation.GetAllMonitors())
+                _monitors[m.Id] = m.Rect;
+            return;
+        }
+
         if (_display == IntPtr.Zero) return;
             
-        if (XRRQueryExtension(_display, out _, out _) == 0)
+        if (Imports.XRRQueryExtension(_display, out _, out _) == 0)
         {
             Debug.LogError("XRandR extension not available.");
             return;
         }
 
-        if (XRRQueryVersion(_display, out var major, out var minor) == 0 || major < 1 || (major == 1 && minor < 3))
+        if (Imports.XRRQueryVersion(_display, out var major, out var minor) == 0 || major < 1 || (major == 1 && minor < 3))
         {
             Debug.LogError("XRandR 1.3+ required for multi-monitor.");
             return;
         }
 
-        var resHandle = XRRGetScreenResourcesCurrent(_display, _rootWindow);
+        var resHandle = Imports.XRRGetScreenResourcesCurrent(_display, _rootWindow);
         var res = Marshal.PtrToStructure<XrrScreenResources>(resHandle);
             
         if (res.noutput <= 0)
         {
-            XRRFreeScreenResources(resHandle);
+            Imports.XRRFreeScreenResources(resHandle);
             return;
         }
 
         for (var i = 0; i < res.noutput; i++)
         {
             var output = Marshal.ReadIntPtr(res.outputs, i * IntPtr.Size);
-            var outInfoHandle = XRRGetOutputInfo(_display, resHandle, output);
+            var outInfoHandle = Imports.XRRGetOutputInfo(_display, resHandle, output);
             var outInfo = Marshal.PtrToStructure<XrrOutputInfo>(outInfoHandle);
             if (outInfo.connection != Connection.Connected || outInfo.crtc == IntPtr.Zero)
             {
-                XRRFreeOutputInfo(outInfoHandle);
+                Imports.XRRFreeOutputInfo(outInfoHandle);
                 continue;
             }
 
-            var crtcInfoHandle = XRRGetCrtcInfo(_display, resHandle, outInfo.crtc);
+            var crtcInfoHandle = Imports.XRRGetCrtcInfo(_display, resHandle, outInfo.crtc);
             var crtcInfo = Marshal.PtrToStructure<XrrCrtcInfo>(crtcInfoHandle);
             if (crtcInfo.width == 0 || crtcInfo.height == 0 || crtcInfoHandle == IntPtr.Zero)
             {
-                XRRFreeCrtcInfo(crtcInfoHandle);
-                XRRFreeOutputInfo(outInfoHandle);
+                Imports.XRRFreeCrtcInfo(crtcInfoHandle);
+                Imports.XRRFreeOutputInfo(outInfoHandle);
                 continue;
             }
 
             var monRect = new RectInt(crtcInfo.x, crtcInfo.y, (int)crtcInfo.width, (int)crtcInfo.height);
             _monitors.Add(crtcInfoHandle, monRect);
 
-            XRRFreeCrtcInfo(crtcInfoHandle);
-            XRRFreeOutputInfo(outInfoHandle);
+            Imports.XRRFreeCrtcInfo(crtcInfoHandle);
+            Imports.XRRFreeOutputInfo(outInfoHandle);
         }
 
-        XRRFreeScreenResources(resHandle);
+        Imports.XRRFreeScreenResources(resHandle);
 
         if (_monitors.Count == 0)
         {
@@ -619,12 +476,12 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private string GetWindowType(IntPtr hwnd)  // Returns type atom name or empty
     {
         if (_netWmWindowType == IntPtr.Zero) return "";
-        var status = XGetWindowProperty(_display, hwnd, _netWmWindowType, 0, 1, false, (IntPtr)XaAtom, out _, out _, out var nItems, out _, out var prop);
-        if (status != 0 || prop == IntPtr.Zero || nItems == 0) { if (prop != IntPtr.Zero) XFree(prop); return ""; }
+        var status = Imports.XGetWindowProperty(_display, hwnd, _netWmWindowType, 0, 1, false, (IntPtr)Constants.XaAtom, out _, out _, out var nItems, out _, out var prop);
+        if (status != 0 || prop == IntPtr.Zero || nItems == 0) { if (prop != IntPtr.Zero) Imports.XFree(prop); return ""; }
         var typeAtom = Marshal.ReadIntPtr(prop);
-        XFree(prop);
+        Imports.XFree(prop);
         // Map to string (add XGetAtomName if needed)
-        return XGetAtomName(_display, typeAtom);
+        return Imports.XGetAtomName(_display, typeAtom);
     }
     
     public bool GetWindowSize(out float x, out float y)
@@ -643,11 +500,13 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public Vector2 GetWindowSize(IntPtr window = default)
     {
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.GetWindowSize(window);
         if (window == IntPtr.Zero)
             window = _unityWindow;
         if (_display != IntPtr.Zero && window != IntPtr.Zero)
         {
-            var result = XGetWindowAttributes(_display, window, out var attributes);
+            var result = Imports.XGetWindowAttributes(_display, window, out var attributes);
             if (result != 0) // Non-zero indicates success in X11
             {
                 return new Vector2(attributes.width, attributes.height);
@@ -669,6 +528,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             SetWindowSizeLegacy(size);
             return;
         }
+        if (_windowManagerImplementation != null)
+            _windowManagerImplementation.SetWindowSize(size);
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
         {
             if (_netMoveResizeWindow == IntPtr.Zero)
@@ -678,7 +539,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             }
             var xClient = new XClientMessageEvent
             {
-                type = ClientMessage,
+                type = Constants.ClientMessage,
                 window = _unityWindow,
                 message_type = _netMoveResizeWindow,
                 format = 32,
@@ -689,8 +550,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             xClient.data3 = new(size.x);
             xClient.data4 = new(size.y);
             
-            XSendEvent(_display, _rootWindow, false, SubstructureRedirectMask | SubstructureNotifyMask, ref xClient);
-            XFlush(_display);
+            Imports.XSendEvent(_display, _rootWindow, false, Constants.SubstructureRedirectMask | Constants.SubstructureNotifyMask, ref xClient);
+            Imports.XFlush(_display);
         }
     }
 
@@ -698,13 +559,15 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     {
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
         {
-            XResizeWindow(_display, _unityWindow, (int)size.x, (int)size.y);
-            XFlush(_display);
+            Imports.XResizeWindow(_display, _unityWindow, (int)size.x, (int)size.y);
+            Imports.XFlush(_display);
         }
     }
 
     public Vector2Int GetMousePosition()
     {
+        if (_windowManagerImplementation != null)
+            return _windowManagerImplementation.GetMousePosition();
         if (SaveLoadHandler.Instance.data.forceKWinApi && _currentDesktopEnv == DesktopEnvironments.Kde)
         {
             return Singleton<KWinManager>.Instance.GetCursorPos().Result;
@@ -715,7 +578,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         int winX = 0, winY = 0;
         uint maskReturn = 0;
 
-        if (!XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY, ref winX,
+        if (!Imports.XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY, ref winX,
                 ref winY, ref maskReturn))
         {
             ShowError("No mouse found.");
@@ -733,7 +596,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         int winX = 0, winY = 0;
         uint maskReturn = 0;
 
-        bool result = XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY, ref winX, ref winY, ref maskReturn);
+        bool result = Imports.XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY, ref winX, ref winY, ref maskReturn);
         position = new Vector2Int(rootX, rootY);
         return result;
     }
@@ -746,7 +609,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         int winX = 0, winY = 0;
         uint mask = 0;
         int rootX = 0, rootY = 0;
-        if (!XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY, ref winX,
+        if (!Imports.XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY, ref winX,
                 ref winY, ref mask))
         {
             ShowError("No mouse found.");
@@ -767,7 +630,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         byte[] keymap = new byte[32];
 
-        if (XQueryKeymap(_display, keymap) == 0)
+        if (Imports.XQueryKeymap(_display, keymap) == 0)
             return false;
 
         // Check keycodes 8 to 255 (skip 0–7 which are usually unused)
@@ -839,7 +702,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public Vector2 GetTotalDisplaySize()
     {
-        XGetWindowAttributes(_display, _unityWindow, out var attr);
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.GetTotalDisplaySize();
+        Imports.XGetWindowAttributes(_display, _unityWindow, out var attr);
         return new Vector2(attr.width, attr.height);
     }
         
@@ -847,6 +712,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private List<IntPtr> FindWindowsByPid(int targetPid)
     {
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.FindWindowsByPid(targetPid);
         var result = new List<IntPtr>();
 
         var windows = GetAllVisibleWindows();
@@ -876,22 +743,24 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public int GetWindowPid(IntPtr window)
     {
-        var pidAtom = XInternAtom(_display, "_NET_WM_PID", false);
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.GetWindowPid(window);
+        var pidAtom = Imports.XInternAtom(_display, "_NET_WM_PID", false);
 
         if (pidAtom == IntPtr.Zero)
         {
             Debug.Log("_NET_WM_PID atom not found");
             return -1;
         }
-        var status = XGetWindowProperty(_display, window, pidAtom,
-            0, 1, false, (IntPtr)XaCardinal,
+        var status = Imports.XGetWindowProperty(_display, window, pidAtom,
+            0, 1, false, (IntPtr)Constants.XaCardinal,
             out _, out _,
             out var nItems, out _, out var prop);
 
         if (status == 0 && prop != IntPtr.Zero && nItems > 0)
         {
             var pid = Marshal.ReadInt32(prop);
-            XFree(prop);
+            Imports.XFree(prop);
             return pid;
         }
 
@@ -904,17 +773,19 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private List<IntPtr> GetAllVisibleWindows()
     {
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.GetAllVisibleWindows();
         if (_cachedVisibleWindows != null && !((DateTime.Now - _lastCacheTime).TotalSeconds > CacheRefreshSeconds))
             return _cachedVisibleWindows;
         var result = new List<IntPtr>();
 
-        var clientListAtom = XInternAtom(_display, "_NET_CLIENT_LIST", true);
+        var clientListAtom = Imports.XInternAtom(_display, "_NET_CLIENT_LIST", true);
         if (clientListAtom != IntPtr.Zero)
         {
-            var status = XGetWindowProperty(_display, _rootWindow, clientListAtom, 0, 1024, false, (IntPtr)XaWindow,
+            var status = Imports.XGetWindowProperty(_display, _rootWindow, clientListAtom, 0, 1024, false, (IntPtr)Constants.XaWindow,
                 out var actualType, out var actualFormat, out var nItems, out _, out var prop);
 
-            if (status == 0 && actualType == (IntPtr)XaWindow && actualFormat == 32 && prop != IntPtr.Zero)
+            if (status == 0 && actualType == (IntPtr)Constants.XaWindow && actualFormat == 32 && prop != IntPtr.Zero)
             {
                 for (ulong i = 0; i < nItems; i++)
                 {
@@ -925,11 +796,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                     }
                 }
 
-                XFree(prop);
+                Imports.XFree(prop);
                 return result;
             }
 
-            if (prop != IntPtr.Zero) XFree(prop);
+            if (prop != IntPtr.Zero) Imports.XFree(prop);
         }
 
         ShowError("Fallback to recursive enumeration because _NET_CLIENT_LIST is not available");
@@ -940,12 +811,12 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void EnumerateWindows(IntPtr window, List<IntPtr> accumulator)
     {
-        var result = XGetWindowAttributes(_display, window, out var attr);
-        if (result != 0 && attr.map_state == IsViewable)
+        var result = Imports.XGetWindowAttributes(_display, window, out var attr);
+        if (result != 0 && attr.map_state == Constants.IsViewable)
         {
             accumulator.Add(window);
 
-            if (XQueryTree(_display, window, out _, out _, out var children, out var nChildren) != 0)
+            if (Imports.XQueryTree(_display, window, out _, out _, out var children, out var nChildren) != 0)
             {
                 if (children != IntPtr.Zero && nChildren > 0)
                 {
@@ -954,7 +825,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                         var child = Marshal.ReadIntPtr(children, i * IntPtr.Size);
                         EnumerateWindows(child, accumulator);
                     }
-                    XFree(children);
+                    Imports.XFree(children);
                 }
             }
         }
@@ -980,10 +851,15 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     public bool GetWindowRect(IntPtr window, out RectInt rect)
     {
         rect = new RectInt();
-        var result = XGetWindowAttributes(_display, window, out var attr);
+        if(_windowManagerImplementation != null)
+        {
+            rect = _windowManagerImplementation.GetWindowRect(window);
+            return true;
+        }
+        var result = Imports.XGetWindowAttributes(_display, window, out var attr);
         if (result == 0) return false;
 
-        if (!XTranslateCoordinates(_display, window, _rootWindow, 0, 0, out var absX, out var absY, out _))
+        if (!Imports.XTranslateCoordinates(_display, window, _rootWindow, 0, 0, out var absX, out var absY, out _))
             return false;
 
         rect.x = absX;
@@ -995,6 +871,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public void SetTopmost(bool topmost = true)
     {
+        if(_windowManagerImplementation != null)
+        {
+            _windowManagerImplementation.SetTopmost(topmost);
+            return;
+        }
 #if UNITY_EDITOR
         return;
 #endif
@@ -1014,7 +895,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         var xClient = new XClientMessageEvent
         {
-            type = ClientMessage,
+            type = Constants.ClientMessage,
             window = _unityWindow,
             message_type = _netWmState,
             format = 32,
@@ -1025,18 +906,23 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         xClient.data3 = IntPtr.Zero;
         xClient.data4 = IntPtr.Zero;
         
-        XSendEvent(_display, _rootWindow, false, 0x00100000 | SubstructureRedirectMask, ref xClient);
-        XFlush(_display);
+        Imports.XSendEvent(_display, _rootWindow, false, 0x00100000 | Constants.SubstructureRedirectMask, ref xClient);
+        Imports.XFlush(_display);
     }
         
     public void HideFromTaskbar(bool reallyHide = true)
     {
+        if(_windowManagerImplementation != null)
+        {
+            _windowManagerImplementation.HideFromTaskbar(reallyHide);
+            return;
+        }
         if (_netWmState == IntPtr.Zero || _netWmStateSkipTaskbar == IntPtr.Zero)
             return;
 
         XClientMessageEvent msg = new()
         {
-            type = ClientMessage,
+            type = Constants.ClientMessage,
             display = _display,
             window = _unityWindow,
             message_type = _netWmState,
@@ -1048,26 +934,31 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         msg.data3 = IntPtr.Zero;
         msg.data4 = new(1);
 
-        XSendEvent(_display, _rootWindow, false, 0x10000L | 0x20000L, ref msg);
-        XFlush(_display);
+        Imports.XSendEvent(_display, _rootWindow, false, 0x10000L | 0x20000L, ref msg);
+        Imports.XFlush(_display);
     }
 
 
     private void SetWindowBorderless()
     {
+        if(_windowManagerImplementation != null)
+        {
+            _windowManagerImplementation.SetWindowBorderless();
+            return;
+        }
         if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero) return;
 
         // Remove window decorations using Motif hints
         object hints = new XMotifWmHints
         {
-            flags = (IntPtr)MwmHintsFlags,
-            decorations = (IntPtr)MwmDecorationsNone,
+            flags = (IntPtr)Constants.MwmHintsFlags,
+            decorations = (IntPtr)Constants.MwmDecorationsNone,
             functions = IntPtr.Zero,
             input_mode = IntPtr.Zero,
             status = IntPtr.Zero
         };
-        ChangeProperty(_motifHintsAtom, _motifHintsAtom, 32, PropModeReplace, hints, 5);
-        XFlush(_display);
+        ChangeProperty(_motifHintsAtom, _motifHintsAtom, 32, Constants.PropModeReplace, hints, 5);
+        Imports.XFlush(_display);
     }
     
     private void ChangeProperty<T>(IntPtr property, IntPtr type, int format, int mode, T data, int nelements)
@@ -1076,7 +967,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         try
         {
             IntPtr ptr = handle.AddrOfPinnedObject();
-            XChangeProperty(_display, _unityWindow, property, type, format, mode, ptr, nelements);
+            Imports.XChangeProperty(_display, _unityWindow, property, type, format, mode, ptr, nelements);
         }
         finally
         {
@@ -1086,13 +977,18 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public void SetWindowType(WindowType type)
     {
+        if(_windowManagerImplementation != null)
+        {
+            _windowManagerImplementation.SetWindowType(type);
+            return;
+        }
         switch (type)
         {
             case WindowType.Dock:
-                ChangeProperty(_netWmWindowType, (IntPtr)XaAtom, 32, PropModeReplace, _netWmWindowTypeDock, 1);
+                ChangeProperty(_netWmWindowType, (IntPtr)Constants.XaAtom, 32, Constants.PropModeReplace, _netWmWindowTypeDock, 1);
                 break;
             case WindowType.Normal:
-                ChangeProperty(_netWmWindowType, (IntPtr)XaAtom, 32, PropModeReplace, _netWmWindowTypeNormal, 1);
+                ChangeProperty(_netWmWindowType, (IntPtr)Constants.XaAtom, 32, Constants.PropModeReplace, _netWmWindowTypeNormal, 1);
                 break;
             default:
                 ShowError("What was that?");
@@ -1102,18 +998,25 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public string GetClassName(IntPtr window)
     {
-        if (XGetClassHint(_display, window, out var hint) != 0)
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.GetClassName(window);
+        if (Imports.XGetClassHint(_display, window, out var hint) != 0)
         {
             var cls = Marshal.PtrToStringAnsi(hint.res_class);
-            XFree(hint.res_name);
-            XFree(hint.res_class);
+            Imports.XFree(hint.res_name);
+            Imports.XFree(hint.res_class);
             return cls ?? "";
         }
 
         return "";
     }
         
-    public bool IsDesktop(IntPtr hwnd) => GetWindowType(hwnd) == "_NET_WM_WINDOW_TYPE_DESKTOP";
+    public bool IsDesktop(IntPtr hwnd)
+    {
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.IsDesktop(hwnd);
+        return GetWindowType(hwnd) == "_NET_WM_WINDOW_TYPE_DESKTOP";
+    } 
 
     private IntPtr _desktop;
 
@@ -1121,7 +1024,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     {
         get
         {
-            if (_desktop == IntPtr.Zero || XGetWindowAttributes(_display, _desktop, out _) == 0)
+            if (_desktop == IntPtr.Zero || Imports.XGetWindowAttributes(_display, _desktop, out _) == 0)
             {
                 var allWin = GetAllVisibleWindows();
                 foreach (var win in allWin)
@@ -1134,7 +1037,12 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         }
     }
     
-    public bool IsDock(IntPtr hwnd) => GetWindowType(hwnd) == "_NET_WM_WINDOW_TYPE_DOCK";
+    public bool IsDock(IntPtr hwnd)
+    {
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.IsDock(hwnd);
+        return GetWindowType(hwnd) == "_NET_WM_WINDOW_TYPE_DOCK";
+    }
     
     private IntPtr _dock;
 
@@ -1157,9 +1065,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public bool IsWindowMaximized(IntPtr hwnd)
     {
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.IsWindowMaximized(hwnd);
         if (_netWmState == IntPtr.Zero) return false;
-        var status = XGetWindowProperty(_display, hwnd, _netWmState, 0, 1024, false, (IntPtr)XaAtom, out _, out _, out var nItems, out _, out var prop);
-        if (status != 0 || prop == IntPtr.Zero || nItems == 0) { if (prop != IntPtr.Zero) XFree(prop); return false; }
+        var status = Imports.XGetWindowProperty(_display, hwnd, _netWmState, 0, 1024, false, (IntPtr)Constants.XaAtom, out _, out _, out var nItems, out _, out var prop);
+        if (status != 0 || prop == IntPtr.Zero || nItems == 0) { if (prop != IntPtr.Zero) Imports.XFree(prop); return false; }
         bool maxH = false, maxV = false;
         for (ulong i = 0; i < nItems; i++)
         {
@@ -1167,12 +1077,14 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             if (atom == _netWmStateMaxHorz) maxH = true;
             if (atom == _netWmStateMaxVert) maxV = true;
         }
-        XFree(prop);
+        Imports.XFree(prop);
         return maxH && maxV;
     }
 
     public bool IsWindowFullscreen(IntPtr hwnd)
     {
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.IsWindowFullscreen(hwnd);
         if (!GetWindowRect(hwnd, out var rect)) return false;
         int screenW = UnityEngine.Display.main.systemWidth, screenH = UnityEngine.Display.main.systemHeight;
         var tol = 2;
@@ -1180,7 +1092,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         if (!sizeMatch) return false;
         // Check _NET_WM_STATE_FULLSCREEN
         if (_netWmState == IntPtr.Zero) return true;  // Fallback if no EWMH
-        var status = XGetWindowProperty(_display, hwnd, _netWmState, 0, 1024, false, (IntPtr)XaAtom, out _, out _, out var nItems, out _, out var prop);
+        var status = Imports.XGetWindowProperty(_display, hwnd, _netWmState, 0, 1024, false, (IntPtr)Constants.XaAtom, out _, out _, out var nItems, out _, out var prop);
         var isFs = false;
         if (status == 0 && prop != IntPtr.Zero && nItems > 0)
         {
@@ -1188,19 +1100,21 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             {
                 if (Marshal.ReadIntPtr(prop, (int)i * IntPtr.Size) == _netWmStateFullscreen) { isFs = true; break; }
             }
-            XFree(prop);
+            Imports.XFree(prop);
         }
         return isFs;
     }
         
     public bool IsWindowVisible(IntPtr window)
     {
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.IsWindowVisible(window);
         if (_display == IntPtr.Zero) return false;
 
-        var result = XGetWindowAttributes(_display, window, out var attr);
-        if (result == 0 || attr.map_state != IsViewable) return false;
+        var result = Imports.XGetWindowAttributes(_display, window, out var attr);
+        if (result == 0 || attr.map_state != Constants.IsViewable) return false;
     
-        if (!XTranslateCoordinates(_display, window, _rootWindow, 0, 0, out var absX, out var absY, out _))
+        if (!Imports.XTranslateCoordinates(_display, window, _rootWindow, 0, 0, out var absX, out var absY, out _))
             return false;
 
         float targetX1 = absX;
@@ -1216,10 +1130,10 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         for (var i = index + 1; i < stacking.Count; i++)
         {
             var ow = stacking[i];
-            XGetWindowAttributes(_display, ow, out var oattr);
-            if (oattr.map_state != IsViewable) continue;
+            Imports.XGetWindowAttributes(_display, ow, out var oattr);
+            if (oattr.map_state != Constants.IsViewable) continue;
 
-            if (!XTranslateCoordinates(_display, ow, _rootWindow, 0, 0, out var oabsX, out var oabsY, out _))
+            if (!Imports.XTranslateCoordinates(_display, ow, _rootWindow, 0, 0, out var oabsX, out var oabsY, out _))
                 continue;
 
             float ox1 = oabsX;
@@ -1257,12 +1171,12 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private bool IsCompositionSupported()
     {
-        for (var screen = 0; screen < XScreenCount(_display); screen++)
+        for (var screen = 0; screen < Imports.XScreenCount(_display); screen++)
         {
-            var selectionAtom = XInternAtom(_display, "_NET_WM_CM_S" + screen, false);
+            var selectionAtom = Imports.XInternAtom(_display, "_NET_WM_CM_S" + screen, false);
             if (selectionAtom == IntPtr.Zero)
                 continue;
-            return XGetSelectionOwner(_display, selectionAtom) != 0;
+            return Imports.XGetSelectionOwner(_display, selectionAtom) != 0;
         }
         return false;
     }
@@ -1279,15 +1193,17 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     
     public List<IntPtr> GetClientStackingList()
     {
-        var atom = XInternAtom(_display, "_NET_CLIENT_LIST_STACKING", false);
+        if(_windowManagerImplementation != null)
+            return _windowManagerImplementation.GetClientStackingList();
+        var atom = Imports.XInternAtom(_display, "_NET_CLIENT_LIST_STACKING", false);
         if (atom == IntPtr.Zero) return new List<IntPtr>();
 
-        var status = XGetWindowProperty(_display, _rootWindow, atom, 0, 1024, false, (IntPtr)XaWindow,
+        var status = Imports.XGetWindowProperty(_display, _rootWindow, atom, 0, 1024, false, (IntPtr)Constants.XaWindow,
             out _, out var actualFormat, out var nItems, out _, out var prop);
 
         if (status != 0 || prop == IntPtr.Zero || nItems == 0 || actualFormat != 32)
         {
-            if (prop != IntPtr.Zero) XFree(prop);
+            if (prop != IntPtr.Zero) Imports.XFree(prop);
             return new List<IntPtr>();
         }
 
@@ -1297,7 +1213,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             var w = Marshal.ReadIntPtr(prop, (i * IntPtr.Size));
             windows.Add(w);
         }
-        XFree(prop);
+        Imports.XFree(prop);
         return windows;
     }
         
@@ -1319,7 +1235,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void SetupTransparentInput()
     {
-        if (XGetWindowAttributes(_display, _unityWindow, out var attrs) == 0)
+        if (Imports.XGetWindowAttributes(_display, _unityWindow, out var attrs) == 0)
         {
             ShowError("Failed to get window attributes");
             return;
@@ -1337,14 +1253,14 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             return;
         }
 
-        XCompositeRedirectWindow(_display, _unityWindow, CompositeRedirectAutomatic);
+        Imports.XCompositeRedirectWindow(_display, _unityWindow, Constants.CompositeRedirectAutomatic);
         
-        _useShm = XShmQueryExtension(_display);
+        _useShm = Imports.XShmQueryExtension(_display);
         if (_useShm)
         {
             int imageSize = attrs.width * attrs.height * 4;
 
-            int shmid = shmget(IPC_PRIVATE, (IntPtr)imageSize, IPC_CREAT | 0x1FF);
+            int shmid = Imports.shmget(Constants.IPC_PRIVATE, (IntPtr)imageSize, Constants.IPC_CREAT | 0x1FF);
 
             if (shmid == -1)
             {
@@ -1353,7 +1269,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             else
             {
                 _shmInfo.shmid = shmid;
-                _shmInfo.shmaddr = shmat(shmid, IntPtr.Zero, 0);
+                _shmInfo.shmaddr = Imports.shmat(shmid, IntPtr.Zero, 0);
                 _shmInfo.readOnly = 0;
 
                 if (_shmInfo.shmaddr == new IntPtr(-1))
@@ -1362,18 +1278,18 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                 }
                 else
                 {
-                    shmctl(shmid, IPC_RMID, IntPtr.Zero);
+                    Imports.shmctl(shmid, Constants.IPC_RMID, IntPtr.Zero);
 
-                    if (XShmAttach(_display, ref _shmInfo) == 0)
+                    if (Imports.XShmAttach(_display, ref _shmInfo) == 0)
                     {
                         _useShm = false;
                     }
                     else
                     {
-                        XSync(_display, false);
+                        Imports.XSync(_display, false);
 
-                        _shmImagePtr = XShmCreateImage(_display, attrs.visual, (uint)attrs.depth,
-                            ZPixmap, _shmInfo.shmaddr, ref _shmInfo, (uint)attrs.width, (uint)attrs.height);
+                        _shmImagePtr = Imports.XShmCreateImage(_display, attrs.visual, (uint)attrs.depth,
+                            Constants.ZPixmap, _shmInfo.shmaddr, ref _shmInfo, (uint)attrs.width, (uint)attrs.height);
 
                         if (_shmImagePtr == IntPtr.Zero)
                         {
@@ -1389,13 +1305,13 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             }
         }
 
-        if (!XDamageQueryExtension(_display, out _damageEventBase, out _))
+        if (!Imports.XDamageQueryExtension(_display, out _damageEventBase, out _))
         {
             ShowError("XDamage extension not available");
             return;
         }
 
-        _damage = XDamageCreate(_display, _unityWindow, XDamageReportNonEmpty);
+        _damage = Imports.XDamageCreate(_display, _unityWindow, Constants.XDamageReportNonEmpty);
         if (_damage == IntPtr.Zero)
         {
             ShowError("Failed to create damage object");
@@ -1407,11 +1323,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private bool IsArgbVisual(IntPtr display, IntPtr visual)
     {
-        var formatPtr = XRenderFindVisualFormat(display, visual);
+        var formatPtr = Imports.XRenderFindVisualFormat(display, visual);
         if (formatPtr == IntPtr.Zero) return false;
 
         var format = Marshal.PtrToStructure<XRenderPictFormat>(formatPtr);
-        return format.type == PictTypeDirect && format.direct.alphaMask != 0;
+        return format.type == Constants.PictTypeDirect && format.direct.alphaMask != 0;
     }
 
     private List<XRectangle> GenerateRectangles(byte[] imageData, int width, int height)
@@ -1459,7 +1375,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         XRectangle[] fullRect = { 
             new() { x = 0, y = 0, width = (ushort)width, height = (ushort)height } 
         };
-        XShapeCombineRectangles(_display, _unityWindow, ShapeBounding, 0, 0, fullRect, 1, ShapeSet, Unsorted);
+        Imports.XShapeCombineRectangles(_display, _unityWindow, Constants.ShapeBounding, 0, 0, fullRect, 1, Constants.ShapeSet, Constants.Unsorted);
 
         IntPtr xImagePtr = IntPtr.Zero;
         byte[] imageBytes;
@@ -1476,11 +1392,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             }
         }
 
-        IntPtr backingPixmap = XCompositeNameWindowPixmap(_display, _unityWindow);
+        IntPtr backingPixmap = Imports.XCompositeNameWindowPixmap(_display, _unityWindow);
 
         if (backingPixmap != IntPtr.Zero)
         {
-            if (XShmGetImage(_display, backingPixmap, _shmImagePtr, 0, 0, AllPlanes))
+            if (Imports.XShmGetImage(_display, backingPixmap, _shmImagePtr, 0, 0, Constants.AllPlanes))
             {
                 xImagePtr = _shmImagePtr;
             }
@@ -1490,11 +1406,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                 _useShm = false;
             }
                 
-            XFreePixmap(_display, backingPixmap);
+            Imports.XFreePixmap(_display, backingPixmap);
         }
         else
         {
-            if (XShmGetImage(_display, _unityWindow, _shmImagePtr, 0, 0, AllPlanes))
+            if (Imports.XShmGetImage(_display, _unityWindow, _shmImagePtr, 0, 0, Constants.AllPlanes))
             {
                 xImagePtr = _shmImagePtr;
             }
@@ -1507,7 +1423,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         if (!_useShm)
         {
-            xImagePtr = XGetImage(_display, _unityWindow, 0, 0, (uint)width, (uint)height, AllPlanes, ZPixmap);
+            xImagePtr = Imports.XGetImage(_display, _unityWindow, 0, 0, (uint)width, (uint)height, Constants.AllPlanes, Constants.ZPixmap);
             if (xImagePtr == IntPtr.Zero)
             {
                 ShowError("XGetImage failed");
@@ -1519,68 +1435,68 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         if (!_useShm && xImagePtr != IntPtr.Zero)
         {
-            XDestroyImage(xImagePtr);
+            Imports.XDestroyImage(xImagePtr);
         }
 
         List<XRectangle> rects = GenerateRectangles(imageBytes, width, height);
         XRectangle[] rectArray = rects.ToArray();
 
-        XShapeCombineRectangles(_display, _unityWindow, ShapeInput, 0, 0, rectArray, rectArray.Length, ShapeSet, YSorted);
+        Imports.XShapeCombineRectangles(_display, _unityWindow, Constants.ShapeInput, 0, 0, rectArray, rectArray.Length, Constants.ShapeSet, Constants.YSorted);
 
-        XFlush(_display);
+        Imports.XFlush(_display);
     }
 
     private bool TryResizeShm(int width, int height)
     {
         if (_shmImagePtr != IntPtr.Zero)
         {
-            XDestroyImage(_shmImagePtr);
+            Imports.XDestroyImage(_shmImagePtr);
             _shmImagePtr = IntPtr.Zero;
         }
         
         if (_shmInfo.shmaddr != IntPtr.Zero)
         {
-            XShmDetach(_display, ref _shmInfo);
-            shmdt(_shmInfo.shmaddr);
+            Imports.XShmDetach(_display, ref _shmInfo);
+            Imports.shmdt(_shmInfo.shmaddr);
         }
 
-        if (XGetWindowAttributes(_display, _unityWindow, out var attrs) == 0) return false;
+        if (Imports.XGetWindowAttributes(_display, _unityWindow, out var attrs) == 0) return false;
 
         int imageSize = width * height * 4;
-        int shmid = shmget(IPC_PRIVATE, (IntPtr)imageSize, IPC_CREAT | 0x1FF);
+        int shmid = Imports.shmget(Constants.IPC_PRIVATE, (IntPtr)imageSize, Constants.IPC_CREAT | 0x1FF);
 
         if (shmid == -1) return false;
 
         _shmInfo = new XShmSegmentInfo
         {
             shmid = shmid,
-            shmaddr = shmat(shmid, IntPtr.Zero, 0),
+            shmaddr = Imports.shmat(shmid, IntPtr.Zero, 0),
             readOnly = 0
         };
 
         if (_shmInfo.shmaddr == new IntPtr(-1))
         {
-            shmctl(shmid, IPC_RMID, IntPtr.Zero);
+            Imports.shmctl(shmid, Constants.IPC_RMID, IntPtr.Zero);
             return false;
         }
 
-        shmctl(shmid, IPC_RMID, IntPtr.Zero);
+        Imports.shmctl(shmid, Constants.IPC_RMID, IntPtr.Zero);
 
-        if (XShmAttach(_display, ref _shmInfo) == 0)
+        if (Imports.XShmAttach(_display, ref _shmInfo) == 0)
         {
-            shmdt(_shmInfo.shmaddr);
+            Imports.shmdt(_shmInfo.shmaddr);
             return false;
         }
 
-        XSync(_display, false);
+        Imports.XSync(_display, false);
 
-        _shmImagePtr = XShmCreateImage(_display, attrs.visual, (uint)attrs.depth,
-            ZPixmap, _shmInfo.shmaddr, ref _shmInfo, (uint)width, (uint)height);
+        _shmImagePtr = Imports.XShmCreateImage(_display, attrs.visual, (uint)attrs.depth,
+            Constants.ZPixmap, _shmInfo.shmaddr, ref _shmInfo, (uint)width, (uint)height);
 
         if (_shmImagePtr == IntPtr.Zero)
         {
-            XShmDetach(_display, ref _shmInfo);
-            shmdt(_shmInfo.shmaddr);
+            Imports.XShmDetach(_display, ref _shmInfo);
+            Imports.shmdt(_shmInfo.shmaddr);
             return false;
         }
 
@@ -1624,11 +1540,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                 if (_display == IntPtr.Zero) break;
                 // Removed XPending here to significantly improve CPU usage
                 XEvent ev = default;
-                XNextEvent(_display, ref ev);
+                Imports.XNextEvent(_display, ref ev);
 
                 switch (ev.type)
                 {
-                    case ConfigureNotify:
+                    case Constants.ConfigureNotify:
                     {
                         var ce = ev.configureEvent;
                         if (ce.window == _unityWindow)
@@ -1637,7 +1553,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                         }
                         break;
                     }
-                    case DestroyNotify:
+                    case Constants.DestroyNotify:
                     {
                         var de = ev.destroyWindowEvent;
                         if (de.window == _unityWindow)
@@ -1646,12 +1562,12 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                         }
                         break;
                     }
-                    case EnterNotify:
+                    case Constants.EnterNotify:
                     {
                         _mouseOver = true;
                         break;
                     }
-                    case LeaveNotify:
+                    case Constants.LeaveNotify:
                     {
                         _mouseOver = false;
                         break;
@@ -1663,8 +1579,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                             var de = ev.damageNotifyEvent;
                             if (de.drawable == _unityWindow)
                             {
-                                XDamageSubtract(_display, de.damage, IntPtr.Zero, IntPtr.Zero);
-                                XGetWindowAttributes(_display, _unityWindow, out var attrs);
+                                Imports.XDamageSubtract(_display, de.damage, IntPtr.Zero, IntPtr.Zero);
+                                Imports.XGetWindowAttributes(_display, _unityWindow, out var attrs);
                                 UpdateInputMask(attrs.width, attrs.height);
                             }
                         }
@@ -1683,11 +1599,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     #region Cursors
     private IntPtr LoadThemedCursor(string cursorName, uint fallbackShape)
     {
-        var cursor = XcursorLibraryLoadCursor(_display, cursorName);
+        var cursor = Imports.XcursorLibraryLoadCursor(_display, cursorName);
         if (cursor == IntPtr.Zero)
         {
             Debug.LogWarning($"WindowManager: Failed to load themed cursor '{cursorName}', falling back to font cursor.");
-            cursor = XCreateFontCursor(_display, fallbackShape);
+            cursor = Imports.XCreateFontCursor(_display, fallbackShape);
         }
         return cursor;
     }
@@ -1697,9 +1613,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero) return;
         if (_currentSessionType == SessionTypes.Wayland || _currentDesktopEnv == DesktopEnvironments.Hyprland) return;
 
-        _defaultCursor  = LoadThemedCursor("left_ptr", XC_LEFT_PTR);
-        _grabCursor     = LoadThemedCursor("grab",     XC_HAND2);
-        _grabbingCursor = LoadThemedCursor("grabbing", XC_HAND2);
+        _defaultCursor  = LoadThemedCursor("left_ptr", Constants.XC_LEFT_PTR);
+        _grabCursor     = LoadThemedCursor("grab",     Constants.XC_HAND2);
+        _grabbingCursor = LoadThemedCursor("grabbing", Constants.XC_HAND2);
     }
     
     private void UpdateCursorState()
@@ -1719,8 +1635,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero) return;
 
         var toSet = (cursor != IntPtr.Zero) ? cursor : _defaultCursor;
-        XDefineCursor(_display, _unityWindow, toSet);
-        XFlush(_display);
+        Imports.XDefineCursor(_display, _unityWindow, toSet);
+        Imports.XFlush(_display);
     }
     #endregion
         
@@ -1754,659 +1670,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private const long ShapingThrottleMs = 100; // Update mask every 100ms
     
-    // Constants
-    private const int XaCardinal = 6;
-    private const int XaAtom = 4;
-    private const int IsViewable = 2;
-    private const int XaWindow = 33;
-    
-    private const long MwmHintsFlags = 1L << 1; // Use decorations
-    private const long MwmDecorationsNone = 0; // No decorations
-    private const int PropModeReplace = 0;
+    public int GetGeometry(out IntPtr rootReturn, out int x, out int y, out int width, out int height, out int borderWidth, out uint depth) => 
+        Imports.XGetGeometry(_display, _unityWindow, out rootReturn, out x, out y, out width, out height, out borderWidth, out depth);
 
-    private const int ClientMessage = 33;
-    private const long StructureNotifyMask = (1L << 17);
-    private const long SubstructureRedirectMask = 0x00080000;
-    private const long SubstructureNotifyMask = 0x00040000;
-    private const long EnterWindowMask = (1L << 4);
-    private const long LeaveWindowMask = (1L << 5);
-    private const long PropertyChangeMask = (1L << 22);
-    private const int ConfigureNotify = 22;
-    private const int DestroyNotify = 17;
-    private const int PropertyNotify = 28;
-    private const int ShapeBounding = 0;
-    private const int ShapeInput = 2;
-    private const int ShapeSet = 0;
-    private const int PictTypeDirect = 1;
-    private const int XDamageReportNonEmpty = 3;
-    private const int ZPixmap = 2;
-    private const ulong AllPlanes = 0xFFFFFFFFFFFFFFFFUL; // For 64-bit
-    private const int Unsorted = 0;
-    private const int YSorted = 1;
-    private const uint XC_LEFT_PTR = 68;
-    private const uint XC_HAND2 = 60;
-    private const int EnterNotify = 7;
-    private const int LeaveNotify = 8;
-    private const int CompositeRedirectAutomatic = 0;
-
-    private const int IPC_RMID = 0;
-    private const int IPC_PRIVATE = 0;
-    private const int IPC_CREAT = 00001000;
-    
-    public const string LibX11 = "libX11.so.6";
-    private const string LibXExt = "libXext.so.6";
-    public const string LibXRender = "libXrender.so.1";
-    private const string LibXDamage = "libXdamage.so.1";
-    private const string LibXRandR = "libXrandr.so.2";
-    private const string LibXCursor = "libXcursor.so.1";
-    private const string LibXComposite = "libXcomposite.so.1";
-    private const string LibC = "libc.so.6";
-
-    // X11 Event structures
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XClientMessageEvent
-    {
-        public int type;
-        public IntPtr serial;
-        public bool send_event;
-        public IntPtr display;
-        public IntPtr window;
-        public IntPtr message_type;
-        public int format;
-        public IntPtr data0;
-        public IntPtr data1;
-        public IntPtr data2;
-        public IntPtr data3;
-        public IntPtr data4;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct XWindowAttributes
-    {
-        public int x, y;
-        public int width, height;
-        public int border_width;
-        public int depth;
-        public IntPtr visual;
-        public IntPtr root;
-        public int c_class;
-        public int bit_gravity;
-        public int win_gravity;
-        public int backing_store;
-        public ulong backing_planes;
-        public ulong backing_pixel;
-        public bool save_under;
-        public IntPtr colormap;
-        public bool map_installed;
-        public int map_state;
-        public long all_event_masks;
-        public long your_event_mask;
-        public long do_not_propagate_mask;
-        public bool override_redirect;
-        public IntPtr screen;
-    }
-    
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XSetWindowAttributes
-    {
-        public IntPtr background_pixmap;
-        public ulong background_pixel;
-        public IntPtr border_pixmap;
-        public ulong border_pixel;
-        public int bit_gravity;
-        public int win_gravity;
-        public int backing_store;
-        public ulong backing_planes;
-        public ulong backing_pixel;
-        public bool save_under;
-        public long event_mask;
-        public long do_not_propagate_mask;
-        public bool override_redirect;
-        public IntPtr colormap;
-        public IntPtr cursor;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XClassHint
-    {
-        public IntPtr res_name;
-        public IntPtr res_class;
-    }
-
-    [StructLayout(LayoutKind.Explicit)]
-    private struct XEvent
-    {
-        [FieldOffset(0)] public int type;
-        [FieldOffset(0)] public XAnyEvent anyEvent;
-        [FieldOffset(0)] public XConfigureEvent configureEvent;
-        [FieldOffset(0)] public XDestroyWindowEvent destroyWindowEvent;
-        [FieldOffset(0)] public XDamageNotifyEvent damageNotifyEvent;
-        [FieldOffset(0)] public XClientMessageEvent clientMessageEvent;
-        [FieldOffset(0)] public XSelectionEvent selectionEvent;
-        [FieldOffset(0)] public XCrossingEvent crossingEvent;
-    }
-    
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XCrossingEvent
-    {
-        public int type;
-        public ulong serial;
-        public bool send_event;
-        public IntPtr display;
-        public IntPtr window;
-        public IntPtr root;
-        public IntPtr subwindow;
-        public ulong time;
-        public int x, y;
-        public int x_root, y_root;
-        public int mode;
-        public int detail;
-        public bool same_screen;
-        public bool focus;
-        public uint state;
-    }
-        
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XSelectionEvent
-    {
-        public int type;
-        public ulong serial;
-        public bool send_event;
-        public IntPtr display;
-        public IntPtr requestor;
-        public IntPtr selection;
-        public IntPtr target;
-        public IntPtr property;
-        public ulong time;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XAnyEvent
-    {
-        public int type;
-        public ulong serial;
-        public bool send_event;
-        public IntPtr display;
-        public IntPtr window;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XConfigureEvent
-    {
-        public int type;
-        public ulong serial;
-        public bool send_event;
-        public IntPtr display;
-        public IntPtr event_window;
-        public IntPtr window;
-        public int x, y;
-        public int width, height;
-        public int border_width;
-        public IntPtr above;
-        public bool override_redirect;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XDestroyWindowEvent
-    {
-        public int type;
-        public ulong serial;
-        public bool send_event;
-        public IntPtr display;
-        public IntPtr event_window;
-        public IntPtr window;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XDamageNotifyEvent
-    {
-        public int type;
-        public ulong serial;
-        public bool send_event;
-        public IntPtr display;
-        public IntPtr drawable;
-        public IntPtr damage;
-        public int level;
-        public bool more;
-        public ulong timestamp;
-        public XRectangle area;
-        public XRectangle geometry;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XRectangle
-    {
-        public short x, y;
-        public ushort width, height;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct XRenderPictFormat
-    {
-        public IntPtr id;
-        public int type;
-        public int depth;
-        public XRenderDirectFormat direct;
-        public IntPtr colormap;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct XRenderDirectFormat
-    {
-        public short red;
-        public short redMask;
-        public short green;
-        public short greenMask;
-        public short blue;
-        public short blueMask;
-        public short alpha;
-        public short alphaMask;
-    }
-
-    private struct Image
-    {
-        public byte[] Data;
-        public int Width, Height;
-    }
-    
-    [StructLayout(LayoutKind.Sequential)]
-    public struct XImage
-    {
-        public int width, height;
-        public int xoffset;
-        public int format;
-        public IntPtr data;
-        public int byte_order;
-        public int bitmap_unit;
-        public int bitmap_bit_order;
-        public int bitmap_pad;
-        public int depth;
-        public int bytes_per_line;
-        public int bits_per_pixel;
-    }
-        
-    [Serializable]
-    public struct RectF
-    {
-        public float x1, y1, x2, y2;
-    }
-
-    private struct CoveredFractionCalculator
-    {
-        [BurstCompile(CompileSynchronously = true)]
-        public static float Compute(NativeArray<RectF> covers, RectF target, int gridSize = 10)
-        {
-            int totalSamples = gridSize * gridSize;
-            int coveredSamples = 0;
-
-            for (int gy = 0; gy < gridSize; gy++)
-            {
-                float y = target.y1 + (target.y2 - target.y1) * (gy + 0.5f) / gridSize;
-                for (int gx = 0; gx < gridSize; gx++)
-                {
-                    float x = target.x1 + (target.x2 - target.x1) * (gx + 0.5f) / gridSize;
-
-                    // Check if this sample point is inside ANY cover rectangle
-                    bool isCovered = false;
-                    for (int j = 0; j < covers.Length; j++)
-                    {
-                        var c = covers[j];
-                        if (x >= c.x1 && x < c.x2 && y >= c.y1 && y < c.y2)
-                        {
-                            isCovered = true;
-                            break;  // Early exit: no need to check more
-                        }
-                    }
-
-                    if (isCovered) coveredSamples++;
-                }
-            }
-
-            return (float)coveredSamples / totalSamples;
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XMotifWmHints
-    {
-        public IntPtr flags;
-        public IntPtr functions;
-        public IntPtr decorations;
-        public IntPtr input_mode;
-        public IntPtr status;
-    }
-        
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XrrScreenResources
-    {
-        public IntPtr timestamp;
-        public IntPtr configTimestamp;
-        public int ncrtc;
-        public IntPtr crtcs;        // IntPtr* (array of XID)
-        public int noutput;
-        public IntPtr outputs;      // IntPtr* (array of XID)
-        public int nmode;
-        public IntPtr modes;        // pointer to array of XRRScreenModeInfo
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XrrOutputInfo
-    {
-        public IntPtr timestamp;
-        public IntPtr crtc;         // XID of current CRTC, or None
-        public IntPtr name;         // pointer to null-terminated string
-        public int nameLen;
-        public long mm_width;       // physical width in millimeters
-        public long mm_height;      // physical height in millimeters
-        public Connection connection; // 0 = connected, 1 = disconnected, 2 = unknown
-        public byte subpixel_order;
-        public int ncrtc;
-        public IntPtr crtcs;        // array of possible CRTCs
-        public int nclone;
-        public IntPtr clones;
-        public int nmode;
-        public int npreferred;
-        public IntPtr modes;        // array of mode XIDs
-    }
-        
-    private enum Connection : byte
-    {
-        Connected = 0,
-        Disconnected = 1,
-        Unknown = 2
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XrrCrtcInfo
-    {
-        public IntPtr timestamp;
-        public int x, y;            // absolute position of CRTC
-        public uint width, height;  // size in pixels
-        public int mode;            // current mode XID
-        public Rotation rotation;   // current rotation
-        public int noutput;
-        public IntPtr outputs;      // array of output XIDs currently driven
-        public int npossible;
-        public IntPtr possible;     // array of possible outputs
-    }
-        
-    [Flags]
-    private enum Rotation
-    {
-        Rotate0   = 1 << 0,
-        Rotate90  = 1 << 1,
-        Rotate180 = 1 << 2,
-        Rotate270 = 1 << 3,
-        ReflectX  = 1 << 4,
-        ReflectY  = 1 << 5
-    }
-
-    private delegate int XErrorHandler(IntPtr display, IntPtr errorEvent);
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XErrorEvent
-    {
-        public int type;
-        public IntPtr display;
-        public ulong resourceid;
-        public ulong serial;
-        public byte error_code;
-        public byte request_code;
-        public byte minor_code;
-    }
-    
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XShmSegmentInfo
-    {
-        public IntPtr shmseg;
-        public int shmid;
-        private int padding;
-        public IntPtr shmaddr;
-        public int readOnly;
-        private int padding2;
-    }
-
-    // X11 Library imports
-    [DllImport(LibX11)]
-    private static extern int XInitThreads();
-    
-    [DllImport(LibX11)]
-    private static extern IntPtr XOpenDisplay(string displayName);
-
-    [DllImport(LibX11)]
-    private static extern void XCloseDisplay(IntPtr display);
-
-    [DllImport(LibX11)]
-    private static extern IntPtr XDefaultRootWindow(IntPtr display);
-
-    [DllImport(LibX11)]
-    private static extern IntPtr XInternAtom(IntPtr display, string atomName, bool onlyIfExists);
-
-    [DllImport(LibX11)]
-    private static extern int XGetWindowProperty(IntPtr display, IntPtr window, IntPtr property,
-        long longOffset, long longLength, bool delete, IntPtr reqType,
-        out IntPtr actualTypeReturn, out int actualFormatReturn,
-        out ulong nItemsReturn, out ulong bytesAfterReturn, out IntPtr propReturn);
-
-    [DllImport(LibX11)]
-    private static extern int XGetGeometry(IntPtr display, IntPtr w, out IntPtr rootReturn, out int x, out int y,
-        out int width, out int height, out int borderWidth, out uint depth);
-
-    public int GetGeometry(out IntPtr rootReturn, out int x, out int y, out int width, out int height,
-        out int borderWidth, out uint depth) => XGetGeometry(_display, _unityWindow, out rootReturn, out x, out y,
-        out width, out height, out borderWidth, out depth);
-
-    [DllImport(LibX11)]
-    private static extern int XFree(IntPtr data);
-
-    [DllImport(LibX11)]
-    private static extern int XQueryTree(IntPtr display, IntPtr window,
-        out IntPtr rootReturn, out IntPtr parentReturn,
-        out IntPtr childrenReturn, out uint nChildrenReturn);
-
-    [DllImport(LibX11)]
-    private static extern int XGetWindowAttributes(IntPtr display, IntPtr window, out XWindowAttributes attributes);
-    
-    [DllImport(LibX11)]
-    private static extern int XChangeWindowAttributes(IntPtr display, IntPtr window, ulong valuemask, ref XSetWindowAttributes attributes);
-
-    [DllImport(LibX11)]
-    private static extern int XMoveWindow(IntPtr display, IntPtr window, int x, int y);
-
-    [DllImport(LibX11)]
-    private static extern int XResizeWindow(IntPtr display, IntPtr window, int width, int height);
-
-    [DllImport(LibX11)]
-    private static extern bool XQueryPointer(IntPtr display, IntPtr window, ref IntPtr windowReturn,
-        ref IntPtr childReturn,
-        ref int rootX, ref int rootY, ref int winX, ref int winY, ref uint mask);
-        
-    [DllImport(LibX11)]
-    private static extern int XQueryKeymap(IntPtr display, [In, Out] byte[] keymap);
-
-    [DllImport(LibX11)]
-    private static extern int XFlush(IntPtr display);
-        
-    [DllImport(LibX11)]
-    private static extern int XScreenCount(IntPtr display);
-
-    [DllImport(LibX11)]
-    private static extern int XGetSelectionOwner(IntPtr display, IntPtr atom);
-
-    [DllImport(LibX11)]
-    private static extern int XSendEvent(IntPtr display, IntPtr window, bool propagate,
-        long eventMask, ref XClientMessageEvent eventSend);
-
-    [DllImport(LibX11)]
-    private static extern IntPtr XRootWindow(IntPtr display, int screenNumber);
-
-    [DllImport(LibX11)]
-    private static extern bool XTranslateCoordinates(IntPtr display, IntPtr srcW, IntPtr destW,
-        int srcX, int srcY, out int destX, out int destY, out IntPtr child);
-
-    [DllImport(LibX11)]
-    private static extern int XGetClassHint(IntPtr display, IntPtr w, out XClassHint classHints);
-
-    [DllImport(LibX11)]
-    private static extern int XDisplayWidth(IntPtr display, int screen);
-        
-    public int DisplayWidth(IntPtr display, int screen) => XDisplayWidth(display, screen);
-
-    [DllImport(LibX11)]
-    private static extern int XDisplayHeight(IntPtr display, int screen);
-        
-    public int DisplayHeight(IntPtr display, int screen) => XDisplayHeight(display, screen);
-
-    [DllImport(LibX11)]
-    private static extern void XSync(IntPtr display, bool discard);
-
-    [DllImport(LibX11)]
-    private static extern int XChangeProperty(IntPtr display, IntPtr window, IntPtr property, IntPtr type,
-        int format, int mode, [In, Out] IntPtr data, int nItems);
-
-    [DllImport(LibX11)]
-    private static extern int XSelectInput(IntPtr display, IntPtr window, long eventMask);
-
-    [DllImport(LibXDamage)]
-    private static extern bool XDamageQueryExtension(IntPtr display, out int eventBase, out int errorBase);
-
-    [DllImport(LibXDamage)]
-    private static extern IntPtr XDamageCreate(IntPtr display, IntPtr drawable, int level);
-
-    [DllImport(LibXDamage)]
-    private static extern void XDamageDestroy(IntPtr display, IntPtr damage);
-
-    [DllImport(LibXDamage)]
-    private static extern void XDamageSubtract(IntPtr display, IntPtr damage, IntPtr repair, IntPtr parts);
-
-    [DllImport(LibXRender)]
-    private static extern IntPtr XRenderFindVisualFormat(IntPtr display, IntPtr visual);
-
-    [DllImport(LibX11)]
-    private static extern IntPtr XGetImage(IntPtr display, IntPtr drawable, int x, int y, uint width, uint height,
-        ulong planeMask, int format);
-
-    [DllImport(LibX11)]
-    private static extern int XDestroyImage(IntPtr xImage);
-
-    [DllImport(LibX11)]
-    private static extern ulong XGetPixel(IntPtr xImage, int x, int y);
-
-    [DllImport(LibX11)]
-    private static extern int XNextEvent(IntPtr display, ref XEvent ev);
-
-    [DllImport(LibX11)]
-    private static extern int XPending(IntPtr display);
-        
-    [DllImport(LibXRandR)]
-    private static extern int XRRQueryExtension(IntPtr display, out IntPtr eventBase, out IntPtr errorBase);
-
-    [DllImport(LibXRandR)]
-    private static extern int XRRQueryVersion(IntPtr display, out int major, out int minor);
-
-    [DllImport(LibXRandR)]
-    private static extern IntPtr XRRGetScreenResourcesCurrent(IntPtr display, IntPtr window);
-
-    [DllImport(LibXRandR)]
-    private static extern void XRRFreeScreenResources(IntPtr resources);
-
-    [DllImport(LibXRandR)]
-    private static extern IntPtr XRRGetOutputInfo(IntPtr display, IntPtr resources, IntPtr output);
-
-    [DllImport(LibXRandR)]
-    private static extern void XRRFreeOutputInfo(IntPtr outputInfo);
-
-    [DllImport(LibXRandR)]
-    private static extern IntPtr XRRGetCrtcInfo(IntPtr display, IntPtr resources, IntPtr crtc);
-
-    [DllImport(LibXRandR)]
-    private static extern void XRRFreeCrtcInfo(IntPtr crtcInfo);
-
-    [DllImport(LibX11)]
-    private static extern string XGetAtomName(IntPtr display, IntPtr atom);
-
-    [DllImport(LibX11)]
-    private static extern bool XGetErrorText(IntPtr display, int code, byte[] buffer, int size);
-
-    [DllImport(LibX11)]
-    private static extern XErrorHandler XSetErrorHandler(XErrorHandler handler);
-    
-    [DllImport(LibX11)]
-    private static extern int XQueryExtension(IntPtr display, string name, out int opcode, out int first_event, out int first_error);
-    
-    [DllImport(LibX11)]
-    private static extern IntPtr XListExtensions(IntPtr display, out int nExtensions);
-    
-    [DllImport(LibX11)]
-    private static extern int XSetTransientForHint(IntPtr display, IntPtr w, IntPtr propWindow);
-    
-    [DllImport(LibXExt)]
-    private static extern void XShapeCombineRectangles(
-        IntPtr display, 
-        IntPtr window, 
-        int destKind, 
-        int xOff, int yOff, 
-        XRectangle[] rectangles, 
-        int nRects, 
-        int op, 
-        int ordering
-    );
-    
-    [DllImport(LibXCursor)]
-    private static extern IntPtr XcursorLibraryLoadCursor(IntPtr display, string name);
-
-    [DllImport(LibX11)]
-    private static extern IntPtr XCreateFontCursor(IntPtr display, uint shape);
-
-    [DllImport(LibX11)]
-    private static extern int XDefineCursor(IntPtr display, IntPtr window, IntPtr cursor);
-
-    [DllImport(LibX11)]
-    private static extern int XFreeCursor(IntPtr display, IntPtr cursor);
-    
-    [DllImport(LibXExt)]
-    private static extern bool XShmQueryExtension(IntPtr display);
-
-    [DllImport(LibXExt)]
-    private static extern int XShmAttach(IntPtr display, ref XShmSegmentInfo shminfo);
-
-    [DllImport(LibXExt)]
-    private static extern int XShmDetach(IntPtr display, ref XShmSegmentInfo shminfo);
-
-    [DllImport(LibXExt)]
-    private static extern IntPtr XShmCreateImage(IntPtr display, IntPtr visual, uint depth,
-        int format, IntPtr data, ref XShmSegmentInfo shminfo, uint width, uint height);
-
-    [DllImport(LibXExt)]
-    private static extern bool XShmGetImage(IntPtr display, IntPtr drawable, IntPtr image,
-        int x, int y, ulong plane_mask);
-
-    [DllImport(LibC)]
-    private static extern int shmget(uint key, IntPtr size, int shmflg);
-
-    [DllImport(LibC)]
-    private static extern IntPtr shmat(int shmid, IntPtr shmaddr, int shmflg);
-
-    [DllImport(LibC)]
-    private static extern int shmdt(IntPtr shmaddr);
-    
-    [DllImport(LibC)]
-    private static extern int shmctl(int shmid, int cmd, IntPtr buf);
-    
-    [DllImport(LibXComposite)]
-    private static extern void XCompositeRedirectWindow(IntPtr display, IntPtr window, int update);
-    
-    [DllImport(LibXComposite)]
-    private static extern void XCompositeUnredirectWindow(IntPtr display, IntPtr window, int update);
-
-    [DllImport(LibXComposite)]
-    private static extern IntPtr XCompositeNameWindowPixmap(IntPtr display, IntPtr window);
-
-    [DllImport(LibX11)]
-    private static extern int XFreePixmap(IntPtr display, IntPtr pixmap);
-    
-    [DllImport(LibX11)]
-    private static extern int XStoreName(IntPtr display, IntPtr window, string window_name);
-    
     #endregion
 }

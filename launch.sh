@@ -2,6 +2,15 @@
 
 export GDK_BACKEND=x11
 
+if [[ $XDG_SESSION_DESKTOP == "Hyprland"* ]]; then
+  echo "Hyprland detected"
+  # hyprland seems to need these variables as well to create a transparent xwayland window
+  export XDG_BACKEND=x11
+  export SDL_VIDEODRIVER=x11 
+else
+  echo "Unknown windowmanager"
+fi
+
 visual_id=$(glxinfo 2>/dev/null | grep -i "32 tc  0  32  0 r  y .   8  8  8  8 .  .   0 24  8" | head -n1 | awk '{print $1}')
 
 if [ -z "$visual_id" ]; then

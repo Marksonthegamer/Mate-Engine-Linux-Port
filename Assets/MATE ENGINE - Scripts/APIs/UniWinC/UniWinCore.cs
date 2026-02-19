@@ -107,14 +107,14 @@ namespace Kirurobo
             public static extern void SetMaximized([MarshalAs(UnmanagedType.U1)] bool bZoomed);
 
             
-            public static void SetPosition(float x, float y) => WindowManager.Instance.SetWindowPosition(x, y);
+            public static void SetPosition(float x, float y) => WindowManager.Instance.SetWindowPosition((int)x, (int)y);
 
             
             [return: MarshalAs(UnmanagedType.Bool)]
             public static bool GetPosition(out float x, out float y) => WindowManager.Instance.GetWindowPosition(out x, out y);
 
             
-            public static void SetSize(float x, float y) => WindowManager.Instance.SetWindowSize(x, y);
+            public static void SetSize(float x, float y) => WindowManager.Instance.SetWindowSize((int)x, (int)y);
 
             
             public static bool GetSize(out float x, out float y) => WindowManager.Instance.GetWindowSize(out x, out y);
