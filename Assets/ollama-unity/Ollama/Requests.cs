@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace ollama
     public static partial class Ollama
     {
         private const string SERVER = "http://localhost:11434/";
+        
+        private static readonly HttpClient httpClient = new HttpClient();
 
         private static class Endpoints
         {
@@ -66,56 +69,46 @@ namespace ollama
 
         private static async Task PostRequestStream<T>(string payload, string endpoint, Action<T> onChunkReceived) where T : Response.BaseResponse
         {
-            HttpWebRequest httpWebRequest;
-
             try
             {
-                httpWebRequest = (HttpWebRequest)WebRequest.Create($"{SERVER}{endpoint}");
-                httpWebRequest.ContentType = "application/json";
-                httpWebRequest.Method = "POST";
+                var request = new HttpRequestMessage(HttpMethod.Post, $"{SERVER}{endpoint}");
+                request.Content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-                using (var streamWriter = new StreamWriter(await httpWebRequest.GetRequestStreamAsync().ConfigureAwait(false)))
-                    await streamWriter.WriteAsync(payload).ConfigureAwait(false);
+                // SendAsync with HttpCompletionOption.ResponseHeadersRead is crucial for streaming data
+                using (var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
+                using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    bool isEnd = false;
+                    int it = 0;
 
-                bool isEnd = false;
-                int it = 0;
-
-                using (var httpResponse = await httpWebRequest.GetResponseAsync().ConfigureAwait(false))
-                using (var responseStream = httpResponse.GetResponseStream())
-                using (var reader = new StreamReader(responseStream, Encoding.UTF8))
-                    while (!isEnd)
+                    while (!isEnd && !reader.EndOfStream)
                     {
                         it++;
                         string result = await reader.ReadLineAsync().ConfigureAwait(false);
-                        var response = JsonConvert.DeserializeObject<T>(result);
+                
+                        if (string.IsNullOrWhiteSpace(result)) continue;
+
+                        var chunkResponse = JsonConvert.DeserializeObject<T>(result);
+                
                         if (it > MaxIterations)
                         {
                             Debug.LogError($"Stream has reached {MaxIterations} iterations... Probably server error?");
-                            response.done = true;
+                            chunkResponse.done = true;
                         }
 
-                        onChunkReceived?.Invoke(response);
-                        isEnd = response.done;
+                        onChunkReceived?.Invoke(chunkResponse);
+                        isEnd = chunkResponse.done;
                     }
-            }
-            catch (WebException webEx)
-            {
-                string errorResponse = "";
-
-                if (webEx.Response != null)
-                {
-                    using (var errorStream = webEx.Response.GetResponseStream())
-                    using (var reader = new StreamReader(errorStream))
-                        errorResponse = await reader.ReadToEndAsync().ConfigureAwait(false);
                 }
-
-                Debug.LogError($"HTTP Error during \"{endpoint}\" PostRequest:\n{webEx.Message}\n{errorResponse}\n{webEx.StackTrace}");
-                return;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                Debug.LogError($"HTTP Error during \"{endpoint}\" PostRequestStream:\n{httpEx.Message}\n{httpEx.StackTrace}");
             }
             catch (Exception e)
             {
                 Debug.LogError($"Error during \"{endpoint}\" PostRequestStream:\n{e.Message}\n{e.StackTrace}");
-                return;
             }
         }
 
