@@ -113,6 +113,35 @@ public class MarkdownTextAutoConverter : MonoBehaviour
             t.color = HueShiftColor(baseTextColor[t]);
         }
     }
+    
+    public void AppendText(Text target, string appendStr)
+    {
+        if (target == null) return;
+
+        if (!baseTextColor.ContainsKey(target)) 
+            baseTextColor[target] = target.color;
+
+        // 尝试获取缓存的原始文本
+        if (!rawText.TryGetValue(target, out var raw))
+        {
+            // 如果没有缓存，取当前文本（如果是占位符 "..." 则视为空）
+            string current = target.text == "..." ? "" : (target.text ?? "");
+            raw = richTextTag.IsMatch(current) ? stripTags.Replace(current, "") : current;
+        }
+        else if (raw == "...")
+        {
+            // 如果缓存的是占位符，重置为空
+            raw = "";
+        }
+
+        // 追加新字符
+        raw += appendStr;
+        rawText[target] = raw;
+
+        // 直接解析并赋值，绕过 ConvertAllNow 的防覆盖冲突
+        target.text = ParseMarkdown(raw);
+        target.color = HueShiftColor(baseTextColor[target]);
+    }
 
     private string ParseMarkdown(string input)
     {

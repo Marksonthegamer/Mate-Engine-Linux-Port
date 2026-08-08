@@ -214,7 +214,7 @@ public class PetVoiceReactionHandler : MonoBehaviour
 
             bool genderAllowed = IsRegionAllowedByGender(region);
             bool stateOk = IsStateAllowedForRegion(region);
-
+            
             if (hovering && !region.wasHovering && stateOk && !anyBlocked && genderAllowed)
             {
                 bool allow = true;
@@ -419,20 +419,22 @@ public class PetVoiceReactionHandler : MonoBehaviour
         if (_unityHwnd == IntPtr.Zero) return false;
         if (!WindowManager.Instance.GetMousePosition(out var p)) return false;
         var stackingList = WindowManager.Instance.GetClientStackingList();
-    
-        foreach (var win in stackingList)
+        for (int i = stackingList.Count - 1; i >= 0; i--)
         {
+            var win = stackingList[i];
+
             if (WindowManager.Instance.IsDesktop(win) || WindowManager.Instance.IsDock(win))
                 continue;
-            
+
             if (!WindowManager.Instance.GetWindowRect(win, out var rect))
                 continue;
-            
+
             if (!rect.Contains(p))
                 continue;
-            
+
             return win != _unityHwnd;
         }
+
         return false;
     }
 

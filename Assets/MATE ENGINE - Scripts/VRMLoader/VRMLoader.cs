@@ -106,8 +106,10 @@ public class VRMLoader : MonoBehaviour
         if (isLoading) return;
 
         isLoading = true;
+        WindowManager.Instance.SetTopmost(false);
         var extensions = new[] { new ExtensionFilter("Model Files", "vrm", "me", "prefab") };
         string[] paths = StandaloneFileBrowser.OpenFilePanel("Select Model File", "", extensions, false);
+        WindowManager.Instance.SetTopmost(SaveLoadHandler.Instance.data.isTopmost);
         if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
             LoadVRM(paths[0]);
 

@@ -3922,7 +3922,7 @@ GameObject:
   - component: {fileID: 153487815}
   - component: {fileID: 153487816}
   m_Layer: 0
-  m_Name: TestProbe
+  m_Name: DesktopAmbientProbe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3942,9 +3942,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 722380195}
+  - {fileID: 1640474849}
   - {fileID: 163679455}
   - {fileID: 898146762}
-  - {fileID: 1640474849}
   m_Father: {fileID: 1221425059}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &153487816
@@ -3973,7 +3973,7 @@ MonoBehaviour:
   smoothing: 0.85
   saveKey: auto_ambient
   minGrayIntensity: 0.3
-  maxColorIntensity: 4
+  maxColorIntensity: 0.8
   saturationGamma: 1.3
 --- !u!1 &154457057
 GameObject:
@@ -34777,7 +34777,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 0.26999998, b: 0.96203995, a: 1}
-  m_Intensity: 7.906313e-31
+  m_Intensity: 6.3545367e-31
   m_Range: 0.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -77938,7 +77938,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 1.5812626e-30
+  m_Intensity: 1.2709073e-30
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -102066,7 +102066,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 1.1859469e-30
+  m_Intensity: 9.531805e-31
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -260133,7 +260133,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 3.9531565e-31
+    fadeCurrentValue: 3.1772684e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -260157,7 +260157,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 3.9531565e-31
+    fadeCurrentValue: 3.1772684e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -260181,7 +260181,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 3.9531565e-31
+    fadeCurrentValue: 3.1772684e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -265770,7 +265770,7 @@ MonoBehaviour:
   chatTemplate: llama3 chat
   lora: 
   loraWeights: 
-  flashAttention: 1
+  flashAttention: 0
   APIKey: 
   SSLCert: 
   SSLCertPath: 

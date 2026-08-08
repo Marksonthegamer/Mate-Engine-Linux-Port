@@ -120,7 +120,7 @@ Material:
     - _GlassTint: {r: 1, g: 1, b: 1, a: 0.35}
     - _MainColor: {r: 0.99999934, g: 0.99999946, b: 1, a: 1}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
-    - _OverlayColor: {r: 0.79244965, g: 0.792452, b: 0.7924528, a: 1}
+    - _OverlayColor: {r: 0.79244953, g: 0.792452, b: 0.7924528, a: 1}
     - _OverlayOffset: {r: 0, g: 0, b: 0, a: 0}
     - _OverlayScale: {r: 1, g: 1, b: 0, a: 0}
     - _OverlaySpeed: {r: 0.1, g: 0.1, b: 0, a: 0}
