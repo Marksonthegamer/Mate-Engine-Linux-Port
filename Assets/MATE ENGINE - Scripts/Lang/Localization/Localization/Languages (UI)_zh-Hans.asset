@@ -1326,14 +1326,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 141664176348708864
-    m_Localized: 'Allows the Avatar to sit on the bottom of the screen.
-
-      Useful
-      if your setup has now bottom dock or taskbar.'
+    m_Localized: "\u5141\u8BB8\u5BA0\u7269\u663E\u793A\u5728\u5C4F\u5E55\u5E95\u90E8\u3002\u5982\u679C\u60A8\u7684\u7535\u8111\u6CA1\u6709\u5E95\u90E8
+      Dock \u680F\u6216\u4EFB\u52A1\u680F\uFF0C\u6B64\u529F\u80FD\u975E\u5E38\u6709\u7528\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 141664102742867968
-    m_Localized: Enable Screen Sitting (Hyprland)
+    m_Localized: "\u542F\u7528\u5C4F\u5E55\u4E45\u5750\uFF08Hyprland\uFF09"
     m_Metadata:
       m_Items: []
   references:

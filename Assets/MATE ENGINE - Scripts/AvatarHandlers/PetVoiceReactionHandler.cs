@@ -417,17 +417,15 @@ public class PetVoiceReactionHandler : MonoBehaviour
     {
         ResolveWindowHandle();
         if (_unityHwnd == IntPtr.Zero) return false;
-        /*
-        Vector2Int p;
-        if (!WindowManager.Instance.GetMousePosition(out p)) return false;
+        if (!WindowManager.Instance.GetMousePosition(out var p)) return false;
         var stackingList = WindowManager.Instance.GetClientStackingList();
     
         foreach (var win in stackingList)
         {
-            if (!WindowManager.Instance.GetWindowRect(win, out var rect))
-                continue;
-
             if (WindowManager.Instance.IsDesktop(win) || WindowManager.Instance.IsDock(win))
+                continue;
+            
+            if (!WindowManager.Instance.GetWindowRect(win, out var rect))
                 continue;
             
             if (!rect.Contains(p))
@@ -435,9 +433,7 @@ public class PetVoiceReactionHandler : MonoBehaviour
             
             return win != _unityHwnd;
         }
-        */
-        // Deprecated as the stacking list order of some X11 WMs is abnormal (Not from top to bottom), resulting in the return value always being false.
-        return true;
+        return false;
     }
 
 #if UNITY_EDITOR

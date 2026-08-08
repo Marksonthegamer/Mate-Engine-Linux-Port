@@ -1154,6 +1154,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public void SetTopmost(bool topmost = true)
     {
+#if UNITY_EDITOR
+        return;
+#endif
         if(_windowManagerImplementation != null)
         {
             _windowManagerImplementation.SetTopmost(topmost);
