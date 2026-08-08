@@ -56,10 +56,13 @@ public class SettingsHandlerDropdowns : MonoBehaviour
             }
             foreach (var model in models)
             {
-                ollamaModelDropdown.AddOptions(new List<string> { model.name + ":" + model.details.parameter_size });
-                ollamaModelOptions.Add(model.name + ":" + model.details.parameter_size);
+                ollamaModelDropdown.AddOptions(new List<string> { model.name });
+                ollamaModelOptions.Add(model.name);
             }
             ollamaModelDropdown.onValueChanged.AddListener(OnOllamaModelChanged);
+            if (!string.IsNullOrEmpty(SaveLoadHandler.Instance.data.ollamaModel))
+                ollamaModelDropdown.value = ollamaModelOptions.IndexOf(SaveLoadHandler.Instance.data.ollamaModel);
+            else SaveLoadHandler.Instance.data.ollamaModel = ollamaModelOptions[0];
         }
 
         if (particleDropdown != null)

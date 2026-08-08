@@ -125,7 +125,7 @@ public class ChatOllama : MonoBehaviour
             FindAvatarSmart();
             Ollama.Launch();
             WarmUpCallback();
-            Ollama.AIName = "Zome";
+            Ollama.AIName = "assistant";
             Ollama.playerName = "user";
         }
 

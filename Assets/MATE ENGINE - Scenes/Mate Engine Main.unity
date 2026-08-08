@@ -34519,7 +34519,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 0.26999998, b: 0.96203995, a: 1}
-  m_Intensity: 1.0521096e-30
+  m_Intensity: 9.353331e-31
   m_Range: 0.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -77583,7 +77583,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 2.1042191e-30
+  m_Intensity: 1.8706663e-30
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -101710,7 +101710,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 1.5781644e-30
+  m_Intensity: 1.4029997e-30
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -256955,6 +256955,7 @@ MonoBehaviour:
     windowType: 0
     ollamaModel: gemma3:4b
     useKWinApi: 0
+    allowHyprlandMonitorSitting: 0
     alarms: []
     timers: []
   safeMode: 0
@@ -258010,7 +258011,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f6c87a428fd5d0be9bbc686bdc8c3c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  advancedOptions: 1
+  advancedOptions: 0
   remote: 0
   _llm: {fileID: 8017896322329334834}
   APIKey: 
@@ -258045,8 +258046,8 @@ MonoBehaviour:
   nKeep: -1
   stop: []
   stream: 1
-  playerName: 
-  AIName: 
+  playerName: user
+  AIName: assistant
   prompt: "\rWho you are:\n\n- Name: Zome\n- Age: 21 years\n- Gender: Female / Girl\n-
     Country: Japan\n- City: Osaka\n- Favorite Food: Pizza, Ramen, Fruits\n- Favorite
     Drink: Water, Cola, Hot Chocolate\n- Favorite Games: Overwatch, Elden Ring, VRChat\n-
@@ -259679,7 +259680,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 5.260548e-31
+    fadeCurrentValue: 4.6766657e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -259703,7 +259704,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 5.260548e-31
+    fadeCurrentValue: 4.6766657e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -259727,7 +259728,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 5.260548e-31
+    fadeCurrentValue: 4.6766657e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
