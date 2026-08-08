@@ -5,10 +5,3 @@ TextScriptImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 273604
-  packageName: LLM for Unity
-  packageVersion: 2.5.1
-  assetPath: Assets/LLMUnity/CHANGELOG.md
-  uploadId: 754381

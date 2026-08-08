@@ -3,6 +3,7 @@ using LLMUnity;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace LLMUnitySamples
 {
@@ -13,7 +14,7 @@ namespace LLMUnitySamples
 
         public static string Weather()
         {
-            string[] weather = new string[]{"sunny", "rainy", "cloudy", "snowy"};
+            string[] weather = new string[] {"sunny", "rainy", "cloudy", "snowy"};
             return "The weather is " + weather[random.Next(weather.Length)];
         }
 
@@ -24,14 +25,14 @@ namespace LLMUnitySamples
 
         public static string Emotion()
         {
-            string[] emotion = new string[]{"happy", "sad", "exhilarated", "ok"};
+            string[] emotion = new string[] {"happy", "sad", "exhilarated", "ok"};
             return "I am feeling " + emotion[random.Next(emotion.Length)];
         }
     }
 
     public class FunctionCalling : MonoBehaviour
     {
-        public LLMCharacter llmCharacter;
+        public LLMAgent llmAgent;
         public InputField playerText;
         public Text AIText;
 
@@ -39,7 +40,7 @@ namespace LLMUnitySamples
         {
             playerText.onSubmit.AddListener(onInputFieldSubmit);
             playerText.Select();
-            llmCharacter.grammarString = MultipleChoiceGrammar();
+            llmAgent.grammar = MultipleChoiceGrammar();
         }
 
         string[] GetFunctionNames()
@@ -59,28 +60,37 @@ namespace LLMUnitySamples
             string prompt = "Which of the following choices matches best the input?\n\n";
             prompt += "Input:" + message + "\n\n";
             prompt += "Choices:\n";
-            foreach(string functionName in GetFunctionNames()) prompt += $"- {functionName}\n";
+            foreach (string functionName in GetFunctionNames()) prompt += $"- {functionName}\n";
             prompt += "\nAnswer directly with the choice";
             return prompt;
         }
 
         string CallFunction(string functionName)
         {
-            return (string) typeof(Functions).GetMethod(functionName).Invoke(null, null);
+            return (string)typeof(Functions).GetMethod(functionName).Invoke(null, null);
         }
 
         async void onInputFieldSubmit(string message)
         {
             playerText.interactable = false;
-            string functionName = await llmCharacter.Chat(ConstructPrompt(message));
+            string functionName = await llmAgent.Chat(ConstructPrompt(message));
             string result = CallFunction(functionName);
             AIText.text = $"Calling {functionName}\n{result}";
+
+            await Task.Yield();
+            AIReplyComplete();
+        }
+
+        public void AIReplyComplete()
+        {
+            playerText.text = "";
             playerText.interactable = true;
+            playerText.Select();
         }
 
         public void CancelRequests()
         {
-            llmCharacter.CancelRequests();
+            llmAgent.CancelRequests();
         }
 
         public void ExitGame()
@@ -92,9 +102,9 @@ namespace LLMUnitySamples
         bool onValidateWarning = true;
         void OnValidate()
         {
-            if (onValidateWarning && !llmCharacter.remote && llmCharacter.llm != null && llmCharacter.llm.model == "")
+            if (onValidateWarning && !llmAgent.remote && llmAgent.llm != null && llmAgent.llm.model == "")
             {
-                Debug.LogWarning($"Please select a model in the {llmCharacter.llm.gameObject.name} GameObject!");
+                Debug.LogWarning($"Please select a model in the {llmAgent.llm.gameObject.name} GameObject!");
                 onValidateWarning = false;
             }
         }

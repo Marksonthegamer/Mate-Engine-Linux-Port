@@ -8,7 +8,7 @@ public class AISystemPromptBinder : MonoBehaviour
 {
     [Header("References")]
     public InputField input;
-    public LLMUnity.LLMCharacter target;
+    public LLMUnity.LLMAgent target;
 
     [Header("Behavior")]
     public bool liveSave = true;
@@ -16,7 +16,7 @@ public class AISystemPromptBinder : MonoBehaviour
     void Reset()
     {
         if (!input) input = GetComponent<InputField>();
-        if (!target) target = FindObjectOfType<LLMUnity.LLMCharacter>();
+        if (!target) target = FindObjectOfType<LLMUnity.LLMAgent>();
     }
 
     void Awake()
@@ -24,7 +24,7 @@ public class AISystemPromptBinder : MonoBehaviour
         if (!input) input = GetComponent<InputField>();
 
         string path = GetFixedPromptPath();
-        string txt = target ? target.prompt : "";
+        string txt = target ? target.systemPrompt : "";
 
         try
         {
@@ -80,7 +80,7 @@ public class AISystemPromptBinder : MonoBehaviour
 
     void ApplyToLLM(string s)
     {
-        if (target != null) target.SetPrompt(s, true);
+        if (target != null) target.systemPrompt = s;
     }
 
     static string GetFixedPromptPath()

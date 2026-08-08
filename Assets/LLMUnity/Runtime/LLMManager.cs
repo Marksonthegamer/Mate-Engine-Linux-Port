@@ -20,14 +20,13 @@ namespace LLMUnity
         public string filename;
         public string path;
         public bool lora;
-        public string chatTemplate;
         public string url;
         public bool embeddingOnly;
         public int embeddingLength;
         public bool includeInBuild;
         public int contextLength;
 
-        static List<string> embeddingOnlyArchs = new List<string> {"bert", "nomic-bert", "jina-bert-v2", "t5", "t5encoder"};
+        static List<string> embeddingOnlyArchs = new List<string> { "bert", "nomic-bert", "jina-bert-v2", "t5", "t5encoder", "gemma-embedding" };
 
         /// <summary>
         /// Returns the relative asset path if it is in the AssetPath folder (StreamingAssets or persistentPath), otherwise the filename.
@@ -60,7 +59,6 @@ namespace LLMUnity
             this.path = LLMUnitySetup.GetFullPath(path);
             this.url = url;
             includeInBuild = true;
-            chatTemplate = null;
             contextLength = -1;
             embeddingOnly = false;
             embeddingLength = 0;
@@ -74,7 +72,6 @@ namespace LLMUnity
                     embeddingLength = reader.GetIntField($"{arch}.embedding_length");
                 }
                 embeddingOnly = embeddingOnlyArchs.Contains(arch);
-                chatTemplate = embeddingOnly ? default : ChatTemplate.FromGGUF(reader, this.path);
             }
         }
 
@@ -98,7 +95,6 @@ namespace LLMUnity
         public bool downloadOnStart;
         public List<ModelEntry> modelEntries;
         public int debugMode;
-        public bool fullLlamaLib;
     }
     /// \endcond
 
@@ -114,7 +110,7 @@ namespace LLMUnity
         static List<LLM> llms = new List<LLM>();
 
         public static float downloadProgress = 1;
-        public static List<Callback<float>> downloadProgressCallbacks = new List<Callback<float>>();
+        public static List<Action<float>> downloadProgressCallbacks = new List<Action<float>>();
         static Task<bool> SetupTask;
         static readonly object lockObject = new object();
         static long totalSize;
@@ -128,7 +124,7 @@ namespace LLMUnity
         public static void SetDownloadProgress(float progress)
         {
             downloadProgress = (completedSize + progress * currFileSize) / totalSize;
-            foreach (Callback<float> downloadProgressCallback in downloadProgressCallbacks) downloadProgressCallback?.Invoke(downloadProgress);
+            foreach (Action<float> downloadProgressCallback in downloadProgressCallbacks) downloadProgressCallback?.Invoke(downloadProgress);
         }
 
         /// <summary>
@@ -167,7 +163,7 @@ namespace LLMUnity
                 else
                 {
                     target = LLMUnitySetup.GetDownloadAssetPath(modelEntry.filename);
-                    downloads.Add(new StringPair {source = modelEntry.url, target = target});
+                    downloads.Add(new StringPair { source = modelEntry.url, target = target });
                 }
             }
             if (downloads.Count == 0) return true;
@@ -204,34 +200,6 @@ namespace LLMUnity
                 return false;
             }
             return true;
-        }
-
-        /// <summary>
-        /// Sets the chat template for a model and distributes it to all LLMs using it
-        /// </summary>
-        /// <param name="filename">model path</param>
-        /// <param name="chatTemplate">chat template</param>
-        public static void SetTemplate(string filename, string chatTemplate)
-        {
-            SetTemplate(Get(filename), chatTemplate);
-        }
-
-        /// <summary>
-        /// Sets the chat template for a model and distributes it to all LLMs using it
-        /// </summary>
-        /// <param name="entry">model entry</param>
-        /// <param name="chatTemplate">chat template</param>
-        public static void SetTemplate(ModelEntry entry, string chatTemplate)
-        {
-            if (entry == null) return;
-            entry.chatTemplate = chatTemplate;
-            foreach (LLM llm in llms)
-            {
-                if (llm != null && llm.model == entry.filename) llm.SetTemplate(chatTemplate);
-            }
-#if UNITY_EDITOR
-            Save();
-#endif
         }
 
         /// <summary>
@@ -327,7 +295,6 @@ namespace LLMUnity
             downloadOnStart = store.downloadOnStart;
             modelEntries = store.modelEntries;
             LLMUnitySetup.DebugMode = (LLMUnitySetup.DebugModeType)store.debugMode;
-            LLMUnitySetup.FullLlamaLib = store.fullLlamaLib;
         }
 
 #if UNITY_EDITOR
@@ -650,8 +617,7 @@ namespace LLMUnity
             {
                 modelEntries = modelEntriesBuild,
                 downloadOnStart = downloadOnStart,
-                debugMode = (int)LLMUnitySetup.DebugMode,
-                fullLlamaLib = LLMUnitySetup.FullLlamaLib
+                debugMode = (int)LLMUnitySetup.DebugMode
             }, true);
             File.WriteAllText(LLMUnitySetup.LLMManagerPath, json);
         }
@@ -660,7 +626,7 @@ namespace LLMUnity
         /// Saves the model manager to disk along with models that are not (or can't) be downloaded for the build
         /// </summary>
         /// <param name="copyCallback">copy function</param>
-        public static void Build(ActionCallback copyCallback)
+        public static void Build(Action<string, string> copyCallback)
         {
             SaveToDisk();
 

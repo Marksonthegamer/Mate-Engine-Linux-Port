@@ -2,6 +2,9 @@
 /// @brief File implementing LLM helper code.
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using UndreamAI.LlamaLib;
+using UnityEngine;
 
 namespace LLMUnity
 {
@@ -145,7 +148,7 @@ namespace LLMUnity
             {
                 List<string> loraStringArr = new List<string>(loraString.Split(delimiter));
                 List<string> loraWeightsStringArr = new List<string>(loraWeightsString.Split(delimiter));
-                if (loraStringArr.Count != loraWeightsStringArr.Count) throw new Exception($"LoRAs number ({loraString}) doesn't match the number of weights ({loraWeightsString})");
+                if (loraStringArr.Count != loraWeightsStringArr.Count) LLMUnitySetup.LogError($"LoRAs number ({loraString}) doesn't match the number of weights ({loraWeightsString})", true);
 
                 List<LoraAsset> lorasNew = new List<LoraAsset>();
                 for (int i = 0; i < loraStringArr.Count; i++) lorasNew.Add(new LoraAsset(loraStringArr[i].Trim(), float.Parse(loraWeightsStringArr[i])));
@@ -199,6 +202,59 @@ namespace LLMUnity
             for (int i = 0; i < loras.Count; i++) loraPaths[i] = loras[i].assetPath;
             return loraPaths;
         }
+    }
+
+    public class Utils
+    {
+        // Extract main thread wrapping logic
+        public static Action<string> WrapActionForMainThread(
+            Action<string> callback, MonoBehaviour owner)
+        {
+            if (callback == null) return null;
+            var context = SynchronizationContext.Current;
+
+            return msg =>
+            {
+                try
+                {
+                    if (owner == null) return;
+                    if (context != null)
+                    {
+                        context.Post(_ =>
+                        {
+                            try
+                            {
+                                if (owner != null) callback(msg);
+                            }
+                            catch (Exception e)
+                            {
+                                LLMUnitySetup.LogError($"Exception in callback: {e}");
+                            }
+                        }, null);
+                    }
+                    else
+                    {
+                        callback(msg);
+                    }
+                }
+                catch (Exception e)
+                {
+                    LLMUnitySetup.LogError($"Exception in callback wrapper: {e}");
+                }
+            };
+        }
+
+#if !ENABLE_IL2CPP
+        // Keep original for Mono builds
+        public static LlamaLib.CharArrayCallback WrapCallbackForAsync(
+            Action<string> callback, MonoBehaviour owner)
+        {
+            if (callback == null) return null;
+            Action<string> mainThreadCallback = WrapActionForMainThread(callback, owner);
+            return msg => mainThreadCallback(msg);
+        }
+
+#endif
     }
     /// \endcond
 }

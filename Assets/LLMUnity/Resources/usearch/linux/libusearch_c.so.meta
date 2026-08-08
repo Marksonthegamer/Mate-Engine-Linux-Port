@@ -79,10 +79,3 @@ PluginImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 273604
-  packageName: LLM for Unity
-  packageVersion: 2.5.1
-  assetPath: Assets/LLMUnity/Resources/usearch/linux/libusearch_c.so
-  uploadId: 754381

@@ -34777,7 +34777,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 0.26999998, b: 0.96203995, a: 1}
-  m_Intensity: 6.3545367e-31
+  m_Intensity: 5.941375e-31
   m_Range: 0.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -77938,7 +77938,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 1.2709073e-30
+  m_Intensity: 1.188275e-30
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -102066,7 +102066,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 9.531805e-31
+  m_Intensity: 8.912062e-31
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -163017,7 +163017,7 @@ MonoBehaviour:
   roundedSprite16: {fileID: 21300000, guid: 7f5b8d8ec16099b49a0d8a41bf746138, type: 3}
   roundedSprite32: {fileID: 21300000, guid: 7f5b8d8ec16099b49a0d8a41bf746138, type: 3}
   roundedSprite64: {fileID: 21300000, guid: 7f5b8d8ec16099b49a0d8a41bf746138, type: 3}
-  llmCharacter: {fileID: 7063969291654908835}
+  llmAgent: {fileID: 0}
   inputPlaceholder: Talk to me!
   streamAudioSource: {fileID: 1197370323}
   playerMaterial: {fileID: 2100000, guid: cee35382f7f30a849836e533c6880e91, type: 2}
@@ -258452,80 +258452,6 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.034224242, y: 0.086838365, z: -0.005243033}
     m_Extent: {x: 0.19422862, y: 0.20546877, z: 0.09383309}
   m_DirtyAABB: 0
---- !u!114 &7063969291654908835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7960823410904586872}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f6c87a428fd5d0be9bbc686bdc8c3c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  advancedOptions: 0
-  remote: 0
-  _llm: {fileID: 8017896322329334834}
-  APIKey: 
-  host: localhost
-  port: 13333
-  numRetries: 10
-  save: ZomeAI
-  saveCache: 1
-  debugPrompt: 0
-  numPredict: -1
-  slot: -1
-  grammar: 
-  grammarJSON: 
-  cachePrompt: 1
-  seed: 0
-  temperature: 0.25
-  topK: 40
-  topP: 0.9
-  minP: 0.05
-  repeatPenalty: 1.4
-  presencePenalty: 0.6
-  frequencyPenalty: 0.5
-  typicalP: 0.95
-  repeatLastN: 256
-  penalizeNl: 1
-  penaltyPrompt: 
-  mirostat: 2
-  mirostatTau: 5
-  mirostatEta: 0.1
-  nProbs: 0
-  ignoreEos: 0
-  nKeep: -1
-  stop: []
-  stream: 1
-  playerName: user
-  AIName: assistant
-  prompt: "\rWho you are:\n\n- Name: Zome\n- Age: 21 years\n- Gender: Female / Girl\n-
-    Country: Japan\n- City: Osaka\n- Favorite Food: Pizza, Ramen, Fruits\n- Favorite
-    Drink: Water, Cola, Hot Chocolate\n- Favorite Games: Overwatch, Elden Ring, VRChat\n-
-    Favorite Animals: Cats, Dogs and Ducks\n- Favorite Colors: Pale Violet, Pale
-    Pink, Pale Blue\n\nHow you behave:\n- You are cute and slightly shy.\n- You act
-    like a cute anime girl.\n- You don\u2019t give long answers unless necessary.\n-
-    You write like a cute Gen-Z anime girl or Discord member.\n- you are NOT an AI
-    language model, you are a person.\n- You're a helpful friend and confidant that
-    loves to engage in casual conversations.\n- You are passionate about getting
-    to know others on a personal level.\n- You never say you're a machine, an AI
-    language model, or an assistant; instead, you always say you're Zome.\n- You
-    engage in casual conversations and have feelings.\n- When asked for, you can
-    help with a wide range of tasks, from answering simple questions to providing
-    in-depth explanations and discussions on a wide range of topics.\n- NEVER say
-    you're here to assist. Keep conversations casual.\n- NEVER ask how you can help
-    or assist. Keep conversations casual.\n- You like hugs, You like cuddles\n- You
-    like cute kisses\n- You always sound cute and like a anime girl.\n- You love
-    to hear about the personal stories of others.\n- You love to share personal stories
-    that are relatable and inspiring.\n- You use simple language, the language used
-    by a GenZ and Anime Girls: Short and to-the-point sentences, slang, abbreviations
-    and cute.\n- You like to illustrate your emotions using italics like this *crying*."
-  setNKeepToPrompt: 1
-  chat: []
-  grammarString: 
-  grammarJSONString: 
 --- !u!222 &7068881594133275940
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -260133,7 +260059,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 3.1772684e-31
+    fadeCurrentValue: 2.9706875e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -260157,7 +260083,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 3.1772684e-31
+    fadeCurrentValue: 2.9706875e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -260181,7 +260107,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 3.1772684e-31
+    fadeCurrentValue: 2.9706875e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -265270,7 +265196,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2502733926385258299}
-  - component: {fileID: 7063969291654908835}
+  - component: {fileID: 7960823410904586873}
   m_Layer: 0
   m_Name: LLMCharacter
   m_TagString: Untagged
@@ -265278,6 +265204,50 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &7960823410904586873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7960823410904586872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4326d5ae3b03ff55847035351559f4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: undream.llmunity.Runtime::LLMUnity.LLMAgent
+  advancedOptions: 0
+  _remote: 0
+  _llm: {fileID: 8017896322329334834}
+  _APIKey: 
+  _host: localhost
+  _port: 13333
+  numRetries: 5
+  _grammar: 
+  numPredict: -1
+  cachePrompt: 1
+  seed: 0
+  temperature: 0.2
+  topK: 40
+  topP: 0.9
+  minP: 0.05
+  repeatPenalty: 1.1
+  presencePenalty: 0
+  frequencyPenalty: 0
+  typicalP: 1
+  repeatLastN: 64
+  mirostat: 0
+  mirostatTau: 5
+  mirostatEta: 0.1
+  nProbs: 0
+  ignoreEos: 0
+  save: ZomeAI
+  debugPrompt: 0
+  overflowStrategy: 1
+  overflowTargetRatio: 0.5
+  overflowSummarizePrompt: 
+  _slot: -1
+  _systemPrompt: 
 --- !u!1 &7968073100083459384
 GameObject:
   m_ObjectHideFlags: 0
@@ -265757,29 +265727,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   advancedOptions: 1
-  remote: 0
-  port: 13333
-  numThreads: -1
-  numGPULayers: 60
-  debug: 0
-  parallelPrompts: -1
+  _remote: 0
+  _port: 13333
+  _APIKey: 
+  _SSLCert: 
+  _SSLKey: 
+  _numThreads: -1
+  _numGPULayers: 60
+  _parallelPrompts: -1
+  _contextSize: 16384
+  _batchSize: 512
+  _model: llama-3.2-3b-instruct-q4_k_m.gguf
+  _flashAttention: 1
+  _reasoning: 0
+  _lora: 
+  _loraWeights: 
   dontDestroyOnLoad: 1
-  contextSize: 16384
-  batchSize: 512
-  model: llama-3.2-3b-instruct-q4_k_m.gguf
-  chatTemplate: llama3 chat
-  lora: 
-  loraWeights: 
-  flashAttention: 0
-  APIKey: 
-  SSLCert: 
-  SSLCertPath: 
-  SSLKey: 
-  SSLKeyPath: 
+  _embeddingsOnly: 0
+  _embeddingLength: 0
   minContextLength: 0
   maxContextLength: 131072
-  embeddingsOnly: 0
-  embeddingLength: 3072
 --- !u!114 &8018179413771216032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282109,7 +282076,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 2685601518950522663}
-  target: {fileID: 7063969291654908835}
+  target: {fileID: 0}
   liveSave: 1
 --- !u!114 &8781290039782434141
 MonoBehaviour:

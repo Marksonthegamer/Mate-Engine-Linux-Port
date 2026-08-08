@@ -5,14 +5,15 @@ using LLMUnity;
 using UnityEngine.UI;
 using System.Collections;
 using System.Linq;
+using UnityEngine.Serialization;
 
 namespace LLMUnitySamples
 {
     public class ChatBot : MonoBehaviour
     {
         [Header("Containers")]
-        public Transform chatContainer;         
-        public Transform inputContainer;        
+        public Transform chatContainer;
+        public Transform inputContainer;
 
         [Header("Colors & Font")]
         public Color playerColor = new Color32(81, 164, 81, 255);
@@ -25,14 +26,14 @@ namespace LLMUnitySamples
         public int bubbleWidth = 600;
         public float textPadding = 10f;
         public float bubbleSpacing = 10f;
-        public float bottomPadding = 10f;       
+        public float bottomPadding = 10f;
         public Sprite sprite;
         public Sprite roundedSprite16;
         public Sprite roundedSprite32;
         public Sprite roundedSprite64;
 
-        [Header("LLM")]
-        public LLMCharacter llmCharacter;
+        [FormerlySerializedAs("llmCharacter")] [Header("LLM")]
+        public LLMAgent llmAgent;
 
         [Header("Input Settings")]
         public string inputPlaceholder = "Message me";
@@ -41,20 +42,20 @@ namespace LLMUnitySamples
         public AudioSource streamAudioSource;
 
         [Header("Bubble Materials")]
-        public Material playerMaterial;         
-        public Material aiMaterial;             
+        public Material playerMaterial;
+        public Material aiMaterial;
         [Header("Text Materials")]
-        public Material playerTextMaterial;      
-        public Material aiTextMaterial;        
+        public Material playerTextMaterial;
+        public Material aiTextMaterial;
         [Header("Scroll")]
-        public ScrollRect scrollRect;           
-        public bool autoScrollOnNewMessage = true;     
-        public bool respectUserScroll = true;            
+        public ScrollRect scrollRect;
+        public bool autoScrollOnNewMessage = true;
+        public bool respectUserScroll = true;
 
         [Header("History")]
-        [Min(0)] public int maxMessages = 100;           
-        public bool trimOnlyWhenAtBottom = true;       
-        public bool enableOffscreenTrim = false;        
+        [Min(0)] public int maxMessages = 100;
+        public bool trimOnlyWhenAtBottom = true;
+        public bool enableOffscreenTrim = false;
 
         [Header("Font Colors (per side)")]
         public Color playerFontColor = Color.white;
@@ -62,7 +63,7 @@ namespace LLMUnitySamples
 
         [Header("Rounded Sprite Radius")]
         [Range(0, 64)]
-        public int cornerRadius = 16; 
+        public int cornerRadius = 16;
         private bool layoutDirty;
 
         private InputBubble inputBubble;
@@ -124,7 +125,7 @@ namespace LLMUnitySamples
             inputBubble.setInteractable(false);
 
             ShowLoadedMessages();
-            _ = llmCharacter.Warmup(WarmUpCallback);
+            _ = llmAgent.Warmup(WarmUpCallback);
             FindAvatarSmart();
         }
 
@@ -173,7 +174,7 @@ namespace LLMUnitySamples
             if (streamAudioSource != null && streamAudioSource.isPlaying)
             {
                 streamAudioSource.Stop();
-                streamAudioSource.volume = 1f; 
+                streamAudioSource.volume = 1f;
             }
             if (avatarAnimator != null) avatarAnimator.SetBool(isTalkingHash, false);
         }
@@ -230,20 +231,20 @@ namespace LLMUnitySamples
 
         bool IsAtBottom(float tolerance = 0.01f)
         {
-            if (scrollRect == null) return true; 
+            if (scrollRect == null) return true;
             return scrollRect.verticalNormalizedPosition <= tolerance;
         }
 
         void ShowLoadedMessages()
         {
             int start = 1;
-            int total = llmCharacter.chat.Count;
+            int total = llmAgent.chat.Count;
             if (maxMessages > 0)
                 start = Mathf.Max(1, total - maxMessages);
 
             for (int i = start; i < total; i++)
             {
-                AddBubble(llmCharacter.chat[i].content, i % 2 == 1);
+                AddBubble(llmAgent.chat[i].content, i % 2 == 1);
             }
             StartCoroutine(ScrollToBottomNextFrame());
         }
@@ -267,7 +268,7 @@ namespace LLMUnitySamples
                 streamAudioSource.Play();
             if (avatarAnimator != null) avatarAnimator.SetBool(isTalkingHash, true);
 
-            Task chatTask = llmCharacter.Chat(
+            Task chatTask = llmAgent.Chat(
                 message,
                 (partial) => { aiBubble.SetText(partial); layoutDirty = true; },
                 () =>
@@ -297,7 +298,7 @@ namespace LLMUnitySamples
             }
 
             streamAudioSource.Stop();
-            streamAudioSource.volume = startVolume; 
+            streamAudioSource.volume = startVolume;
         }
 
         public void WarmUpCallback()
@@ -315,7 +316,7 @@ namespace LLMUnitySamples
 
         public void CancelRequests()
         {
-            llmCharacter.CancelRequests();
+            llmAgent.CancelRequests();
             AllowInput();
         }
 
@@ -393,7 +394,7 @@ namespace LLMUnitySamples
             yield return null;
             Canvas.ForceUpdateCanvases();
             if (scrollRect != null)
-                scrollRect.verticalNormalizedPosition = 0f; 
+                scrollRect.verticalNormalizedPosition = 0f;
         }
 
         bool onValidateWarning = true;
@@ -403,9 +404,9 @@ namespace LLMUnitySamples
             else if (cornerRadius <= 32) sprite = roundedSprite32;
             else sprite = roundedSprite64;
 
-            if (onValidateWarning && llmCharacter != null && !llmCharacter.remote && llmCharacter.llm != null && llmCharacter.llm.model == "")
+            if (onValidateWarning && llmAgent != null && !llmAgent.remote && llmAgent.llm != null && llmAgent.llm.model == "")
             {
-                Debug.LogWarning($"Please select a model in the {llmCharacter.llm.gameObject.name} GameObject!");
+                Debug.LogWarning($"Please select a model in the {llmAgent.llm.gameObject.name} GameObject!");
                 onValidateWarning = false;
             }
         }

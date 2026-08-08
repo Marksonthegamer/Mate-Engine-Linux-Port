@@ -1,0 +1,53 @@
+using System;
+using UnityEditor;
+using UnityEngine;
+using System.Collections.Generic;
+
+namespace LLMUnity
+{
+    [CustomEditor(typeof(LLMClient), true)]
+    public class LLMCallerEditor : PropertyEditor {}
+
+    [CustomEditor(typeof(LLMAgent), true)]
+    public class LLMAgentEditor : LLMCallerEditor
+    {
+        public override void AddSetupExtras(SerializedObject llmScriptSO)
+        {
+            int strategy = llmScriptSO.FindProperty("overflowStrategy").intValue;
+            if (strategy > 0) ShowPropertiesOfClass("", llmScriptSO, new List<Type> { typeof(Overflow1Attribute) }, false);
+            if (strategy > 1) ShowPropertiesOfClass("", llmScriptSO, new List<Type> { typeof(Overflow2Attribute) }, false);
+        }
+
+        public override void AddModelSettings(SerializedObject llmScriptSO)
+        {
+            if (!llmScriptSO.FindProperty("advancedOptions").boolValue)
+            {
+                base.AddModelSettings(llmScriptSO);
+            }
+            else
+            {
+                EditorGUILayout.LabelField("Model Settings", EditorStyles.boldLabel);
+                ShowPropertiesOfClass("", llmScriptSO, new List<Type> { typeof(ModelAttribute) }, false);
+
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("Load grammar", GUILayout.Width(buttonWidth)))
+                {
+                    EditorApplication.delayCall += () =>
+                    {
+                        string path = EditorUtility.OpenFilePanelWithFilters("Select a grammar file", "", new string[] { "Grammar Files", "json,gbnf" });
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            ((LLMAgent)target).LoadGrammar(path);
+                        }
+                    };
+                }
+                EditorGUILayout.EndHorizontal();
+
+                ShowPropertiesOfClass("", llmScriptSO, new List<Type> { typeof(ModelAdvancedAttribute) }, false);
+            }
+        }
+    }
+
+    [CustomEditor(typeof(DBSearch), true)]
+    public class DBSearchEditor : PropertyEditor {}
+}

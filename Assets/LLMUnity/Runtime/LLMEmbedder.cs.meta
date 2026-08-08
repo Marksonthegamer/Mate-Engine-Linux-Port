@@ -9,10 +9,3 @@ MonoImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 273604
-  packageName: LLM for Unity
-  packageVersion: 2.5.1
-  assetPath: Assets/LLMUnity/Runtime/LLMEmbedder.cs
-  uploadId: 754381

@@ -138,10 +138,3 @@ TextureImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 273604
-  packageName: LLM for Unity
-  packageVersion: 2.5.1
-  assetPath: Assets/LLMUnity/Resources/llmunity_trash_icon.png
-  uploadId: 754381

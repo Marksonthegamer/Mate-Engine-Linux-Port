@@ -8,12 +8,14 @@
 [Mm]emoryCaptures/
 
 # AI Source
+LLMUnityBuild/
 Assets/StreamingAssets/undreamai-v1.2.4-llamacpp/
 Assets/StreamingAssets/qwen2.5-1.5b-instruct-q4_k_m.gguf
 Assets/StreamingAssets/Qwen3-1.7B-Q4_K_M.gguf
 Assets/StreamingAssets/Qwen3-4B-Q2_K.gguf
 Assets/StreamingAssets/Qwen3-4B-Q4_K_M.gguf
 Assets/StreamingAssets/undreamai-v1.2.5-llamacpp
+Assets/StreamingAssets/LlamaLib-v2.0.5
 
 # Test Models
 Assets/MATE ENGINE\ -\ Test\ Station

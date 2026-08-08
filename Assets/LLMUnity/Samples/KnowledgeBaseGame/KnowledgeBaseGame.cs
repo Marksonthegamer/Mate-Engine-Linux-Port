@@ -4,17 +4,20 @@ using System.IO;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using UnityEngine.UI;
-using LLMUnity;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using LLMUnity;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace LLMUnitySamples
 {
     public class KnowledgeBaseGame : KnowledgeBaseGameUI
     {
         [Header("Models")]
-        public LLMCharacter llmCharacter;
+        public LLMAgent llmAgent;
         public RAG rag;
         public int numRAGResults = 3;
 
@@ -54,7 +57,7 @@ namespace LLMUnitySamples
         {
             // warm-up the LLM
             PlayerText.text += "Warming up the model...";
-            _ = llmCharacter.Warmup(AIReplyComplete);
+            _ = llmAgent.Warmup(AIReplyComplete);
         }
 
         public Dictionary<string, string> LoadQuestionAnswers(string questionAnswersText)
@@ -90,7 +93,7 @@ namespace LLMUnitySamples
                 rag.Save(ragPath);
     #else
                 // if in play mode throw an error
-                throw new System.Exception("The embeddings could not be found!");
+                Debug.LogError("The embeddings could not be found!");
     #endif
             }
         }
@@ -118,12 +121,12 @@ namespace LLMUnitySamples
             return prompt;
         }
 
-        protected async override void OnInputFieldSubmit(string question)
+        protected override async void OnInputFieldSubmit(string question)
         {
             PlayerText.interactable = false;
             SetAIText("...");
             string prompt = await ConstructPrompt(question);
-            _ = llmCharacter.Chat(prompt, SetAIText, AIReplyComplete);
+            _ = llmAgent.Chat(prompt, SetAIText, AIReplyComplete);
         }
 
         protected override void DropdownChange(int selection)
@@ -133,9 +136,6 @@ namespace LLMUnitySamples
             currentBotName = CharacterSelect.options[selection].text;
             botImages[currentBotName].gameObject.SetActive(true);
             Debug.Log($"{currentBotName}: {rag.Count(currentBotName)} phrases available");
-
-            // set the LLMCharacter name
-            llmCharacter.AIName = currentBotName;
         }
 
         void SetAIText(string text)
@@ -152,7 +152,7 @@ namespace LLMUnitySamples
 
         public void CancelRequests()
         {
-            llmCharacter.CancelRequests();
+            llmAgent.CancelRequests();
             AIReplyComplete();
         }
 
@@ -162,20 +162,20 @@ namespace LLMUnitySamples
             Application.Quit();
         }
 
-        void CheckLLM(LLMCaller llmCaller, bool debug)
+        void CheckLLM(LLMClient llmClient, bool debug)
         {
-            if (!llmCaller.remote && llmCaller.llm != null && llmCaller.llm.model == "")
+            if (!llmClient.remote && llmClient.llm != null && llmClient.llm.model == "")
             {
-                string error = $"Please select a llm model in the {llmCaller.llm.gameObject.name} GameObject!";
+                string error = $"Please select a llm model in the {llmClient.llm.gameObject.name} GameObject!";
                 if (debug) Debug.LogWarning(error);
-                else throw new System.Exception(error);
+                else Debug.LogError(error);
             }
         }
 
         void CheckLLMs(bool debug)
         {
             CheckLLM(rag.search.llmEmbedder, debug);
-            CheckLLM(llmCharacter, debug);
+            CheckLLM(llmAgent, debug);
         }
 
         bool onValidateWarning = true;
@@ -232,11 +232,20 @@ namespace LLMUnitySamples
 
         void OnValueChanged(string newText)
         {
-            // Get rid of newline character added when we press enter
-            if (Input.GetKey(KeyCode.Return))
+            // Remove newline added by Enter
+#if ENABLE_INPUT_SYSTEM
+            // new input system for latest Unity version
+            bool enterPressed = Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame;
+#else
+            // old input system
+            bool enterPressed = Input.GetKey(KeyCode.Return);
+#endif
+            if (enterPressed)
             {
                 if (PlayerText.text.Trim() == "")
+                {
                     PlayerText.text = "";
+                }
             }
         }
 
@@ -308,11 +317,20 @@ namespace LLMUnitySamples
 
         void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+#if ENABLE_INPUT_SYSTEM
+            // new input system for latest Unity version
+            bool mouseClicked = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+            Vector2 mousePosition = Mouse.current.position.ReadValue();
+#else
+            // old input system
+            bool mouseClicked = Input.GetMouseButtonDown(0);
+            Vector2 mousePosition = Input.mousePosition;
+#endif
+            if (mouseClicked)
             {
                 foreach (RawImage image in new RawImage[] {NotebookImage, MapImage, SuccessImage})
                 {
-                    if (image.IsActive() && !RectTransformUtility.RectangleContainsScreenPoint(image.rectTransform, Input.mousePosition))
+                    if (image.IsActive() && !RectTransformUtility.RectangleContainsScreenPoint(image.rectTransform, mousePosition))
                     {
                         image.gameObject.SetActive(false);
                     }

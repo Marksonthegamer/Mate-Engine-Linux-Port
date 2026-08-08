@@ -51,17 +51,20 @@ namespace LLMUnitySamples
                 rag.Save(ragPath);
     #else
                 // if in play mode throw an error
-                throw new System.Exception("The embeddings could not be found!");
+                Debug.LogError("The embeddings could not be found!");
     #endif
             }
         }
 
-        protected async virtual void onInputFieldSubmit(string message)
+        protected virtual async void onInputFieldSubmit(string message)
         {
             playerText.interactable = false;
             AIText.text = "...";
             (string[] similarPhrases, float[] distances) = await rag.Search(message, 1);
             AIText.text = similarPhrases[0];
+
+            await Task.Yield();
+            AIReplyComplete();
         }
 
         public void SetAIText(string text)
@@ -71,9 +74,9 @@ namespace LLMUnitySamples
 
         public void AIReplyComplete()
         {
+            playerText.text = "";
             playerText.interactable = true;
             playerText.Select();
-            playerText.text = "";
         }
 
         public void ExitGame()
@@ -82,13 +85,13 @@ namespace LLMUnitySamples
             Application.Quit();
         }
 
-        protected void CheckLLM(LLMCaller llmCaller, bool debug)
+        protected void CheckLLM(LLMClient llmClient, bool debug)
         {
-            if (!llmCaller.remote && llmCaller.llm != null && llmCaller.llm.model == "")
+            if (!llmClient.remote && llmClient.llm != null && llmClient.llm.model == "")
             {
-                string error = $"Please select a llm model in the {llmCaller.llm.gameObject.name} GameObject!";
+                string error = $"Please select a llm model in the {llmClient.llm.gameObject.name} GameObject!";
                 if (debug) Debug.LogWarning(error);
-                else throw new System.Exception(error);
+                else Debug.LogError(error);
             }
         }
 

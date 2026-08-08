@@ -1,0 +1,80 @@
+name: Changelog
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: startsWith(github.base_ref, 'release/') && github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+            persist-credentials: false
+            token: ${{ github.token }}
+
+      - name: Build Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v4.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          fromTag: main
+          toTag: ${{ github.base_ref }}
+          outputFile: CHANGELOG.release.md
+          configurationJson: |
+            {
+              "pr_template": "- #{{TITLE}} (PR: ##{{NUMBER}})",
+              "categories": [
+                  {
+                    "title": "### 🚀 Features",
+                    "labels": ["feature", "enhancement"]
+                  },
+                  {
+                    "title": "### 🐛 Fixes",
+                    "labels": ["fix", "hotfix", "bug"]
+                  },
+                  {
+                    "title": "### 🧪 Test",
+                    "labels": ["test"]
+                  },
+                  {
+                    "title": "### 📦 General",
+                    "labels": []
+                  },
+                  {
+                    "title": "### 📖 Documentation",
+                    "labels": ["doc"]
+                  }
+                ],
+                "label_extractor": [
+                    {
+                    "pattern": "(.*)/(.+)",
+                    "on_property": "branch",
+                    "target": "$1",
+                    "flags": "gu"
+                    }
+                ]
+            }
+
+      - name: Create CHANGELOG.md
+        run: |
+            echo "## ${GITHUB_BASE_REF#release/}" > CHANGELOG.md.new
+            cat CHANGELOG.release.md | sed -e 's:## :### :g'  >> CHANGELOG.md.new
+            echo "" >> CHANGELOG.md.new
+            git checkout origin/main -- CHANGELOG.md
+            cat CHANGELOG.md >> CHANGELOG.md.new;
+            mv CHANGELOG.md.new CHANGELOG.md
+
+            git config --global user.name $GITHUB_ACTOR
+            git config --global user.email $GITHUB_ACTOR@users.noreply.github.com
+            git add CHANGELOG.md
+            git add CHANGELOG.release.md
+            git commit -m "update changelogs"
+  
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+            github_token: ${{ github.token }}
+            branch: ${{ github.base_ref }}

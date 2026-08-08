@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Gtk;
 using LLMUnity;
 using UnityEngine;
 using Application = UnityEngine.Application;
@@ -90,7 +89,7 @@ namespace ollama
         /// <returns>response string from the LLM</returns>
         public static async Task<string> Chat(string model, string prompt, int keep_alive = 300, Texture2D image = null)
         {
-            ChatHistory.Add(new ChatMessage{ role = playerName, content = prompt });
+            ChatHistory.Add(new ChatMessage(playerName, prompt));
 
             var request = new Request.Chat(model, ChatHistory, false, keep_alive, null);
             string payload = JsonConvert.SerializeObject(request);
@@ -119,7 +118,7 @@ namespace ollama
         public static async Task ChatStream(Action<string> onTextReceived, string model, string prompt,
             int keep_alive = 300, Texture2D image = null)
         {
-            ChatHistory.Add(new ChatMessage { role = playerName, content = prompt });
+            ChatHistory.Add(new ChatMessage(playerName, prompt));
 
             var request = new Request.Chat(model, ChatHistory, true, keep_alive, null);
             string payload = JsonConvert.SerializeObject(request);
@@ -134,7 +133,7 @@ namespace ollama
                 }
             });
 
-            ChatHistory.Add(new ChatMessage { role = AIName, content = reply.ToString()});
+            ChatHistory.Add(new ChatMessage(AIName, reply.ToString()));
 
         bool system = HasSystemPrompt();
 
@@ -155,9 +154,9 @@ namespace ollama
         public static void SetSystemPrompt(string system)
         {
             if (HasSystemPrompt())
-                ChatHistory[0] = new ChatMessage{role = "system", content = system};
+                ChatHistory[0] = new ChatMessage("system", system);
             else
-                ChatHistory.Insert(0, new ChatMessage { role = "system", content = system });
+                ChatHistory.Insert(0, new ChatMessage("system", system ));
         }
 
         public static string GetSystemPrompt()

@@ -1,3 +1,44 @@
+## v3.0.3
+#### 🚀 Features
+
+- Support Qwen 3.5 models (PR: #391)
+- Upgrade LlamaLib to v2.0.4 (llama.cpp b8209) (PR: #391)
+- add button to redownload LlamaLib (PR: #393)
+
+
+## v3.0.2
+#### 🚀 Features
+
+- Cache LlamaLib to prevent re-downloads (PR: #386)
+- Implement strategies for context overflow (chat truncation, chat summarization) (PR: #384)
+- Upgrade LlamaLib to v2.0.4 (PR: #384)
+- Re-introduce UI dropdown for level of debug messages (PR: #384)
+
+#### 🐛 Fixes
+
+- Fix context overflow with caching and overflow strategies (PR: #384)
+- Ensure macOS build includes the required runtime library (PR: #382)
+- Fix inference for AMD GPUs using Vulkan (PR: #384)
+
+
+## v3.0.1
+#### 🚀 Features
+
+- add Unity.Nuget.Newtonsoft-Json in the assembly definition (PR: #379)
+- Update LlamaLib to v2.0.2 (llama.cpp b7777) (PR: #380)
+
+#### 🐛 Fixes
+
+- fix running in Editor with Android/iOS platform selected (PR: #378)
+
+
+## v2.5.2
+#### 🚀 Features
+
+- Support Android x86-64 architecture (Magic Leap 2) (PR: #344)
+- Combine ARM and Intel architectures of macOS (PR: #345)
+
+
 ## v2.5.1
 #### 🚀 Features
 

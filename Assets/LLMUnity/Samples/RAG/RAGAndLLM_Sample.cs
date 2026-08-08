@@ -1,14 +1,15 @@
 using UnityEngine.UI;
 using LLMUnity;
+using System.Threading.Tasks;
 
 namespace LLMUnitySamples
 {
     public class RAGAndLLMSample : RAGSample
     {
-        public LLMCharacter llmCharacter;
+        public LLMAgent llmAgent;
         public Toggle ParaphraseWithLLM;
 
-        protected async override void onInputFieldSubmit(string message)
+        protected override async void onInputFieldSubmit(string message)
         {
             playerText.interactable = false;
             AIText.text = "...";
@@ -17,24 +18,25 @@ namespace LLMUnitySamples
             if (!ParaphraseWithLLM.isOn)
             {
                 AIText.text = similarPhrase;
+                await Task.Yield();
                 AIReplyComplete();
             }
             else
             {
-                _ = llmCharacter.Chat("Paraphrase the following phrase: " + similarPhrase, SetAIText, AIReplyComplete);
+                _ = llmAgent.Chat("Paraphrase the following phrase: " + similarPhrase, SetAIText, AIReplyComplete);
             }
         }
 
         public void CancelRequests()
         {
-            llmCharacter.CancelRequests();
+            llmAgent.CancelRequests();
             AIReplyComplete();
         }
 
         protected override void CheckLLMs(bool debug)
         {
             base.CheckLLMs(debug);
-            CheckLLM(llmCharacter, debug);
+            CheckLLM(llmAgent, debug);
         }
     }
 }

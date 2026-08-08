@@ -133,7 +133,7 @@ namespace ollama
         public static async Task<string> Ask(string model, string prompt, int keep_alive = 300)
         {
             var system = await Analyze(prompt);
-            var query = new ChatMessage{role = "user", content = $"Question:\n{prompt}"};
+            var query = new ChatMessage("user", $"Question:\n{prompt}");
             var messages = new List<ChatMessage>() { system, query };
 
             var request = new Request.Chat(model, messages, false, keep_alive, null);
@@ -149,7 +149,7 @@ namespace ollama
         public static async Task AskStream(Action<string> onTextReceived, string model, string prompt, int keep_alive = 300)
         {
             var system = await Analyze(prompt);
-            var query = new ChatMessage{role = "user", content = $"Question:\n{prompt}"};
+            var query = new ChatMessage("user", $"Question:\n{prompt}");
             var messages = new List<ChatMessage> { system, query };
 
             var request = new Request.Chat(model, messages, true, keep_alive, null);
@@ -166,11 +166,11 @@ namespace ollama
 
         private static ChatMessage Context2Message(string context)
         {
-            return new ChatMessage{role = "system",
-                content = "You are an assistant for question-answering tasks. Use only the following piece of context to answer the question. " +
+            return new ChatMessage("system",
+                "You are an assistant for question-answering tasks. Use only the following piece of context to answer the question. " +
                 "If no answer can be found within the context, simply say so. Do **NOT** answer outside of context. (Do not mention what the context is about either)\n" +
                 $"Context:\n\"\"\"\n{context}\n\"\"\""
-            };
+            );
         }
 
         public static void DebugContext()
