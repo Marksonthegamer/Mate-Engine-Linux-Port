@@ -2026,6 +2026,10 @@ MonoBehaviour:
     m_Localized: Enable Screen Sitting (Hyprland)
     m_Metadata:
       m_Items: []
+  - m_Id: 176634849360044032
+    m_Localized: Follow Desktop Color
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

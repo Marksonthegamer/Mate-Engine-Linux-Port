@@ -1,6 +1,7 @@
 using DiscordRPC.Logging;
 using Lachee.Discord.Control;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 
@@ -12,6 +13,7 @@ public class SettingsHandlerToggles : MonoBehaviour
     public Toggle isTopmostToggle;
     public Toggle enableParticlesToggle;
     public Toggle bloomToggle;
+    public Toggle desktopAmbiToggle;
     public Toggle dayNightToggle;
     public Toggle enableWindowSittingToggle;
     public Toggle enableDiscordRPCToggle;
@@ -27,8 +29,10 @@ public class SettingsHandlerToggles : MonoBehaviour
     public Toggle enableRandomAvatarToggle;
     public Toggle verboseDiscordRpcLogToggle;
 
-    [Header("External Objects")]
+    [FormerlySerializedAs("bloomObject")] [Header("External Objects")]
+    public GameObject desktopAmbientObject;
     public GameObject bloomObject;
+    public ColorController colorController;
     public GameObject dayNightObject;
     public GameObject ambientOcclusionObject;
     
@@ -41,6 +45,7 @@ public class SettingsHandlerToggles : MonoBehaviour
         isTopmostToggle?.onValueChanged.AddListener(OnIsTopmostChanged);
         enableParticlesToggle?.onValueChanged.AddListener(OnEnableParticlesChanged);
         bloomToggle?.onValueChanged.AddListener(OnBloomChanged);
+        desktopAmbiToggle?.onValueChanged.AddListener(OnDesktopAmbiChanged);
         dayNightToggle?.onValueChanged.AddListener(OnDayNightChanged);
         enableWindowSittingToggle?.onValueChanged.AddListener(OnEnableWindowSittingChanged);
         enableDiscordRPCToggle?.onValueChanged.AddListener(OnEnableDiscordRPCChanged);
@@ -66,6 +71,7 @@ public class SettingsHandlerToggles : MonoBehaviour
     private void OnIsTopmostChanged(bool v) { SaveLoadHandler.Instance.data.isTopmost = v; ApplySettings(); Save(); }
     private void OnEnableParticlesChanged(bool v) { SaveLoadHandler.Instance.data.enableParticles = v; ApplySettings(); Save(); }
     private void OnBloomChanged(bool v) { SaveLoadHandler.Instance.data.bloom = v; ApplySettings(); Save(); }
+    private void OnDesktopAmbiChanged(bool v) { SaveLoadHandler.Instance.data.desktopAmbient = v; ApplySettings(); Save(); }
     private void OnDayNightChanged(bool v) { SaveLoadHandler.Instance.data.dayNight = v; ApplySettings(); Save(); }
     private void OnEnableWindowSittingChanged(bool v) { SaveLoadHandler.Instance.data.enableWindowSitting = v; ApplySettings(); if (!v) { var handlers = FindObjectsByType<AvatarWindowHandler>(FindObjectsInactive.Include, FindObjectsSortMode.None); foreach (var handler in handlers) handler.ForceExitWindowSitting(); } Save(); }
     private void OnEnableDiscordRPCChanged(bool v) { SaveLoadHandler.Instance.data.enableDiscordRPC = v; ApplySettings(); Save(); }
@@ -111,6 +117,7 @@ public class SettingsHandlerToggles : MonoBehaviour
         isTopmostToggle?.SetIsOnWithoutNotify(data.isTopmost);
         enableParticlesToggle?.SetIsOnWithoutNotify(data.enableParticles);
         bloomToggle?.SetIsOnWithoutNotify(data.bloom);
+        desktopAmbiToggle?.SetIsOnWithoutNotify(data.desktopAmbient);
         dayNightToggle?.SetIsOnWithoutNotify(data.dayNight);
         enableWindowSittingToggle?.SetIsOnWithoutNotify(data.enableWindowSitting);
         enableDiscordRPCToggle?.SetIsOnWithoutNotify(data.enableDiscordRPC);
@@ -152,9 +159,10 @@ public class SettingsHandlerToggles : MonoBehaviour
 
 
         // Visuals
-        if (bloomObject != null) bloomObject.SetActive(data.bloom);
-        if (dayNightObject != null) dayNightObject.SetActive(data.dayNight);
-        if (ambientOcclusionObject != null) ambientOcclusionObject.SetActive(data.ambientOcclusion);
+        if (desktopAmbientObject) desktopAmbientObject.SetActive(data.desktopAmbient);
+        if (bloomObject) bloomObject.SetActive(data.bloom);
+        if (dayNightObject) dayNightObject.SetActive(data.dayNight);
+        if (ambientOcclusionObject) ambientOcclusionObject.SetActive(data.ambientOcclusion);
 
         // Window
         WindowManager.Instance.SetTopmost(data.isTopmost);
@@ -189,7 +197,7 @@ public class SettingsHandlerToggles : MonoBehaviour
         enableMouseTrackingToggle?.SetIsOnWithoutNotify(true);
         isTopmostToggle?.SetIsOnWithoutNotify(true);
         enableParticlesToggle?.SetIsOnWithoutNotify(true);
-        bloomToggle?.SetIsOnWithoutNotify(false);
+        desktopAmbiToggle?.SetIsOnWithoutNotify(false);
         dayNightToggle?.SetIsOnWithoutNotify(true);
         enableWindowSittingToggle?.SetIsOnWithoutNotify(false);
         enableDiscordRPCToggle?.SetIsOnWithoutNotify(true);
@@ -210,6 +218,7 @@ public class SettingsHandlerToggles : MonoBehaviour
         data.enableMouseTracking = true;
         data.isTopmost = true;
         data.enableParticles = true;
+        data.desktopAmbient = false;
         data.bloom = false;
         data.dayNight = true;
         data.enableWindowSitting = false;

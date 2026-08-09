@@ -1,13 +1,22 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 public class DesktopAmbientProbe : MonoBehaviour
 {
-    public Light topLight;
-    public Light bottomLight;
-    public Light leftLight;
-    public Light rightLight;
+    public enum Band { Top, Bottom, Left, Right }
+
+    [Serializable]
+    public class BandTarget
+    {
+        public Band band = Band.Top;
+        public string targetID = "";
+    }
+
+    [Header("Color Controller Linkage")]
+    public ColorController colorController;
+    public List<BandTarget> bandTargets = new List<BandTarget>();
 
     public bool enabledAuto = true;
     public bool driveIntensity = true;
@@ -57,21 +66,38 @@ public class DesktopAmbientProbe : MonoBehaviour
     }
 
     float nextTick;
-    Vector3 hsvTop;
-    Vector3 hsvBot;
-    Vector3 hsvLeft;
-    Vector3 hsvRight;
-    Vector3 hsvTopTarget;
-    Vector3 hsvBotTarget;
-    Vector3 hsvLeftTarget;
-    Vector3 hsvRightTarget;
+    static readonly Vector3 DefaultHsv = new Vector3(0f, 0f, 1f);
+    Vector3 hsvTop = DefaultHsv;
+    Vector3 hsvBot = DefaultHsv;
+    Vector3 hsvLeft = DefaultHsv;
+    Vector3 hsvRight = DefaultHsv;
+    Vector3 hsvTopTarget = DefaultHsv;
+    Vector3 hsvBotTarget = DefaultHsv;
+    Vector3 hsvLeftTarget = DefaultHsv;
+    Vector3 hsvRightTarget = DefaultHsv;
     bool inited;
     bool hasSample;
 
     void Start()
     {
         TryLoadToggle();
+        EnsureSelfConfig();
         inited = true;
+    }
+
+    void EnsureSelfConfig()
+    {
+        if (colorController == null)
+            colorController = FindAnyObjectByType<ColorController>();
+            
+        if (bandTargets == null) bandTargets = new List<BandTarget>();
+        if (bandTargets.Count == 0)
+        {
+            bandTargets.Add(new BandTarget { band = Band.Top, targetID = "ambi_1" });
+            bandTargets.Add(new BandTarget { band = Band.Bottom, targetID = "ambi_2" });
+            bandTargets.Add(new BandTarget { band = Band.Left, targetID = "ambi_3" });
+            bandTargets.Add(new BandTarget { band = Band.Right, targetID = "ambi_3" });
+        }
     }
 
     void TryLoadToggle()
@@ -104,7 +130,7 @@ public class DesktopAmbientProbe : MonoBehaviour
             CaptureAndAnalyze();
         }
         SmoothTowardsTargets(Time.unscaledDeltaTime);
-        ApplyToLights();
+        ApplyToTargets();
     }
 
     void CaptureAndAnalyze()
@@ -272,23 +298,51 @@ public class DesktopAmbientProbe : MonoBehaviour
         return new Vector3(h, s, v);
     }
 
-    void ApplyToLights()
+    void ApplyToTargets()
     {
-        ApplyLight(topLight, hsvTop);
-        ApplyLight(bottomLight, hsvBot);
-        ApplyLight(leftLight, hsvLeft);
-        ApplyLight(rightLight, hsvRight);
+        if (colorController == null) return;
+        if (!hasSample) return;
+        
+        for (int i = 0; i < bandTargets.Count; i++)
+        {
+            var bt = bandTargets[i];
+            var target = FindTarget(bt.targetID);
+            if (target == null) continue;
+            ApplyTarget(target, GetBandHsv(bt.band));
+        }
     }
 
-    void ApplyLight(Light L, Vector3 hsv)
+    ColorController.ColorTarget FindTarget(string id)
     {
-        if (L == null) return;
-        Color c = Color.HSVToRGB(hsv.x, hsv.y, 1f);
-        L.color = c;
+        if (string.IsNullOrEmpty(id) || colorController == null) return null;
+        var targets = colorController.targets;
+        for (int i = 0; i < targets.Count; i++)
+            if (targets[i].id == id) return targets[i];
+        return null;
+    }
+
+    Vector3 GetBandHsv(Band b)
+    {
+        switch (b)
+        {
+            case Band.Top: return hsvTop;
+            case Band.Bottom: return hsvBot;
+            case Band.Left: return hsvLeft;
+            case Band.Right: return hsvRight;
+            default: return hsvTop;
+        }
+    }
+
+    void ApplyTarget(ColorController.ColorTarget target, Vector3 hsv)
+    {
+        target.hue = hsv.x;
+        target.saturation = hsv.y;
+        
         if (driveIntensity)
         {
             float i = Mathf.Lerp(minGrayIntensity, maxColorIntensity, Mathf.Pow(Mathf.Clamp01(hsv.y), saturationGamma));
-            L.intensity = Mathf.Clamp(i, 0f, 4f);
+            float maxI = target.intensityOverride ? target.maxIntensity : 1f;
+            target.intensity = Mathf.Clamp(i * maxI, 0f, Mathf.Max(0.01f, maxI));
         }
     }
 }

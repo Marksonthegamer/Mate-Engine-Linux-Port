@@ -1430,6 +1430,10 @@ MonoBehaviour:
       if your setup has now bottom dock or taskbar.'
     m_Metadata:
       m_Items: []
+  - m_Id: 176634849360044032
+    m_Localized: Follow Desktop Color
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

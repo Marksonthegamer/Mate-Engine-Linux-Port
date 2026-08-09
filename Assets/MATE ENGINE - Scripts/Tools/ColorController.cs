@@ -44,6 +44,8 @@ public class ColorController : MonoBehaviour
 
     public void SetGroupEnabled(string groupID, bool state)
     {
+        if (string.IsNullOrEmpty(groupID)) return;
+        
         var sameGroup = targets.Where(t => t.groupID == groupID).ToList();
         var allTags = new HashSet<string>();
         foreach (var t in sameGroup)

@@ -130,6 +130,7 @@ public class SaveLoadHandler : MonoBehaviour
 
         public List<string> allowedApps = new();
         public bool bloom = false;
+        public bool desktopAmbient = false;
         public bool dayNight = true;
 
         public bool enableParticles = true;

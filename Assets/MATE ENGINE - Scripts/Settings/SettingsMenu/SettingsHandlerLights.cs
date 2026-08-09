@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -27,6 +28,10 @@ public class SettingsHandlerLights : MonoBehaviour
     public List<LightControlEntry> lights = new List<LightControlEntry>();
     public List<LightToggleEntry> lightToggles = new List<LightToggleEntry>();
     public ColorController colorController;
+
+    private bool isGlobalLightOn;
+    private bool isAmbientLightOn;
+    private bool isDesktopAmbientOn;
 
     private void Start()
     {
@@ -74,6 +79,25 @@ public class SettingsHandlerLights : MonoBehaviour
         ApplySettings();
     }
 
+    private void Update()
+    {
+        if (isDesktopAmbientOn)
+        {
+            for (int i = 0; i < lights.Count; i++)
+            {
+                var entry = lights[i];
+                if (colorController == null) return;
+                var target = colorController.targets.Find(t => t.id == entry.lightID);
+                if (target != null && target.groupID == "ambi_lights")
+                {
+                    entry.intensitySlider.SetValueWithoutNotify(target.intensity);
+                    entry.saturationSlider.SetValueWithoutNotify(target.saturation);
+                    entry.hueSlider.SetValueWithoutNotify(target.hue);
+                }
+            }
+        }
+    }
+
     public void LoadSettings()
     {
         var data = SaveLoadHandler.Instance.data;
@@ -110,8 +134,14 @@ public class SettingsHandlerLights : MonoBehaviour
         for (int i = 0; i < lightToggles.Count; i++)
         {
             var entry = lightToggles[i];
-            OnLightToggleChanged(i, entry.checkmark != null && entry.checkmark.isOn);
+            OnLightToggleChanged(i, entry.checkmark && entry.checkmark.isOn);
+            if (entry.activeID == "ambi_lights")
+            {
+                OnAmbientLightToggleChanged(entry.checkmark && entry.checkmark.isOn);
+            }
         }
+        OnDesktopAmbientToggleChanged(SaveLoadHandler.Instance.data.desktopAmbient);
+        OnGlobalLightToggleChanged(SaveLoadHandler.Instance.data.dayNight);
     }
 
     public void ResetLightToDefault(int idx)
@@ -157,8 +187,6 @@ public class SettingsHandlerLights : MonoBehaviour
         }
         SaveLoadHandler.Instance.SaveToDisk();
     }
-
-
     private void OnLightSliderChanged(int idx)
     {
         var entry = lights[idx];
@@ -178,6 +206,98 @@ public class SettingsHandlerLights : MonoBehaviour
         if (colorController == null) return;
         colorController.SetGroupEnabled(entry.activeID, state);
         colorController.SetGroupEnabled(entry.nonActiveID, !state);
+    }
+    
+    public void OnGlobalLightToggleChanged(bool isOn)
+    {
+        isGlobalLightOn = isOn;
+        UpdateSlidersInteractable();
+    }
+
+    public void OnAmbientLightToggleChanged(bool isOn)
+    {
+        isAmbientLightOn = isOn;
+        UpdateSlidersInteractable();
+    }
+
+    public void OnDesktopAmbientToggleChanged(bool isOn)
+    {
+        isDesktopAmbientOn = isOn;
+        UpdateSlidersInteractable();
+        if (!isOn)
+        {
+            RestoreAmbientLightValues();
+        }
+    }
+    
+    private void RestoreAmbientLightValues()
+    {
+        if (colorController == null) return;
+
+        var data = SaveLoadHandler.Instance.data;
+
+        for (int i = 0; i < lights.Count; i++)
+        {
+            var entry = lights[i];
+            var target = colorController.targets.Find(t => t.id == entry.lightID);
+            
+            if (target != null && target.groupID == "ambi_lights")
+            {
+                float iVal = entry.defaultIntensity;
+                float sVal = entry.defaultSaturation;
+                float hVal = entry.defaultHue;
+
+                if (data.lightIntensities.TryGetValue(entry.lightID, out float savedI)) iVal = savedI;
+                if (data.lightSaturations.TryGetValue(entry.lightID, out float savedS)) sVal = savedS;
+                if (data.lightHues.TryGetValue(entry.lightID, out float savedH)) hVal = savedH;
+
+                entry.intensitySlider.SetValueWithoutNotify(iVal);
+                entry.saturationSlider.SetValueWithoutNotify(sVal);
+                entry.hueSlider.SetValueWithoutNotify(hVal);
+
+                target.intensity = iVal;
+                target.saturation = sVal;
+                target.hue = hVal;
+            }
+        }
+    }
+    
+    private void UpdateSlidersInteractable()
+    {
+        if (colorController == null) return;
+
+        for (int i = 0; i < lights.Count; i++)
+        {
+            var entry = lights[i];
+            var target = colorController.targets.Find(t => t.id == entry.lightID);
+            if (target == null) continue;
+
+            bool interactable = false;
+
+            if (!isGlobalLightOn)
+            {
+                interactable = false;
+            }
+            else
+            {
+                if (target.id == "avatar_light")
+                {
+                    interactable = !isAmbientLightOn;
+                }
+                else if (target.groupID == "ambi_lights")
+                {
+                    interactable = isAmbientLightOn && !isDesktopAmbientOn;
+                }
+                else
+                {
+                    interactable = true; 
+                }
+            }
+
+            entry.intensitySlider.interactable = interactable;
+            entry.saturationSlider.interactable = interactable;
+            entry.hueSlider.interactable = interactable;
+        }
     }
 
     private void Save()
