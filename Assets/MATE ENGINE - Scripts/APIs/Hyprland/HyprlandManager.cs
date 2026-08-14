@@ -546,7 +546,7 @@ namespace APIs.Hyprland
             return windows;
         }
 
-        public List<IntPtr> GetAllVisibleWindows()
+        public List<IntPtr> GetAllWindows()
         {
             var windows = _Clients.Keys.ToList();
             // ShowError(string.Join(",",windows));

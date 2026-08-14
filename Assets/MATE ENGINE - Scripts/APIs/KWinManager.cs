@@ -278,7 +278,7 @@ public class KWinManager : IDisposable, IWindowManagerImplementation
         return _cachedClients.Where(client => client.Pid == targetPid).Select(client => client.Hwnd).ToList();
     }
 
-    public List<IntPtr> GetAllVisibleWindows()
+    public List<IntPtr> GetAllWindows()
     {
         return _cachedClients.Select(client => client.Hwnd).ToList();
     }
@@ -311,7 +311,7 @@ public class KWinManager : IDisposable, IWindowManagerImplementation
     public bool IsWindowVisible(IntPtr window) => true; 
     public bool IsWindowFullscreen(IntPtr window) => false;
     public bool IsWindowMaximized(IntPtr window) => false;
-    public List<IntPtr> GetClientStackingList() => GetAllVisibleWindows();
+    public List<IntPtr> GetClientStackingList() => GetAllWindows();
     public List<(IntPtr Id, RectInt Rect)> GetAllMonitors() => new();
     public bool IsDesktop(IntPtr window) => false;
     public bool IsDock(IntPtr window) => false;

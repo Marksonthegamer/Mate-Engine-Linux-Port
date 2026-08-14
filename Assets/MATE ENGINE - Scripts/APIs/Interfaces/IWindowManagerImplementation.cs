@@ -11,7 +11,7 @@ public interface  IWindowManagerImplementation
     int GetWindowPid(IntPtr window);
     Vector2Int GetMousePosition();
     List<IntPtr> FindWindowsByPid(int targetPid);
-    List<IntPtr> GetAllVisibleWindows();
+    List<IntPtr> GetAllWindows();
     bool IsWindowVisible(IntPtr window);
     bool IsWindowFullscreen(IntPtr window);
     bool IsWindowMaximized(IntPtr window);

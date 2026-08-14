@@ -159,7 +159,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         Init();
         CheckSingleInstanceForNoNetWmPidSupportCompositors();
         var pid = Process.GetCurrentProcess().Id;
-        var windows = FindWindowsByPid(pid);
+        var windows = FindWindowsByPid(pid, false);
 
         if (windows.Count > 0)
         {
@@ -176,12 +176,12 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             print($"{GetType()} initialization completed.");
             return;
         }
-        ShowError("No matching windows found for PID.");
+        ShowError($"No matching windows found for PID {pid}.");
     }
     
     private void CheckSingleInstanceForNoNetWmPidSupportCompositors()
     {
-        var allWindows = GetAllVisibleWindows();
+        var allWindows = GetAllWindows();
         int matchCount = 0;
 
         foreach (var window in allWindows)
@@ -998,13 +998,13 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public Dictionary<IntPtr, RectInt> GetAllMonitors() => new(_monitors); // Copy to prevent external modification
 
-    private List<IntPtr> FindWindowsByPid(int targetPid)
+    private List<IntPtr> FindWindowsByPid(int targetPid, bool excludeInvisible = true)
     {
         if(_windowManagerImplementation != null)
             return _windowManagerImplementation.FindWindowsByPid(targetPid);
         var result = new List<IntPtr>();
 
-        var windows = GetAllVisibleWindows();
+        var windows = GetAllWindows(excludeInvisible);
 
         foreach (var window in windows)
         {
@@ -1058,10 +1058,10 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private DateTime _lastCacheTime;
     private const float CacheRefreshSeconds = 1f;
 
-    private List<IntPtr> GetAllVisibleWindows()
+    private List<IntPtr> GetAllWindows(bool excludeInvisible = true)
     {
-        if(_windowManagerImplementation != null)
-            return _windowManagerImplementation.GetAllVisibleWindows();
+        if (_windowManagerImplementation != null)
+            return _windowManagerImplementation.GetAllWindows();
         if (_cachedVisibleWindows != null && !((DateTime.Now - _lastCacheTime).TotalSeconds > CacheRefreshSeconds))
             return _cachedVisibleWindows;
         var result = new List<IntPtr>();
@@ -1077,7 +1077,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                 for (ulong i = 0; i < nItems; i++)
                 {
                     var win = Marshal.ReadIntPtr(prop, (int)(i * (ulong)IntPtr.Size));
-                    if (IsWindowVisible(win))
+                    if (excludeInvisible & IsWindowVisible(win) || !excludeInvisible)
                     {
                         result.Add(win);
                     }
@@ -1311,7 +1311,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         {
             if (_desktop == IntPtr.Zero || XGetWindowAttributes(_display, _desktop, out _) == 0)
             {
-                foreach (var win in GetAllVisibleWindows())
+                foreach (var win in GetAllWindows())
                 {
                     if (!IsDesktop(win)) continue;
                     _desktop = win;
@@ -1337,7 +1337,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         {
             if (_dock == IntPtr.Zero)
             {
-                foreach (var win in GetAllVisibleWindows())
+                foreach (var win in GetAllWindows())
                 {
                     if (!IsDock(win)) continue;
                     _dock = win;
