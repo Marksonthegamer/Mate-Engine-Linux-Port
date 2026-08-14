@@ -34881,7 +34881,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 0.26999998, b: 0.96203995, a: 1}
-  m_Intensity: 3.084726e-31
+  m_Intensity: 2.7888244e-31
   m_Range: 0.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -78042,7 +78042,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 6.169452e-31
+  m_Intensity: 5.5776488e-31
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -102246,7 +102246,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 4.627089e-31
+  m_Intensity: 4.1832364e-31
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -103075,6 +103075,7 @@ Transform:
   - {fileID: 915476473}
   - {fileID: 1520083670}
   - {fileID: 1701833819}
+  - {fileID: 1496270198}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1397622855
@@ -106172,6 +106173,50 @@ Transform:
   - {fileID: 1993074841}
   m_Father: {fileID: 668395635}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1496270197
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1496270198}
+  - component: {fileID: 1496270199}
+  m_Layer: 0
+  m_Name: RaiseWindow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1496270198
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1496270197}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1395823394}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1496270199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1496270197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f279510778be93ee29ef6cff3fcbe00e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaiseMEWindow
 --- !u!1 &1497408097
 GameObject:
   m_ObjectHideFlags: 0
@@ -106834,6 +106879,12 @@ MonoBehaviour:
     toggleField: enableWindowSittingToggle
     className: SettingsHandlerButtons
     methodName: CycleWindowSize
+  - label: Raise Window
+    type: 2
+    handlerObject: {fileID: 1496270197}
+    toggleField: enableWindowSittingToggle
+    className: RaiseMEWindow
+    methodName: Raise
   - label: Move To Main Monitor
     type: 2
     handlerObject: {fileID: 915476471}
@@ -260540,7 +260591,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 1.542363e-31
+    fadeCurrentValue: 1.3944122e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -260564,7 +260615,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 1.542363e-31
+    fadeCurrentValue: 1.3944122e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -260588,7 +260639,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 1.542363e-31
+    fadeCurrentValue: 1.3944122e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0

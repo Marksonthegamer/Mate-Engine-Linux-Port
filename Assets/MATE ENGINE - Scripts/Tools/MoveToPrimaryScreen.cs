@@ -9,6 +9,7 @@ public class MoveToPrimaryScreen : MonoBehaviour
         WindowManager.Instance.GetWindowRect(out RectInt winRect);
         var targetScreen = FindMainMonitorRect(winRect);
         WindowManager.Instance.SetWindowPosition(targetScreen.x, targetScreen.y);
+        WindowManager.Instance.RaiseWindow();
     }
     
     private RectInt FindMainMonitorRect(RectInt windowRect)

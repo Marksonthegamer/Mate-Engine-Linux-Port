@@ -840,6 +840,16 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         }
     }
 
+    public void RaiseWindow(IntPtr window = default)
+    {
+        if (window == IntPtr.Zero) window = _unityWindow;
+        if (_display != IntPtr.Zero && window != IntPtr.Zero)
+        {
+            XRaiseWindow(_display, window);
+            XFlush(_display);
+        }
+    }
+
     public Vector2Int GetMousePosition()
     {
         if (_windowManagerImplementation != null)
@@ -1390,14 +1400,19 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         return isFs;
     }
         
-    public bool IsWindowVisible(IntPtr window)
+    public bool IsWindowVisible(IntPtr window, bool simplifiedCheck = false)
     {
         if(_windowManagerImplementation != null)
             return _windowManagerImplementation.IsWindowVisible(window);
         if (_display == IntPtr.Zero) return false;
 
         var result = XGetWindowAttributes(_display, window, out var attr);
-        if (result == 0 || attr.map_state != IsViewable) return false;
+        if (result == 0) return false;
+
+        if (simplifiedCheck && attr.map_state == IsViewable)
+        {
+            return true;
+        }
     
         if (!XTranslateCoordinates(_display, window, _rootWindow, 0, 0, out var absX, out var absY, out _))
             return false;
@@ -2427,6 +2442,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     [DllImport(LibX11)]
     private static extern int XResizeWindow(IntPtr display, IntPtr window, int width, int height);
+    
+    [DllImport(LibX11)]
+    private static extern int XRaiseWindow(IntPtr display, IntPtr window);
 
     [DllImport(LibX11)]
     private static extern bool XQueryPointer(IntPtr display, IntPtr window, ref IntPtr windowReturn,

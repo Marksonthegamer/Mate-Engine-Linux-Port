@@ -276,7 +276,7 @@ public class AvatarWindowHandler : MonoBehaviour
                 handled = true; 
             }
             // Check visibility directly via X11
-            if (!handled && !WindowManager.Instance.IsWindowVisible(snappedHWND)) { ClearSnapAndHide(); }
+            if (!handled && !WindowManager.Instance.IsWindowVisible(snappedHWND, true)) { ClearSnapAndHide(); }
         }
 
         if (controller.isDragging)
@@ -431,7 +431,7 @@ public class AvatarWindowHandler : MonoBehaviour
         {
             if (hWnd == unityHWND) continue;
             if (!WindowManager.Instance.GetWindowRect(hWnd, out RectInt r)) continue;
-            if (!WindowManager.Instance.IsWindowVisible(hWnd)) continue;
+            if (!WindowManager.Instance.IsWindowVisible(hWnd, !SaveLoadHandler.Instance.data.isTopmost)) continue;
             
             if (IsSameProcessWindow(hWnd)) continue;
 
