@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 using UnityEngine.UI;
 //using UnityStandardAssets.Characters.FirstPerson;
 //using UnityStandardAssets.ImageEffects;

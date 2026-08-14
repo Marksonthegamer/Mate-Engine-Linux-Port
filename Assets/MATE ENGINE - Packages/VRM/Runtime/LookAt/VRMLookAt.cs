@@ -1,6 +1,5 @@
 ﻿#pragma warning disable 0414, 0649
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using UniGLTF;
 using UnityEngine;

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Gtk;
 using LLMUnity;
 using UnityEngine;
 using Application = UnityEngine.Application;

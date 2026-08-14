@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UniGLTF;
 using UniJSON;
-using UnityEngine;
 
 namespace UniVRM10
 {

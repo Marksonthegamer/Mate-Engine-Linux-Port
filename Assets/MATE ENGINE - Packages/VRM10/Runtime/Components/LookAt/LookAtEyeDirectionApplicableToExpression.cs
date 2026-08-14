@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UniGLTF.Extensions.VRMC_vrm;
 using UnityEngine;
 
 namespace UniVRM10

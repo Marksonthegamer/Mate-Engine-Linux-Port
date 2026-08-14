@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace uWindowCapture
+﻿namespace uWindowCapture
 {
 
 public class UwcAltTabWindowTextureManager : UwcWindowTextureManager

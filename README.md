@@ -7,14 +7,11 @@
 ## English
 
 > [!IMPORTANT]
-> I'm currently a high school student, with studies coming first!
-> Responses to issues/PRs, frequency of releasing may be slow (usually 1-4 weeks).
-> Feel free to submit PRs to help fix bugs or discuss in Discussions.
-> Thanks for your understanding and support! 🚀
+> The maintainance of this project will be temporarily suspended from September 1, 2026, to mid-June 2027, owing to the author’s commitment to intensive preparation for the national college entrance examination.
 
 # Mate-Engine-Linux-Port
 This is an **unofficial** Linux port of shinyflvre's [MateEngine](https://github.com/shinyflvre/Mate-Engine) - A free Desktop Mate (the costy desktop pet software) alternative with a lightweight interface and custom VRM support.
-Tested on Ubuntu 24.04 LTS.
+Tested on Ubuntu 24.04 LTS and Fedora 43.
 
 ![](https://raw.githubusercontent.com/Marksonthegamer/Mate-Engine-Linux-Port/refs/heads/main/Screenshot.png)
 
@@ -96,11 +93,7 @@ This project lacks further testing and updates. Feel free to make PRs to contrib
 ## 简体中文
 
 > [!IMPORTANT]
-> 我是高二学生，学业很忙！
-> Issues/PR 回复与版本发布较慢，欢迎提交 PR 或去 Discussions 讨论。谢谢理解！
-
-> [!NOTE]
-> 项目仍在维护，但优先级在高考前会降低。
+> 由于本人备战高考需要，从2026年9月1日起，本项目将暂停维护直到2027年6月中旬。
 
 # Mate-Engine-Linux-Port
 这是一个非官方的[MateEngine](https://github.com/shinyflvre/Mate-Engine) Linux移植版 - 一个免费的Desktop Mate替代品（桌宠软件），具有轻量级界面和自定义VRM支持。

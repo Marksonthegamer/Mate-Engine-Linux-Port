@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using Unity.Jobs;
 using UnityEngine.Profiling;
 using UniGLTF.SpringBoneJobs.InputPorts;
-using UnityEngine;
-using Unity.Collections;
 using System.Linq;
 
 namespace UniGLTF.SpringBoneJobs

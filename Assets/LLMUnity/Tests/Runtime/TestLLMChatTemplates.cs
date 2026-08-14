@@ -1,6 +1,5 @@
 using LLMUnity;
 using System.Collections.Generic;
-using NUnit.Framework.Internal;
 using NUnit.Framework;
 
 namespace LLMUnityTests

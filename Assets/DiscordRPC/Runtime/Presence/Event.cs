@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Lachee.Discord
+﻿namespace Lachee.Discord
 {
 	/// <summary>
 	/// Events to receive from Discord

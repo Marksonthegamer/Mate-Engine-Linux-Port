@@ -1,6 +1,5 @@
 using UnityEditor;
 using UnityEngine;
-using Thry.ThryEditor.Helpers;
 
 namespace Thry.ThryEditor.Drawers
 {

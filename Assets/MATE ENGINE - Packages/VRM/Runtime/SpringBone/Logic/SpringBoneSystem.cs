@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UniGLTF;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace VRM.SpringBone

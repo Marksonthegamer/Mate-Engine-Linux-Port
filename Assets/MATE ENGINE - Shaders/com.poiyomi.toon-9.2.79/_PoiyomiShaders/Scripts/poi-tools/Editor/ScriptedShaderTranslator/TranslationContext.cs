@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Thry;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace Poi.Tools.ShaderTranslator
 {

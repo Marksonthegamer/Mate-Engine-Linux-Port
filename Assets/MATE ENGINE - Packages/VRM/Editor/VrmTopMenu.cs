@@ -1,6 +1,5 @@
 ﻿using UniGLTF;
 using UnityEditor;
-using VRM.DevOnly.PackageExporter;
 
 namespace VRM
 {

@@ -1,10 +1,8 @@
 using System;
-using System.IO;
 using System.Linq;
 using UniGLTF;
 using UniGLTF.Extensions.VRMC_vrm;
 using UniJSON;
-using UnityEngine;
 
 namespace UniVRM10
 {

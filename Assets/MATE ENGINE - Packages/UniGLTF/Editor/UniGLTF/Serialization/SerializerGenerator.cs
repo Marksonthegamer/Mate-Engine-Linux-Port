@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using UniJSON;
-using UnityEditor;
-using UnityEngine;
 
 namespace UniGLTF
 {

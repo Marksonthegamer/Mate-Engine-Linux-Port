@@ -1,8 +1,6 @@
 using UnityEngine;
 using TMPro;
 using System.Linq;
-using VRM;
-using UniVRM10;
 
 public class RuntimeModelStats : MonoBehaviour
 {

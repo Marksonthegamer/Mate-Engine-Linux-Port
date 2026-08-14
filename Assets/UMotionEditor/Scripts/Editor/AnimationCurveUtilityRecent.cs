@@ -1,7 +1,4 @@
 ﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
-using System.Reflection;
 
 namespace UMotionEditor
 {

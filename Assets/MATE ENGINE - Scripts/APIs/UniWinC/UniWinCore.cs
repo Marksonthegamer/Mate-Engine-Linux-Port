@@ -11,7 +11,6 @@ using System.Runtime.InteropServices;
 using AOT;
 using UnityEngine;
 using System.Text;
-using Gdk;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

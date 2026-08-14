@@ -1,9 +1,5 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using UnityEditor.Compilation;
 #if UNITY_2021_2_OR_NEWER
 using UnityEditor.SceneManagement;
 #else

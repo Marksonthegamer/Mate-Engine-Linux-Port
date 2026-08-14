@@ -1,9 +1,5 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using Xamin;
-using Xamin.Demo;
 
 /// <summary>
 /// Sample class for touch screen interactions.

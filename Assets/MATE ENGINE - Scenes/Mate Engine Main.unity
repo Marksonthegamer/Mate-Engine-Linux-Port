@@ -4069,8 +4069,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a2118e24c8e54a46802497db8957ba8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DesktopAmbientProbe
-  colorController: {fileID: 0}
-  bandTargets: []
+  colorController: {fileID: 7290369651463270812}
+  bandTargets:
+  - band: 0
+    targetID: ambi_1
+  - band: 1
+    targetID: ambi_2
+  - band: 2
+    targetID: ambi_3
+  - band: 3
+    targetID: ambi_3
   enabledAuto: 1
   driveIntensity: 1
   captureHz: 10
@@ -4080,9 +4088,9 @@ MonoBehaviour:
   excludeMarginPx: 12
   smoothing: 0.85
   saveKey: auto_ambient
-  minGrayIntensity: 0.3
-  maxColorIntensity: 3
-  saturationGamma: 0.5
+  minGrayIntensity: 0.35
+  maxColorIntensity: 0.7
+  saturationGamma: 1.4
 --- !u!1 &154457057
 GameObject:
   m_ObjectHideFlags: 0
@@ -34873,7 +34881,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 0.26999998, b: 0.96203995, a: 1}
-  m_Intensity: 3.24425e-31
+  m_Intensity: 3.084726e-31
   m_Range: 0.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -78034,7 +78042,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 6.4885e-31
+  m_Intensity: 6.169452e-31
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -90354,7 +90362,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 2685601518950522663}
-  target: {fileID: 0}
+  target: {fileID: 7063969291654908835}
   liveSave: 1
 --- !u!114 &1128499983
 MonoBehaviour:
@@ -102238,7 +102246,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 4.866375e-31
+  m_Intensity: 4.627089e-31
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -260532,7 +260540,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 1.622125e-31
+    fadeCurrentValue: 1.542363e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -260556,7 +260564,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 1.622125e-31
+    fadeCurrentValue: 1.542363e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -260580,7 +260588,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 1.622125e-31
+    fadeCurrentValue: 1.542363e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0

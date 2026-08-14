@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using UniGLTF.M17N;
-using UnityEngine;
 
 namespace UniGLTF
 {

@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
-using System.Collections;
-using System.Linq;
 
 public class ModRemoveButton : MonoBehaviour
 {

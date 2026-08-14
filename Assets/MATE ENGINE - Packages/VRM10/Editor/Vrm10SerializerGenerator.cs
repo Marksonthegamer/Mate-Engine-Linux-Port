@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using UniGLTF;
-using UnityEditor;
 using UnityEngine;
 
 namespace UniVRM10

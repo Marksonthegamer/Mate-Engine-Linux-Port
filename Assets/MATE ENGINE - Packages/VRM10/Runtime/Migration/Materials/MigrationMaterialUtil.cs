@@ -2,7 +2,6 @@
 using System.Linq;
 using UniGLTF;
 using UniJSON;
-using UnityEngine;
 
 namespace UniVRM10
 {

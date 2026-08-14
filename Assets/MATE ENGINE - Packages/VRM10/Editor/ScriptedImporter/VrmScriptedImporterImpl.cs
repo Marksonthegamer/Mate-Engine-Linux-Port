@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using UnityEngine;
 using UniGLTF;
-using System;
 using VRM10.Settings;
 
 #if UNITY_2020_2_OR_NEWER

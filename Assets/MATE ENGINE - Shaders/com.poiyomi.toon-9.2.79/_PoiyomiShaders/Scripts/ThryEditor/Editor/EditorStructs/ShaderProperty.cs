@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Thry.ThryEditor.Helpers;
 using UnityEditor;
 using UnityEngine;
-using static UnityEditor.MaterialProperty;
 
 namespace Thry.ThryEditor
 {

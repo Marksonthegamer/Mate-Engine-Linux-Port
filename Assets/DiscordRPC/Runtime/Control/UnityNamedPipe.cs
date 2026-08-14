@@ -4,8 +4,6 @@ using DiscordRPC.Logging;
 using System;
 using Lachee.IO;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace Lachee.Discord.Control
 {

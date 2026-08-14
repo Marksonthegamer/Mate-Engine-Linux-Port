@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using UnityEditor;
+﻿using UnityEngine;
 
 namespace Mochie {
     public static class Tips {

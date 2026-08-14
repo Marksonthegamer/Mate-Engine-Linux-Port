@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Thry;
 using UnityEditor;
 using UnityEngine;
 using Thry.ThryEditor.Helpers;

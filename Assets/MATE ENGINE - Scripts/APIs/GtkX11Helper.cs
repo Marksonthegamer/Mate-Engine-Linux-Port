@@ -1,8 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Gdk;
-using GLib;
 using Debug = UnityEngine.Debug;
 using Display = Gdk.Display;
 

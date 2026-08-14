@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using UniJSON;
 
 namespace UniGLTF
 {

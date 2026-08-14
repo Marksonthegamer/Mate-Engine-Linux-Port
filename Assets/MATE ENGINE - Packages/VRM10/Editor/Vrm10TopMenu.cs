@@ -1,4 +1,3 @@
-using UniGLTF.MeshUtility;
 using UnityEditor;
 
 namespace UniVRM10

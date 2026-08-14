@@ -2,7 +2,6 @@
 using System.IO;
 using UniGLTF;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 

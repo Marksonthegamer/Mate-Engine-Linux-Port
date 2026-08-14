@@ -1,8 +1,6 @@
 using System.IO;
 using System.Reflection;
 using System.Text;
-using UnityEditor;
-using UnityEngine;
 
 namespace UniGLTF
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using UnityEngine;
-
-namespace UniGLTF
+﻿namespace UniGLTF
 {
     public enum TextureImportTypes
     {

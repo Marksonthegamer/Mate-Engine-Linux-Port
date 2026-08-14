@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
+﻿using System.Reflection;
 using UnityEditor;
-using UnityEngine;
 
 namespace Lachee.Discord.Editor
 {

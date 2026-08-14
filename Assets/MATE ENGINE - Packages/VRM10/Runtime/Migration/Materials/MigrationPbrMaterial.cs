@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using UniGLTF;
+﻿using UniGLTF;
 using UniJSON;
 using UnityEngine;
 using ColorSpace = UniGLTF.ColorSpace;

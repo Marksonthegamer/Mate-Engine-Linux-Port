@@ -4,7 +4,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
-using static UnityEditor.MaterialProperty;
 
 namespace Thry.ThryEditor
 {

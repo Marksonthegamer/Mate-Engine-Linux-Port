@@ -2,7 +2,6 @@
 using UnityEditor;
 using System;
 using UnityEditorInternal;
-using System.Collections.Generic;
 
 namespace Poi.Tools
 {

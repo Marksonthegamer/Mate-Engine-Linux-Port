@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
-using UniJSON;
 using System.Collections.Concurrent;
 
 namespace UniGLTF

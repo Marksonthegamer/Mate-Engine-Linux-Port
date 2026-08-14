@@ -1,5 +1,4 @@
-﻿using System;
-using UniGLTF;
+﻿using UniGLTF;
 using UnityEngine;
 
 namespace VRM

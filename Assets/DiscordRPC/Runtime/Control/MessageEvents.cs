@@ -1,7 +1,6 @@
 ﻿using DiscordRPC;
 using DiscordRPC.Message;
 using System;
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace Lachee.Discord.Control

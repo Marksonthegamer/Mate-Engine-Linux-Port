@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using UnityEngine.UI;
 using LLMUnity;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 
 namespace LLMUnitySamples
 {

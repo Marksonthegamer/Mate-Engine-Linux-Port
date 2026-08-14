@@ -1,9 +1,4 @@
-﻿using NUnit.Framework;
-using System.Collections;
-using System;
-
-
-namespace UniJSON
+﻿namespace UniJSON
 {
     public class GenericCallUtilityTests
     {

@@ -3,7 +3,6 @@ using UnityEngine.Localization.Settings;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Localization.Tables;
 using UnityEngine.UI;
 
 

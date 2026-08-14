@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Mochie.ShaderUpgrader
 {
     public abstract class PropertyActionBase : UpgradeActionBase, IPropertyAction

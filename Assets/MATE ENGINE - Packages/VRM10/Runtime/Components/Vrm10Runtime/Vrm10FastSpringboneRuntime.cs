@@ -1,4 +1,3 @@
-using System;
 using UniGLTF;
 using UnityEngine;
 using UniGLTF.SpringBoneJobs.InputPorts;

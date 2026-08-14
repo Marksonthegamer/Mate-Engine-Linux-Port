@@ -2,8 +2,6 @@
 using System.Reflection;
 using System.Text;
 using UniGLTF;
-using UnityEditor;
-using UnityEngine;
 
 namespace VRM
 {

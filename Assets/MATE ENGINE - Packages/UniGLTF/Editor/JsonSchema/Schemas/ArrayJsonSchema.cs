@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace UniGLTF.JsonSchema.Schemas
+﻿namespace UniGLTF.JsonSchema.Schemas
 {
     public class ArrayJsonSchema : JsonSchemaBase
     {

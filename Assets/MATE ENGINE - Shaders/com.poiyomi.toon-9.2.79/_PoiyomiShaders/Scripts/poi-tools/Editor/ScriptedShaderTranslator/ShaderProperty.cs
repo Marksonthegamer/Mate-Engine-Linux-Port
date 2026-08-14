@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using UnityEditor;
 using UnityEngine;
 
 namespace Poi.Tools.ShaderTranslator

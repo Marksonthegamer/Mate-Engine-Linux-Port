@@ -1,8 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using Unity.Collections;
-using System.Runtime.InteropServices;
 
 namespace UniGLTF
 {

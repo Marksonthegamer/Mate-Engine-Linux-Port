@@ -1,6 +1,4 @@
-﻿using System.IO;
-using NUnit.Framework;
-using UniGLTF;
+﻿using NUnit.Framework;
 using UnityEngine;
 
 namespace UniVRM10.Test

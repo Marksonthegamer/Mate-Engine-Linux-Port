@@ -1,5 +1,3 @@
-using System;
-
 namespace UniGLTF.JsonSchema.Schemas
 {
     public class DictionaryJsonSchema : JsonSchemaBase

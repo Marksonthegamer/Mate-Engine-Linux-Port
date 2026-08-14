@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using VRM;
 using UniGLTF;
 using SFB;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UniVRM10;
@@ -227,7 +226,7 @@ public class VRMLoader : MonoBehaviour
             return;
         }
 
-        var prefab = bundle.LoadAllAssets<GameObject>().FirstOrDefault();
+        var prefab = bundle.LoadAsset<GameObject>("__TempExport");
         if (prefab == null)
         {
             Debug.LogError("[VRMLoader] No prefab found in AssetBundle.");

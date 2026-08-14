@@ -1,8 +1,6 @@
 ﻿using DiscordRPC.Message;
 using Lachee.Discord.Events;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Lachee.Discord
 {

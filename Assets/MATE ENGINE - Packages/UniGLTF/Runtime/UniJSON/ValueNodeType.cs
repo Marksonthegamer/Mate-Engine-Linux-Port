@@ -1,7 +1,4 @@
-﻿using System;
-
-
-namespace UniJSON
+﻿namespace UniJSON
 {
     public enum ValueNodeType
     {

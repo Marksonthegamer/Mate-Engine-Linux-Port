@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using Thry.ThryEditor.Helpers;
 using UnityEditor;
 using UnityEngine;
-using static UnityEditor.MaterialProperty;
 
 namespace Thry.ThryEditor
 {

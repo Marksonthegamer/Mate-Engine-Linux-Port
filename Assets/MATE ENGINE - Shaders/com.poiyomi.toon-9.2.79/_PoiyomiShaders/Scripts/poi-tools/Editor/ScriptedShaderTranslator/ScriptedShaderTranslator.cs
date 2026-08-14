@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Thry;
-using UnityEditor;
 using UnityEngine;
 
 namespace Poi.Tools.ShaderTranslator

@@ -4,7 +4,6 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 #if UNITY_2019_1_OR_NEWER
-using UnityEditor.Graphs;
 #endif
 
 namespace UniGLTF

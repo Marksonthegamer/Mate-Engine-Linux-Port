@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Unity.Collections;
+﻿using System.Threading.Tasks;
 using UnityEngine;
 #if USE_COM_UNITY_CLOUD_KTX
 using KtxUnity;

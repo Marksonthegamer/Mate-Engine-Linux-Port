@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UniGLTF;
 using UnityEngine;
-using System.IO;
-using System.Text;
-using UnityEditor;
 
 namespace VRM
 {

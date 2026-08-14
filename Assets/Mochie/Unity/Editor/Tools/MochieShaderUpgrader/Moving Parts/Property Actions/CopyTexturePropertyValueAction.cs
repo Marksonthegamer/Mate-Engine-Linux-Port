@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Mochie.ShaderUpgrader
 {
     public class CopyTexturePropertyValueAction : CopyPropertyValueActionBase

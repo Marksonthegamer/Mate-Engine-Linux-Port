@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System;
-using Gtk;
 using LLMUnity;
 using Image = UnityEngine.UI.Image;
 
