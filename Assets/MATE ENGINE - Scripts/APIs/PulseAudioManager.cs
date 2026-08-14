@@ -667,7 +667,7 @@ namespace PulseAudio
 
         void ShowError(string error)
         {
-            Debug.LogError($"{typeof(PulseAudioManager)}: {error}");
+            Console.WriteLine($"\u001b[31m{GetType().Name}: {error}\u001b[0m");
         }
     }
 }
