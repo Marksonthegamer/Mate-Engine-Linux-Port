@@ -318,7 +318,7 @@ public class KWinManager : IDisposable, IWindowManagerImplementation
     public string GetClassName(IntPtr window) => "KWinWindow";
     public void SetTopmost(bool topmost) { }
     public void HideFromTaskbar(bool reallyHide) { }
-    public void SetWindowBorderless() { }
+    public void SetWindowBorderless(bool value) { }
     public void SetWindowType(WindowType type) { }
     public void SetXUnityWindow(IntPtr unityWindow) { }
     public void SetSnapedWindow(IntPtr window) { }

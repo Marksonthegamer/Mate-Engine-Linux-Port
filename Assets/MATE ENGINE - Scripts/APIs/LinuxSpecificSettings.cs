@@ -114,6 +114,7 @@ public class LinuxSpecificSettings : MonoBehaviour
         model.AppendValues(stringTable.GetEntry("LSS_WINTYPE_NORMAL").GetLocalizedString());
         model.AppendValues(stringTable.GetEntry("LSS_WINTYPE_DOCK").GetLocalizedString());
         model.AppendValues(stringTable.GetEntry("LSS_WINTYPE_DESKTOP").GetLocalizedString());
+        model.AppendValues(stringTable.GetEntry("LSS_WINTYPE_BORDERED").GetLocalizedString());
         winTypeCombo.Model = model;
         winTypeCombo.Active = (int)SaveLoadHandler.Instance.data.windowType;
         
@@ -212,7 +213,7 @@ public class LinuxSpecificSettings : MonoBehaviour
         winTypeLabel.Yalign = 0.5f;
         hbox.PackStart(winTypeLabel, false, false, 0);
 
-        winTypeCombo = new ComboBox(new[] { stringTable.GetEntry("LSS_WINTYPE_NORMAL").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_DOCK").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_DESKTOP").GetLocalizedString() }){Active = (int)SaveLoadHandler.Instance.data.windowType};
+        winTypeCombo = new ComboBox(new[] { stringTable.GetEntry("LSS_WINTYPE_NORMAL").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_DOCK").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_DESKTOP").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_BORDERED").GetLocalizedString() }){Active = (int)SaveLoadHandler.Instance.data.windowType};
         hbox.PackStart(winTypeCombo, false, false, 0);
         
         winTypeDesc = CreateDescriptionLabel(stringTable.GetEntry("LSS_WINTYPE_TIP").GetLocalizedString());
@@ -364,7 +365,7 @@ public class LinuxSpecificSettings : MonoBehaviour
         GUILayout.BeginHorizontal();
         GUILayout.Label(stringTable.GetEntry("LSS_WINTYPE").GetLocalizedString(), GUILayout.Width(100));
         
-        windowType = (WindowType)GUILayout.SelectionGrid((int)windowType, new [] { stringTable.GetEntry("LSS_WINTYPE_NORMAL").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_DOCK").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_DESKTOP").GetLocalizedString() }, 2);
+        windowType = (WindowType)GUILayout.SelectionGrid((int)windowType, new [] { stringTable.GetEntry("LSS_WINTYPE_NORMAL").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_DOCK").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_DESKTOP").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_BORDERED").GetLocalizedString() }, 4);
         GUILayout.EndHorizontal();
 
         GUILayout.Label(stringTable.GetEntry("LSS_WINTYPE_TIP").GetLocalizedString(), 

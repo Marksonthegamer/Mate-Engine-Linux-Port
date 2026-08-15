@@ -36,7 +36,8 @@ public enum WindowType
 {
     Normal = 0,
     Dock = 1,
-    Desktop = 2
+    Desktop = 2,
+    ShowBorder = 3
 }
 
 public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
@@ -59,6 +60,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     public IntPtr RootWindow => _rootWindow;
 
     public IntPtr UnityWindow => _unityWindow;
+    
+    private string _compositorName;
+    public string CompositorName => _compositorName ?? GetCompositorName();
     
     private XErrorHandler _errorHandlerDelegate;
 
@@ -169,7 +173,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 #if UNITY_EDITOR
             return;
 #endif
-            SetWindowBorderless();
+            SetWindowBorderless(SaveLoadHandler.Instance.data.windowType != WindowType.ShowBorder);
             XSelectInput(_display, _unityWindow, StructureNotifyMask | EnterWindowMask | LeaveWindowMask | PropertyChangeMask);
             EnableClickThroughTransparency();
             LoadCursors();
@@ -267,6 +271,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         _netWmWindowTypeDock = XInternAtom(_display, "_NET_WM_WINDOW_TYPE_DOCK", false);
         _netWmWindowTypeDesktop = XInternAtom(_display, "_NET_WM_WINDOW_TYPE_DESKTOP", false);
         _netWmWindowTypeNormal = XInternAtom(_display, "_NET_WM_WINDOW_TYPE_NORMAL", false);
+        _netActiveWindow = XInternAtom(_display, "_NET_ACTIVE_WINDOW", false);
         _motifHintsAtom = XInternAtom(_display, "_MOTIF_WM_HINTS", false);
         _wakeupAtom = XInternAtom(_display, "_SDL_WAKEUP", false);
     }
@@ -845,7 +850,22 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         if (window == IntPtr.Zero) window = _unityWindow;
         if (_display != IntPtr.Zero && window != IntPtr.Zero)
         {
-            XRaiseWindow(_display, window);
+            if (_netActiveWindow == IntPtr.Zero)
+            {
+                ShowError("Cannot find atom for _NET_ACTIVE_WINDOW!");
+                return;
+            }
+            var xClient = new XClientMessageEvent
+            {
+                type = ClientMessage,
+                window = _unityWindow,
+                message_type = _netActiveWindow,
+                format = 32,
+            };
+            xClient.data0 = new IntPtr(1);
+            xClient.data1 = IntPtr.Zero;
+            
+            XSendEvent(_display, _rootWindow, false, SubstructureRedirectMask | SubstructureNotifyMask, ref xClient);
             XFlush(_display);
         }
     }
@@ -1231,11 +1251,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         XFlush(_display);
     }
 
-    private void SetWindowBorderless()
+    public void SetWindowBorderless(bool value)
     {
         if(_windowManagerImplementation != null)
         {
-            _windowManagerImplementation.SetWindowBorderless();
+            _windowManagerImplementation.SetWindowBorderless(value);
             return;
         }
         if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero) return;
@@ -1244,7 +1264,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         object hints = new XMotifWmHints
         {
             flags = (IntPtr)MwmHintsFlags,
-            decorations = (IntPtr)MwmDecorationsNone,
+            decorations = (IntPtr)(value ? MwmDecorationsNone : MwmDecorationsAll),
             functions = IntPtr.Zero,
             input_mode = IntPtr.Zero,
             status = IntPtr.Zero
@@ -1276,13 +1296,20 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         }
         switch (type)
         {
+            case WindowType.Normal:
+                SetWindowBorderless(true);
+                ChangeProperty(_netWmWindowType, (IntPtr)XaAtom, 32, PropModeReplace, _netWmWindowTypeNormal, 1);
+                break;
             case WindowType.Dock:
+                SetWindowBorderless(true);
                 ChangeProperty(_netWmWindowType, (IntPtr)XaAtom, 32, PropModeReplace, _netWmWindowTypeDock, 1);
                 break;
             case WindowType.Desktop:
+                SetWindowBorderless(true);
                 ChangeProperty(_netWmWindowType, (IntPtr)XaAtom, 32, PropModeReplace, _netWmWindowTypeDesktop, 1);
                 break;
-            case WindowType.Normal:
+            case WindowType.ShowBorder:
+                SetWindowBorderless(false);
                 ChangeProperty(_netWmWindowType, (IntPtr)XaAtom, 32, PropModeReplace, _netWmWindowTypeNormal, 1);
                 break;
             default:
@@ -1290,7 +1317,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                 break;
         }
     }
-
+    
     public string GetClassName(IntPtr window)
     {
         if(_windowManagerImplementation != null)
@@ -1305,7 +1332,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         return "";
     }
-        
+    
     public bool IsDesktop(IntPtr hwnd)
     {
         if(_windowManagerImplementation != null)
@@ -1476,9 +1503,43 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             var selectionAtom = XInternAtom(_display, "_NET_WM_CM_S" + screen, false);
             if (selectionAtom == IntPtr.Zero)
                 continue;
-            return XGetSelectionOwner(_display, selectionAtom) != 0;
+            return XGetSelectionOwner(_display, selectionAtom) != IntPtr.Zero;
         }
         return false;
+    }
+    
+    public string GetCompositorName()
+    {
+        if (_display == IntPtr.Zero || _rootWindow == IntPtr.Zero)
+            return null;
+
+        IntPtr checkAtom = XInternAtom(_display, "_NET_SUPPORTING_WM_CHECK", false);
+        IntPtr nameAtom = XInternAtom(_display, "_NET_WM_NAME", false);
+
+        int status = XGetWindowProperty(_display, _rootWindow, checkAtom, 0, 1024, false, IntPtr.Zero, 
+            out _, out _, out ulong nitems, out _, out IntPtr prop);
+
+        if (status == 0 && prop != IntPtr.Zero && nitems > 0)
+        {
+            IntPtr wmWindow = Marshal.ReadIntPtr(prop);
+            XFree(prop);
+
+            if (wmWindow != IntPtr.Zero)
+            {
+                status = XGetWindowProperty(_display, wmWindow, nameAtom, 0, 1024, false, IntPtr.Zero, 
+                    out IntPtr actualType, out _, out nitems, out _, out prop);
+
+                if (status == 0 && prop != IntPtr.Zero && nitems > 0)
+                {
+                    string name = Marshal.PtrToStringUTF8(prop, (int)nitems);
+                    XFree(prop);
+                    _compositorName = name;
+                    return name;
+                }
+            }
+        }
+
+        return null;
     }
     
     public List<IntPtr> GetClientStackingList()
@@ -1960,6 +2021,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private IntPtr _netWmState, _netWmStateFullscreen, _netWmStateMaxHorz, _netWmStateMaxVert, _netWmStateAbove, _netWmStateSkipTaskbar;
     private IntPtr _netWmWindowType, _netWmWindowTypeDock, _netWmWindowTypeDesktop, _netWmWindowTypeNormal;
     private IntPtr _netMoveResizeWindow;
+    private IntPtr _netActiveWindow;
     private IntPtr _motifHintsAtom;
     
     private IntPtr _defaultCursor;
@@ -1987,8 +2049,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private const int IsViewable = 2;
     private const int XaWindow = 33;
     
-    private const long MwmHintsFlags = 1L << 1; // Use decorations
-    private const long MwmDecorationsNone = 0; // No decorations
+    private const ulong MwmHintsFlags = 1L << 1; // Use decorations
+    private const ulong MwmDecorationsNone = 0; // No decorations
+    private const ulong MwmDecorationsAll = 1UL << 0; // Enable decorations
     private const int PropModeReplace = 0;
 
     private const int ClientMessage = 33;
@@ -2442,9 +2505,6 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     [DllImport(LibX11)]
     private static extern int XResizeWindow(IntPtr display, IntPtr window, int width, int height);
-    
-    [DllImport(LibX11)]
-    private static extern int XRaiseWindow(IntPtr display, IntPtr window);
 
     [DllImport(LibX11)]
     private static extern bool XQueryPointer(IntPtr display, IntPtr window, ref IntPtr windowReturn,
@@ -2461,7 +2521,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private static extern int XScreenCount(IntPtr display);
 
     [DllImport(LibX11)]
-    private static extern int XGetSelectionOwner(IntPtr display, IntPtr atom);
+    private static extern IntPtr XGetSelectionOwner(IntPtr display, IntPtr atom);
 
     [DllImport(LibX11)]
     private static extern int XSendEvent(IntPtr display, IntPtr window, bool propagate,

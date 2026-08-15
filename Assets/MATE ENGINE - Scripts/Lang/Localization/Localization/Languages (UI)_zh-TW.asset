@@ -1371,6 +1371,10 @@ MonoBehaviour:
     m_Localized: Follow Desktop Color
     m_Metadata:
       m_Items: []
+  - m_Id: 178612646722887680
+    m_Localized: Bordered
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

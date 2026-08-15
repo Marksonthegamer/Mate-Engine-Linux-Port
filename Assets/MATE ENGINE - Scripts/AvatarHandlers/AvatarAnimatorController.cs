@@ -54,6 +54,12 @@ public class AvatarAnimatorController : MonoBehaviour
         soundCheckCoroutine = StartCoroutine(CheckSoundContinuously());
     }
 
+    void Start()
+    {
+        isMutter = WindowManager.Instance.CompositorName.ToLower().Contains("mutter") || WindowManager.Instance.CompositorName.ToLower().Contains("gnome");
+        borderHidden = SaveLoadHandler.Instance.data.windowType != WindowType.ShowBorder;
+    }
+
     void OnDisable() => CleanupAudioResources();
     void OnDestroy() => CleanupAudioResources();
     void OnApplicationQuit() => CleanupAudioResources();
@@ -205,12 +211,47 @@ public class AvatarAnimatorController : MonoBehaviour
                 danceState = nextDance;
             }
         }
+
+        if (isMutter && !borderHidden && SaveLoadHandler.Instance.data.windowType != WindowType.ShowBorder)
+        {
+            if (borderHideCounter < borderShowDuration)
+            {
+                borderHideCounter += Time.deltaTime;
+                return;
+            }
+
+            borderHidden = true;
+            WindowManager.Instance.SetWindowBorderless(true);
+        }
     }
     void SetDragging(bool value)
     {
+        if (isMutter && SaveLoadHandler.Instance.data.windowType != WindowType.ShowBorder)
+        {
+            switch (isDragging)
+            {
+                case false when value:
+                    WindowManager.Instance.SetWindowBorderless(false);
+                    break;
+                case true:
+                    borderHideCounter = 0f;
+                    break;
+            }
+
+            if (!value) borderHidden = false;
+        }
+        
         isDragging = value;
         animator.SetBool(isDraggingParam, value);
     }
+
+    private bool isMutter;
+
+    private float borderShowDuration = 3f;
+
+    private float borderHideCounter;
+
+    private bool borderHidden;
 
     void UpdateIdleStatus()
     {

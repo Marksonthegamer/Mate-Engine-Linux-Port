@@ -160,7 +160,7 @@ namespace APIs.Hyprland
             // has to be configured in the bar/widget application
         }
 
-        public void SetWindowBorderless()
+        public void SetWindowBorderless(bool value)
         {
             // not necessary
         }

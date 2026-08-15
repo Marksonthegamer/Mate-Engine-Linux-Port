@@ -1045,6 +1045,10 @@ MonoBehaviour:
     m_Key: LIGHT_DESKTOP_COL
     m_Metadata:
       m_Items: []
+  - m_Id: 178612646722887680
+    m_Key: LSS_WINTYPE_BORDERED
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -159,7 +159,7 @@ public class VRMLoader : MonoBehaviour
 
             try
             {
-                var glbData = new GlbFileParser(path).Parse();
+                using var glbData = new GlbFileParser(path).Parse();
                 var vrm10Data = Vrm10Data.Parse(glbData);
                 if (vrm10Data != null)
                 {

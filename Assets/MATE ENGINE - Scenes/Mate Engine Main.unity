@@ -1054,7 +1054,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1044452301}
   toggleTransition: 1
   graphic: {fileID: 1589012363}
@@ -26644,6 +26644,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1401039965}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!1 &601962980
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 601962981}
+  - component: {fileID: 601962982}
+  m_Layer: 0
+  m_Name: ToggleBorder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &601962981
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 601962980}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1395823394}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &601962982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 601962980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b44fbcfd44b7cc4ab1f53a4b1018117, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ToggleWindowBorder
 --- !u!1 &606374446
 GameObject:
   m_ObjectHideFlags: 0
@@ -34881,7 +34925,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 0.26999998, b: 0.96203995, a: 1}
-  m_Intensity: 2.7888244e-31
+  m_Intensity: 2.4379638e-31
   m_Range: 0.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -78042,7 +78086,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 5.5776488e-31
+  m_Intensity: 4.8759275e-31
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -102246,7 +102290,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0, g: 0.44799995, b: 1, a: 1}
-  m_Intensity: 4.1832364e-31
+  m_Intensity: 3.6569455e-31
   m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -103076,6 +103120,7 @@ Transform:
   - {fileID: 1520083670}
   - {fileID: 1701833819}
   - {fileID: 1496270198}
+  - {fileID: 601962981}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1397622855
@@ -106885,6 +106930,12 @@ MonoBehaviour:
     toggleField: enableWindowSittingToggle
     className: RaiseMEWindow
     methodName: Raise
+  - label: Toggle Window Border
+    type: 2
+    handlerObject: {fileID: 601962980}
+    toggleField: enableWindowSittingToggle
+    className: ToggleWindowBorder
+    methodName: ToggleBordered
   - label: Move To Main Monitor
     type: 2
     handlerObject: {fileID: 915476471}
@@ -229479,6 +229530,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 37618154}
+        m_TargetAssemblyTypeName: UnityEngine.UI.Toggle, UnityEngine.UI
+        m_MethodName: set_interactable
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_IsOn: 0
 --- !u!1 &5820370760646096422
 GameObject:
@@ -260591,7 +260654,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 1.3944122e-31
+    fadeCurrentValue: 1.2189819e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -260615,7 +260678,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 1.3944122e-31
+    fadeCurrentValue: 1.2189819e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -260639,7 +260702,7 @@ MonoBehaviour:
     groupID: ambi_lights
     exclusiveTags:
     - lights
-    fadeCurrentValue: 1.3944122e-31
+    fadeCurrentValue: 1.2189819e-31
     fadeTarget: 0
     isFading: 1
     hasYSet: 0
@@ -275796,6 +275859,7 @@ MonoBehaviour:
     nonActiveID: avatar_lights
     checkmark: {fileID: 5819031733449302703}
   colorController: {fileID: 7290369651463270812}
+  desktopAmbiToggle: {fileID: 37618154}
 --- !u!114 &8536052333486738849
 MonoBehaviour:
   m_ObjectHideFlags: 0

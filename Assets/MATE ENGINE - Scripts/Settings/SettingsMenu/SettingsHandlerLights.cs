@@ -97,6 +97,8 @@ public class SettingsHandlerLights : MonoBehaviour
         }
     }
 
+    public Toggle desktopAmbiToggle;
+
     public void LoadSettings()
     {
         var data = SaveLoadHandler.Instance.data;
@@ -122,6 +124,10 @@ public class SettingsHandlerLights : MonoBehaviour
                 if (data.groupToggles.TryGetValue(entry.activeID, out bool state)) toggleState = state;
                 entry.checkmark.SetIsOnWithoutNotify(toggleState);
                 OnLightToggleChanged(i, toggleState);
+                if (entry.activeID == "ambi_lights")
+                {
+                    desktopAmbiToggle.interactable = entry.checkmark.isOn;
+                }
             }
         }
     }

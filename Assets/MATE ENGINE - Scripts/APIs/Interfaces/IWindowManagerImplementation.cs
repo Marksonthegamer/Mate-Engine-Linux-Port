@@ -25,7 +25,7 @@ public interface  IWindowManagerImplementation
     string GetClassName(IntPtr window);
     void SetTopmost(bool topmost);
     void HideFromTaskbar(bool reallyHide);
-    void SetWindowBorderless();
+    void SetWindowBorderless(bool value);
     void SetWindowType(WindowType type);
     void SetXUnityWindow(IntPtr unityWindow);
     void SetSnapedWindow(IntPtr window);
