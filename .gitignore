@@ -24,6 +24,9 @@ sysinfo.txt
 
 # Crash logs
 *.stacktrace
+# Native libraries built locally
+/libmate_gnome_compat.so
+Plugins/wayland_compat/libmate_gnome_compat.so
 
 # User-specific files
 *.user

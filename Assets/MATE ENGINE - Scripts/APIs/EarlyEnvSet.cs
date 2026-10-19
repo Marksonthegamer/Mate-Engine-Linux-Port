@@ -102,6 +102,10 @@ public static class EarlyEnvSet
     
     private static bool IsCompositionSupported(IntPtr display)
     {
+        if (string.Equals(Environment.GetEnvironmentVariable("XDG_SESSION_TYPE"), "wayland", StringComparison.OrdinalIgnoreCase) ||
+            !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY")))
+            return true;
+
         for (int screen = 0; screen < XScreenCount(display); screen++)
         {
             IntPtr selectionAtom = XInternAtom(display, "_NET_WM_CM_S" + screen, false);
