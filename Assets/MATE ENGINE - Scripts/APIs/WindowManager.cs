@@ -65,6 +65,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     
     private XErrorHandler _errorHandlerDelegate;
 
+    private bool _forceLegacyMoveResize = false;
+
     #region Unity Events
 
     TDBus.Connection _dBusConnection;
@@ -90,37 +92,21 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             if(_dBusConnectionInfo == null)
                 _dBusConnectionInfo = await _dBusConnection.ConnectAsync();
             
-            if (Enum.TryParse(Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP"), true, out _currentDesktopEnv))
+            switch (_currentDesktopEnv)
             {
-                switch(_currentDesktopEnv)
-                {
-                    case DesktopEnvironments.Hyprland:
-                        _windowManagerImplementation = Singleton<HyprlandManager>.Instance;
-                        break;
-                    case DesktopEnvironments.Kde:
-                        if (SaveLoadHandler.Instance.data.useKWinApi)
-                        {
-                            var km = new KWinManager(_dBusConnection, _dBusConnectionInfo);
-                            await km.SetupDBus();
-                            _windowManagerImplementation = km;
-                        }
-                        break;
-                }
-                _windowManagerImplementation?.SetXUnityWindow(_unityWindow);
+                case DesktopEnvironments.Hyprland:
+                    _windowManagerImplementation = Singleton<HyprlandManager>.Instance;
+                    break;
+                case DesktopEnvironments.Kde:
+                    if (SaveLoadHandler.Instance.data.useKWinApi)
+                    {
+                        var km = new KWinManager(_dBusConnection, _dBusConnectionInfo);
+                        await km.SetupDBus();
+                        _windowManagerImplementation = km;
+                    }
+                    break;
             }
-            else
-            {
-                _currentDesktopEnv = _currentSessionType switch
-                {
-                    SessionTypes.X11 => DesktopEnvironments.OtherX11,
-                    SessionTypes.Wayland => DesktopEnvironments.OtherWayland,
-                    _ => DesktopEnvironments.Unknown
-                };
-            }
-            if (!Enum.TryParse(Environment.GetEnvironmentVariable("XDG_SESSION_TYPE"), true, out _currentSessionType))
-            {
-                _currentSessionType = SessionTypes.Unknown;
-            }
+            _windowManagerImplementation?.SetXUnityWindow(_unityWindow);
 
             if (_currentSessionType == SessionTypes.Wayland)
             {
@@ -172,7 +158,20 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 #if UNITY_EDITOR
             return;
 #endif
-            SetWindowBorderless(SaveLoadHandler.Instance.data.windowType != WindowType.ShowBorder);
+            var effectiveWindowType = SaveLoadHandler.Instance.data.windowType;
+            if (_currentDesktopEnv == DesktopEnvironments.OtherWayland)
+            {
+                // In Mutter (GNOME Wayland), normal windows are constrained to one monitor and decorated with a title bar.
+                // Setting WindowType.Dock removes decorations, avoids focus trapping, and permits multi-monitor dragging.
+                if (effectiveWindowType == WindowType.Normal)
+                {
+                    effectiveWindowType = WindowType.Dock;
+                }
+                _forceLegacyMoveResize = true;
+            }
+            SetWindowType(effectiveWindowType);
+            SetWindowBorderless(effectiveWindowType != WindowType.ShowBorder);
+            SetTopmost(SaveLoadHandler.Instance.data.isTopmost);
             XSelectInput(_display, _unityWindow, StructureNotifyMask | EnterWindowMask | LeaveWindowMask | PropertyChangeMask);
             EnableClickThroughTransparency();
             LoadCursors();
@@ -240,8 +239,50 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         SetCursor(IntPtr.Zero);
     }
 
+    private void DetectSessionAndDesktop()
+    {
+        var sessionTypeEnv = Environment.GetEnvironmentVariable("XDG_SESSION_TYPE");
+        var waylandDisplayEnv = Environment.GetEnvironmentVariable("WAYLAND_DISPLAY");
+        if (string.Equals(sessionTypeEnv, "wayland", StringComparison.OrdinalIgnoreCase) ||
+            !string.IsNullOrEmpty(waylandDisplayEnv))
+        {
+            _currentSessionType = SessionTypes.Wayland;
+        }
+        else if (string.Equals(sessionTypeEnv, "x11", StringComparison.OrdinalIgnoreCase))
+        {
+            _currentSessionType = SessionTypes.X11;
+        }
+        else
+        {
+            _currentSessionType = SessionTypes.Unknown;
+        }
+
+        var desktopEnv = Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP") ?? "";
+        if (desktopEnv.IndexOf("hyprland", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            _currentDesktopEnv = DesktopEnvironments.Hyprland;
+        }
+        else if (desktopEnv.IndexOf("kde", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            _currentDesktopEnv = DesktopEnvironments.Kde;
+        }
+        else if (_currentSessionType == SessionTypes.Wayland)
+        {
+            _currentDesktopEnv = DesktopEnvironments.OtherWayland;
+        }
+        else if (_currentSessionType == SessionTypes.X11)
+        {
+            _currentDesktopEnv = DesktopEnvironments.OtherX11;
+        }
+        else
+        {
+            _currentDesktopEnv = DesktopEnvironments.Unknown;
+        }
+    }
+
     private void Init()
     {
+        DetectSessionAndDesktop();
 #if !UNITY_EDITOR
         XInitThreads();
 #endif
@@ -574,7 +615,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public void SetWindowPosition(Vector2Int position)
     {
-        if (SaveLoadHandler.Instance.data.useLegacyMoveResizeCalls)
+        if (SaveLoadHandler.Instance.data.useLegacyMoveResizeCalls || _forceLegacyMoveResize)
         { 
             SetWindowPositionLegacy(position);
             return;
@@ -803,7 +844,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public void SetWindowSize(Vector2Int size)
     {
-        if (SaveLoadHandler.Instance.data.useLegacyMoveResizeCalls)
+        if (SaveLoadHandler.Instance.data.useLegacyMoveResizeCalls || _forceLegacyMoveResize)
         {
             SetWindowSizeLegacy(size);
             return;
@@ -1507,6 +1548,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private bool IsCompositionSupported()
     {
+        if (_currentSessionType == SessionTypes.Wayland || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY")))
+            return true;
+
         for (var screen = 0; screen < XScreenCount(_display); screen++)
         {
             var selectionAtom = XInternAtom(_display, "_NET_WM_CM_S" + screen, false);
