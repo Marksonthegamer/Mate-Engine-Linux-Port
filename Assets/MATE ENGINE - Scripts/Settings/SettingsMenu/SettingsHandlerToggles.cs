@@ -189,6 +189,7 @@ public class SettingsHandlerToggles : MonoBehaviour
             amm.enableMinecraftMessages = data.enableMinecraftMessages;
 
         WindowManager.Instance.SetWindowType(data.windowType);
+        WindowManager.Instance.SetOverrideRedirect(data.overrideRedirect);
     }
 
     public void ResetToDefaults()
@@ -237,6 +238,8 @@ public class SettingsHandlerToggles : MonoBehaviour
         data.verboseDiscordRPCLog = false;
         data.windowType = WindowType.Normal;
         data.useKWinApi = false;
+        data.allowHyprlandMonitorSitting = false;
+        data.overrideRedirect = false;
         
         SaveLoadHandler.Instance.SaveToDisk();
         ApplySettings();

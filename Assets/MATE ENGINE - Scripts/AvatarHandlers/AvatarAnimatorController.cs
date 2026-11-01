@@ -56,7 +56,7 @@ public class AvatarAnimatorController : MonoBehaviour
 
     void Start()
     {
-        isMutter = WindowManager.Instance.CompositorName.ToLower().Contains("mutter") || WindowManager.Instance.CompositorName.ToLower().Contains("gnome");
+        isMutter = false;//WindowManager.Instance.CompositorName.ToLower().Contains("mutter") || WindowManager.Instance.CompositorName.ToLower().Contains("gnome");
         borderHidden = SaveLoadHandler.Instance.data.windowType != WindowType.ShowBorder;
     }
 

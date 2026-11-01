@@ -10,7 +10,7 @@ public class SaveLoadHandler : MonoBehaviour
 
     public SettingsData data;
     
-    public bool safeMode;
+    public bool safeMode, noProfile;
 
     // Multi-Instance Variablen
     private static string fileName = "settings.json";
@@ -45,6 +45,9 @@ public class SaveLoadHandler : MonoBehaviour
             
             if (args[i].Equals("--safemode"))
                 safeMode = true;
+            
+            if (args[i].Equals("--reset-settings"))
+                noProfile = true;
         }
 
         LoadFromDisk();
@@ -69,7 +72,6 @@ public class SaveLoadHandler : MonoBehaviour
     // Speichern
     public void SaveToDisk()
     {
-        if (safeMode) return;
         try
         {
             string dir = Path.GetDirectoryName(FilePath);
@@ -89,7 +91,7 @@ public class SaveLoadHandler : MonoBehaviour
     // Laden
     public void LoadFromDisk()
     {
-        if (File.Exists(FilePath) && !safeMode)
+        if (File.Exists(FilePath) && !noProfile)
         {
             try
             {
@@ -104,6 +106,7 @@ public class SaveLoadHandler : MonoBehaviour
         else
         {
             if (safeMode) Debug.Log("[SaveLoadHandler] Entering Safe Mode...");
+            if (noProfile) Debug.Log("[SaveLoadHandler] Using default profile...");
             data = new SettingsData();
         }
         MigrateAfterLoad();
@@ -191,6 +194,7 @@ public class SaveLoadHandler : MonoBehaviour
         public string ollamaModel = string.Empty;
         public bool useKWinApi = false;
         public bool allowHyprlandMonitorSitting = false;
+        public bool overrideRedirect = false;
 
         //ALARM
         [Serializable]

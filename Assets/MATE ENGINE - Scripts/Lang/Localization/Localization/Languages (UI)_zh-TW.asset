@@ -1319,10 +1319,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 107787947293663232
-    m_Localized: In Mutter (the WM used in GNOME and Cinnamon), normal windows are
-      constrained to on-screen positioning in API calls. Changing ME's window type
-      to Dock will remove these constraints, but may also change how the window behaves.\n\nIf
-      unsure, leave it normal.
+    m_Localized: 'MateEngine''s window type requires tweaking on some WMs to run
+      ME correctly. Note that changing the window type may lead to unexpected behaviours.
+
+
+      If
+      unsure, leave it normal.'
     m_Metadata:
       m_Items: []
   - m_Id: 107788295882268672
@@ -1373,6 +1375,16 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 178612646722887680
     m_Localized: Bordered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 207047429844348928
+    m_Localized: "Bypass the window manager\u2019s normal constraints so the pet
+      can move freely like a desktop overlay. May affect focus, stacking, and compatibility
+      with some desktop environments."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 207047213309210624
+    m_Localized: Enable override_redirect window attribute
     m_Metadata:
       m_Items: []
   references:

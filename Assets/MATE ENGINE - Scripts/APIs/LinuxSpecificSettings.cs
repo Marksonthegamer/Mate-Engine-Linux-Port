@@ -20,6 +20,7 @@ public class LinuxSpecificSettings : MonoBehaviour
     private bool enableAutoMemoryTrim;
     private bool forceKWin;
     private bool allowHyprlandMonitorSitting;
+    private bool overrideRedirect;
     private WindowType windowType;
     
     private Vector2 scrollPos;
@@ -42,6 +43,8 @@ public class LinuxSpecificSettings : MonoBehaviour
     private Label forceKWinDesc;
     private CheckButton allowHyprlandMonitorSittingToggle;
     private Label allowHyprlandMonitorSittingDesc;
+    private CheckButton overrideRedirectToggle;
+    private Label overrideRedirectDesc;
     private Button cancelBtn;
     private Button saveBtn;
     
@@ -53,7 +56,7 @@ public class LinuxSpecificSettings : MonoBehaviour
         inEditor = true;
         return;
 #endif
-        window = new Window(UnityEngine.Application.productName)
+        window = new Window($"{stringTable.GetEntry("LINUX_SPECIFIC").GetLocalizedString()} - {UnityEngine.Application.productName}")
         {
             Resizable = false,
             WindowPosition = WindowPosition.Center,
@@ -77,6 +80,7 @@ public class LinuxSpecificSettings : MonoBehaviour
             enableAutoMemoryTrim = SaveLoadHandler.Instance.data.enableAutoMemoryTrim;
             forceKWin = SaveLoadHandler.Instance.data.useKWinApi;
             allowHyprlandMonitorSitting = SaveLoadHandler.Instance.data.allowHyprlandMonitorSitting;
+            overrideRedirect = SaveLoadHandler.Instance.data.overrideRedirect;
             windowType = SaveLoadHandler.Instance.data.windowType;
             background.SetActive(true);
             if (!show)
@@ -189,20 +193,24 @@ public class LinuxSpecificSettings : MonoBehaviour
         cardBox.PackStart(intro, false, false, 0); 
         
         legacyMoveToggle = new CheckButton(stringTable.GetEntry("LSS_XMOVE").GetLocalizedString()) {Active = SaveLoadHandler.Instance.data.useLegacyMoveResizeCalls, UseUnderline = false};
+        var legacyMoveToggleDescText = stringTable.GetEntry("LSS_XMOVE_TIP").GetLocalizedString();
+        legacyMoveToggle.Accessible.Description = legacyMoveToggleDescText;
         //legacyMoveToggle.MarginTop = 40;
         ((Label)legacyMoveToggle.Child).Xalign = 0.0f;
         ((Label)legacyMoveToggle.Child).Yalign = 0.5f;
         cardBox.PackStart(legacyMoveToggle, false, false, 0);
 
-        legacyMoveDesc = CreateDescriptionLabel(stringTable.GetEntry("LSS_XMOVE_TIP").GetLocalizedString());
+        legacyMoveDesc = CreateDescriptionLabel(legacyMoveToggleDescText);
         cardBox.PackStart(legacyMoveDesc, false, false, 0);
         
         memTrimToggle = new CheckButton(stringTable.GetEntry("LSS_PMO").GetLocalizedString()) {Active = SaveLoadHandler.Instance.data.enableAutoMemoryTrim, UseUnderline = false};
+        var memTrimDescText = stringTable.GetEntry("LSS_PMO_TIP").GetLocalizedString();
+        memTrimToggle.Accessible.Description = memTrimDescText;
         ((Label)memTrimToggle.Child).Xalign = 0.0f;
         ((Label)memTrimToggle.Child).Yalign = 0.5f;
         cardBox.PackStart(memTrimToggle, false, false, 0);
 
-        memTrimDesc = CreateDescriptionLabel(stringTable.GetEntry("LSS_PMO_TIP").GetLocalizedString());
+        memTrimDesc = CreateDescriptionLabel(memTrimDescText);
         cardBox.PackStart(memTrimDesc, false, false, 0);
 
         var hbox = new Box(Orientation.Horizontal, 5);
@@ -214,26 +222,43 @@ public class LinuxSpecificSettings : MonoBehaviour
         hbox.PackStart(winTypeLabel, false, false, 0);
 
         winTypeCombo = new ComboBox(new[] { stringTable.GetEntry("LSS_WINTYPE_NORMAL").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_DOCK").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_DESKTOP").GetLocalizedString(), stringTable.GetEntry("LSS_WINTYPE_BORDERED").GetLocalizedString() }){Active = (int)SaveLoadHandler.Instance.data.windowType};
+        var winTypeDescText = stringTable.GetEntry("LSS_WINTYPE_TIP").GetLocalizedString();
+        winTypeCombo.Accessible.Name = winTypeLabel.Text;
+        winTypeCombo.Accessible.Description = winTypeDescText;
         hbox.PackStart(winTypeCombo, false, false, 0);
         
-        winTypeDesc = CreateDescriptionLabel(stringTable.GetEntry("LSS_WINTYPE_TIP").GetLocalizedString());
+        winTypeDesc = CreateDescriptionLabel(winTypeDescText);
         cardBox.PackStart(winTypeDesc, false, false, 0);
         
         forceKWinToggle = new CheckButton(stringTable.GetEntry("LSS_KWIN").GetLocalizedString()) {Active = SaveLoadHandler.Instance.data.useKWinApi, UseUnderline = false};
+        var forceKWinDescText = stringTable.GetEntry("LSS_KWIN_TIP").GetLocalizedString();
+        forceKWinToggle.Accessible.Description = forceKWinDescText;
         ((Label)forceKWinToggle.Child).Xalign = 0.0f;
         ((Label)forceKWinToggle.Child).Yalign = 0.5f;
         cardBox.PackStart(forceKWinToggle, false, false, 0);
         
-        forceKWinDesc = CreateDescriptionLabel(stringTable.GetEntry("LSS_KWIN_TIP").GetLocalizedString());
+        forceKWinDesc = CreateDescriptionLabel(forceKWinDescText);
         cardBox.PackStart(forceKWinDesc, false, false, 0);
 
         allowHyprlandMonitorSittingToggle = new CheckButton(stringTable.GetEntry("LSS_HYPR_MS").GetLocalizedString()) {Active = SaveLoadHandler.Instance.data.allowHyprlandMonitorSitting, UseUnderline = false};
+        var allowHyprlandMonitorSittingDescText = stringTable.GetEntry("LSS_HYPR_MS_TIP").GetLocalizedString();
+        allowHyprlandMonitorSittingToggle.Accessible.Description = allowHyprlandMonitorSittingDescText;
         ((Label)allowHyprlandMonitorSittingToggle.Child).Xalign = 0.0f;
         ((Label)allowHyprlandMonitorSittingToggle.Child).Yalign = 0.5f;
         cardBox.PackStart(allowHyprlandMonitorSittingToggle, false, false, 0);
         
-        allowHyprlandMonitorSittingDesc = CreateDescriptionLabel(stringTable.GetEntry("LSS_HYPR_MS_TIP").GetLocalizedString());
+        allowHyprlandMonitorSittingDesc = CreateDescriptionLabel(allowHyprlandMonitorSittingDescText);
         cardBox.PackStart(allowHyprlandMonitorSittingDesc, false, false, 0);
+        
+        overrideRedirectToggle = new CheckButton(stringTable.GetEntry("LSS_OVRR").GetLocalizedString()) {Active = SaveLoadHandler.Instance.data.overrideRedirect, UseUnderline = false};
+        var overrideRedirectDescText = stringTable.GetEntry("LSS_OVRR_TIP").GetLocalizedString();
+        forceKWinToggle.Accessible.Description = overrideRedirectDescText;
+        ((Label)overrideRedirectToggle.Child).Xalign = 0.0f;
+        ((Label)overrideRedirectToggle.Child).Yalign = 0.5f;
+        cardBox.PackStart(overrideRedirectToggle, false, false, 0);
+        
+        overrideRedirectDesc = CreateDescriptionLabel(overrideRedirectDescText);
+        cardBox.PackStart(overrideRedirectDesc, false, false, 0);
         
         var buttonBox = new Box(Orientation.Horizontal, 20) { Halign = Align.End };
         contentBox.PackEnd(buttonBox, false, false, 0);
@@ -254,6 +279,7 @@ public class LinuxSpecificSettings : MonoBehaviour
             SaveLoadHandler.Instance.data.windowType = (WindowType)winTypeCombo.Active;
             SaveLoadHandler.Instance.data.useKWinApi = forceKWinToggle.Active;
             SaveLoadHandler.Instance.data.allowHyprlandMonitorSitting = allowHyprlandMonitorSittingToggle.Active;
+            SaveLoadHandler.Instance.data.overrideRedirect = overrideRedirectToggle.Active;
             FindFirstObjectByType<SettingsHandlerToggles>().ApplySettings();
             SaveLoadHandler.Instance.SaveToDisk();
         };
@@ -383,6 +409,12 @@ public class LinuxSpecificSettings : MonoBehaviour
 
         GUILayout.Label(stringTable.GetEntry("LSS_HYPR_MS_TIP").GetLocalizedString());
         
+        GUILayout.Space(10f);
+        
+        overrideRedirect = GUILayout.Toggle(overrideRedirect, stringTable.GetEntry("LSS_OVRR").GetLocalizedString());
+
+        GUILayout.Label(stringTable.GetEntry("LSS_OVRR_TIP").GetLocalizedString());
+        
         GUILayout.EndScrollView();
         
         GUILayout.FlexibleSpace();
@@ -399,7 +431,7 @@ public class LinuxSpecificSettings : MonoBehaviour
             SaveLoadHandler.Instance.data.useKWinApi = forceKWin;
             SaveLoadHandler.Instance.data.windowType = windowType;
             SaveLoadHandler.Instance.data.allowHyprlandMonitorSitting = allowHyprlandMonitorSitting;
-
+            SaveLoadHandler.Instance.data.overrideRedirect = overrideRedirect;
             FindFirstObjectByType<SettingsHandlerToggles>().ApplySettings();
             SaveLoadHandler.Instance.SaveToDisk();
             ShowWindow(false);

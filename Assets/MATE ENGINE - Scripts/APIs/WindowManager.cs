@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-// named namespace to prevent naming conflicts with X11 classes
 using TDBus= Tmds.DBus;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -1317,7 +1316,17 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                 break;
         }
     }
-    
+
+    public void SetOverrideRedirect(bool value)
+    {
+        XSetWindowAttributes attrs = new()
+        {
+            override_redirect = value
+        };
+        XChangeWindowAttributes(_display, _unityWindow, CWOverrideRedirect, ref attrs);
+        print($"override_redirect set to {value}");
+    }
+
     public string GetClassName(IntPtr window)
     {
         if(_windowManagerImplementation != null)
@@ -1332,7 +1341,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         return "";
     }
-    
+
     public bool IsDesktop(IntPtr hwnd)
     {
         if(_windowManagerImplementation != null)
@@ -2053,6 +2062,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private const ulong MwmDecorationsNone = 0; // No decorations
     private const ulong MwmDecorationsAll = 1UL << 0; // Enable decorations
     private const int PropModeReplace = 0;
+    private const int CWOverrideRedirect = 0x0200;
 
     private const int ClientMessage = 33;
     private const long StructureNotifyMask = (1L << 17);
