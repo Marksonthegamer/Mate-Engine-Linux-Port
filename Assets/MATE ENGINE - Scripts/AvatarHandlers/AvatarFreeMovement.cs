@@ -33,7 +33,10 @@ public class AvatarFreeMovement : MonoBehaviour
     private static readonly List<AvatarFreeMovement> Instances = new();
 
     // Margin kept between the avatar and the top/bottom of the camera frame, in world units.
-    private const float FramePaddingWorld = 0.04f;
+    // The frame is 2.2 units tall, so this is a few pixels in a typical window.
+    private const float FramePaddingWorld = 0.01f;
+    // Ankle height for a scale of 1, used when the standing height is added up from the skeleton.
+    private const float FootBoneHeight = 0.08f;
     // Fallback avatar height and the distance from the head bone to the top of the head, for a scale of 1.
     private const float DefaultHeadHeight = 1.48f;
     private const float HeadBoneToCrown = 0.18f;
@@ -54,6 +57,25 @@ public class AvatarFreeMovement : MonoBehaviour
     private Transform _headBone;
     private Renderer[] _renderers;
     private float _nextExtentsRefresh;
+    // Bone chains whose segment lengths add up to the standing height, whatever pose is playing.
+    private readonly List<Transform> _spineChain = new();
+    private readonly List<Transform> _legChain = new();
+
+    // Camera framing shared by all avatars: the scene's own values and what was last written here.
+    // The frame only grows for an avatar that is too tall for it, and is left alone while someone
+    // else (e.g. big screen mode) has changed the camera.
+    // Some compositors (Mutter) never let a window cross the top of the work area. A small avatar has empty
+    // window above its head, so while the window is pressed against that edge the avatar is raised inside the
+    // window until its head reaches the top of the frame, and lowered again when the window leaves the edge.
+    private const float TopEdgeLiftSpeed = 4f; // world units per second
+    private static bool _windowAtTopEdge;
+    private float _topEdgeLift;
+
+    private static Camera _framedCamera;
+    private static float _baseOrthoSize;
+    private static float _baseCameraY;
+    private static float _appliedOrthoSize;
+    private static float _appliedCameraY;
 
     // Tracked shadow planes to keep the shadow under the avatar when moved.
     private Transform _shadowPlaneTransform;
@@ -127,6 +149,52 @@ public class AvatarFreeMovement : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Vertical screen positions (Unity pixels, y pointing up) of the top of the head and of the feet of the
+    /// standing avatar. The window manager uses this to know where the avatar really is inside the window:
+    /// a small avatar leaves a lot of empty window above its head.
+    /// </summary>
+    public static bool TryGetAvatarScreenSpan(out float headTopPixels, out float feetPixels)
+    {
+        headTopPixels = feetPixels = 0f;
+        foreach (var instance in Instances)
+        {
+            if (!instance.isActiveAndEnabled || !instance.TryGetCamera()) continue;
+            Vector3 feet = instance.GetPosition();
+            Vector3 head = feet + Vector3.up * instance.GetStandingHeadOffset();
+            feetPixels = instance._camera.WorldToScreenPoint(feet).y;
+            headTopPixels = instance._camera.WorldToScreenPoint(head).y;
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>Told by the window manager whether the window is pressed against the top of the work area.</summary>
+    public static void SetWindowAtTopEdge(bool atTopEdge) => _windowAtTopEdge = atTopEdge;
+
+    private void UpdateTopEdgeLift()
+    {
+        if (!_windowAtTopEdge && _topEdgeLift <= 0f) return;
+        if (!TryGetCamera() || !_camera.orthographic) return;
+
+        var position = GetPosition();
+        float unliftedY = position.y - _topEdgeLift;
+
+        float wanted = 0f;
+        if (_windowAtTopEdge)
+        {
+            // Standing height, not the current pose, so the avatar does not bob with its animation.
+            float camTopY = _camera.transform.position.y + _camera.orthographicSize;
+            wanted = Mathf.Max(0f, camTopY - GetStandingHeadOffset() - FramePaddingWorld - unliftedY);
+        }
+
+        float lift = Mathf.MoveTowards(_topEdgeLift, wanted, TopEdgeLiftSpeed * Time.unscaledDeltaTime);
+        if (Mathf.Approximately(lift, _topEdgeLift)) return;
+
+        _topEdgeLift = lift;
+        SetPosition(new Vector3(position.x, unliftedY + lift, position.z));
+    }
+
     private bool CanMove => isActiveAndEnabled && enableFreeMovement;
 
     void Awake()
@@ -160,6 +228,7 @@ public class AvatarFreeMovement : MonoBehaviour
         }
 
         RefitAfterResize();
+        UpdateTopEdgeLift();
 
         if (!enableFreeMovement || IsMoving || MenuActions.IsMovementBlocked() || TutorialMenu.IsActive) return;
 
@@ -177,6 +246,7 @@ public class AvatarFreeMovement : MonoBehaviour
     {
         if (!TryGetPointerWorld(out var start)) return false;
         _grabOffset = GetPosition() - start;
+        _topEdgeLift = 0f; // the user takes over: the lift becomes part of their placement
         _dragButton = button;
         _active = this;
         IsMoving = true;
@@ -186,6 +256,7 @@ public class AvatarFreeMovement : MonoBehaviour
 
     public void ResetPosition()
     {
+        _topEdgeLift = 0f;
         if (_fixedPosition != null) _fixedPosition.ResetToHome();
         SyncShadows();
     }
@@ -250,6 +321,7 @@ public class AvatarFreeMovement : MonoBehaviour
         if (!TryGetCamera()) return;
 
         RefreshModelCache();
+        FitCameraToAvatar();
         float scale = _animator != null ? _animator.transform.lossyScale.y : transform.lossyScale.y;
         // Only compared against its previous value, so the field of view serves for a perspective camera.
         float halfHeight = _camera.orthographic ? _camera.orthographicSize : _camera.fieldOfView;
@@ -266,17 +338,82 @@ public class AvatarFreeMovement : MonoBehaviour
         if (first) return;
 
         // At its rest position the avatar is framed by the scene itself, leave that alone.
+        // A top edge lift follows the new size on its own.
         var position = GetPosition();
-        if ((position - GetHome()).sqrMagnitude < 1e-6f) return;
+        if ((position - GetHome()).sqrMagnitude < 1e-6f || _topEdgeLift > 0f) return;
 
         _nextExtentsRefresh = 0f; // measure the resized model, not the cached one
         SetPosition(ClampToView(position));
     }
 
     /// <summary>
-    /// Height of the top of the head and of the lowest point of the model, relative to this transform.
-    /// The head bone is the primary source; renderer bounds are only allowed to add a little on top of it
-    /// (hats, hair), because skinned mesh bounds are often much larger than what is actually drawn.
+    /// Grows the orthographic camera frame when the avatar at its rest position is too tall for it, so a
+    /// maximum size avatar keeps its head. The bottom edge of the frame stays where the scene put it (the feet
+    /// keep their place in the window), the extra room is added at the top. Never shrinks below the scene's size.
+    /// </summary>
+    private void FitCameraToAvatar()
+    {
+        if (!_camera.orthographic) return;
+
+        if (_framedCamera != _camera)
+        {
+            _framedCamera = _camera;
+            _baseOrthoSize = _appliedOrthoSize = _camera.orthographicSize;
+            _baseCameraY = _appliedCameraY = _camera.transform.position.y;
+        }
+
+        // Someone else is driving the camera right now: hands off until it is back where we left it.
+        var camTransform = _camera.transform;
+        if (Mathf.Abs(_camera.orthographicSize - _appliedOrthoSize) > 1e-4f ||
+            Mathf.Abs(camTransform.position.y - _appliedCameraY) > 1e-4f) return;
+
+        // The standing height is used, not the current pose, so the frame does not pump with the animation.
+        float bottom = _baseCameraY - _baseOrthoSize;
+        float requiredTop = GetHome().y + GetStandingHeadOffset() + FramePaddingWorld;
+        float size = Mathf.Max(_baseOrthoSize, (requiredTop - bottom) * 0.5f);
+        float cameraY = bottom + size;
+
+        if (Mathf.Abs(size - _appliedOrthoSize) <= 1e-4f) return;
+
+        _camera.orthographicSize = size;
+        var p = camTransform.position;
+        camTransform.position = new Vector3(p.x, cameraY, p.z);
+        _appliedOrthoSize = _camera.orthographicSize;
+        _appliedCameraY = camTransform.position.y;
+    }
+
+    /// <summary>
+    /// Height of the top of the head above this transform when the avatar stands upright, in world units.
+    /// Added up from bone lengths, which do not change with the pose, so sitting or dancing does not alter it.
+    /// </summary>
+    private float GetStandingHeadOffset()
+    {
+        RefreshModelCache();
+        float scale = Mathf.Max(_animator != null ? _animator.transform.lossyScale.y : transform.lossyScale.y, 0.01f);
+        if (_spineChain.Count < 2 || _legChain.Count < 3) return DefaultHeadHeight * scale;
+
+        float height = (FootBoneHeight + HeadBoneToCrown) * scale;
+        height += ChainLength(_legChain);
+        height += ChainLength(_spineChain);
+        return height;
+    }
+
+    private static float ChainLength(List<Transform> chain)
+    {
+        float length = 0f;
+        for (int i = 1; i < chain.Count; i++)
+        {
+            if (chain[i - 1] == null || chain[i] == null) return length;
+            length += Vector3.Distance(chain[i - 1].position, chain[i].position);
+        }
+        return length;
+    }
+
+    /// <summary>
+    /// Height of the top of the head and of the lowest point of the model, relative to this transform, in the
+    /// current pose. With a head bone the top is the bone plus the crown: skinned mesh bounds are loose boxes
+    /// around hair and clothing and would stop a small avatar well short of the frame's edge. Renderer bounds
+    /// are only the source when there is no humanoid skeleton.
     /// </summary>
     private void GetAvatarVerticalExtents(out float headOffset, out float feetOffset)
     {
@@ -291,8 +428,7 @@ public class AvatarFreeMovement : MonoBehaviour
             : DefaultHeadHeight * scale;
         feetOffset = 0f;
 
-        // With a head bone the mesh may raise the estimate only slightly, without one it is all there is.
-        float maxHeadOffset = hasHeadBone ? headOffset + 0.15f * scale : 2.5f * scale;
+        float maxHeadOffset = hasHeadBone ? headOffset : 2.5f * scale;
         float minFeetOffset = -0.5f * scale;
 
         if (_renderers == null) return;
@@ -315,6 +451,23 @@ public class AvatarFreeMovement : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
         _headBone = _animator != null && _animator.isHuman ? _animator.GetBoneTransform(HumanBodyBones.Head) : null;
         _renderers = GetComponentsInChildren<Renderer>();
+
+        _spineChain.Clear();
+        _legChain.Clear();
+        if (_headBone == null) return;
+        AddBones(_spineChain, HumanBodyBones.Hips, HumanBodyBones.Spine, HumanBodyBones.Chest,
+            HumanBodyBones.UpperChest, HumanBodyBones.Neck, HumanBodyBones.Head);
+        AddBones(_legChain, HumanBodyBones.LeftUpperLeg, HumanBodyBones.LeftLowerLeg, HumanBodyBones.LeftFoot);
+    }
+
+    /// <summary>Collects the bones that exist; optional ones (chest, upper chest, neck) are simply skipped.</summary>
+    private void AddBones(List<Transform> chain, params HumanBodyBones[] bones)
+    {
+        foreach (var bone in bones)
+        {
+            var t = _animator.GetBoneTransform(bone);
+            if (t != null) chain.Add(t);
+        }
     }
 
     private bool ModifierHeld() =>
@@ -387,11 +540,14 @@ public class AvatarFreeMovement : MonoBehaviour
         var delta = target - home;
         float x = Mathf.Clamp(Vector3.Dot(delta, camTransform.right), -halfWidth * maxOffsetViewFraction, halfWidth * maxOffsetViewFraction);
 
-        // Strict vertical bounds ensuring neither head nor feet cross the camera frame
+        // Neither head nor feet may cross the camera frame.
         float maxRootY = camTopY - headOffset - FramePaddingWorld;
         float minRootY = camBottomY - feetOffset + FramePaddingWorld;
 
-        float clampedY = Mathf.Clamp(target.y, minRootY, Mathf.Max(minRootY, maxRootY));
+        // Taller than the frame: the head wins, the feet go below the edge instead of the face above it.
+        if (maxRootY < minRootY) minRootY = maxRootY;
+
+        float clampedY = Mathf.Clamp(target.y, minRootY, maxRootY);
 
         return new Vector3(home.x + x, clampedY, home.z);
     }

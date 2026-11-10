@@ -311,6 +311,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     /// Clamps the window so its companion does not sink below the screen floor,
     /// and its head can reach the top panel without clipping.
     /// </summary>
+    private const int TopEdgeTolerancePixels = 4;
+
     private void ApplyWindowScreenGuard()
     {
         if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero || _closing) return;
@@ -322,13 +324,24 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         var monitor = GetMonitorRectFromWindow(_unityWindow);
         if (monitor.height <= 0) return;
 
+        // Pressed against the top of the work area (Mutter does not let a window go higher): the avatar
+        // closes the remaining gap inside the window.
+        var workArea = GetWorkArea(monitor);
+        AvatarFreeMovement.SetWindowAtTopEdge(!_fillMonitorActive && Mathf.Abs(windowRect.y - workArea.yMin) <= TopEdgeTolerancePixels);
+
         // Feet sit at ~62% from top of window in standard framing.
         // Prevent feet from going below bottom floor.
         int feetPixelOffset = (int)(windowRect.height * 0.62f);
         int maxWindowY = monitor.yMax - feetPixelOffset;
 
-        // Head reaches near top of window (~2% padding).
+        // Empty window above the head: the window may leave the screen by that much, so the head itself
+        // can reach the top edge. A scaled-down avatar has a lot of it; assuming a fixed 2% stopped it early.
         int headPixelOffset = (int)(windowRect.height * 0.02f);
+        if (Screen.height > 0 && AvatarFreeMovement.TryGetAvatarScreenSpan(out float headTopPixels, out _))
+        {
+            float emptyAbove = (Screen.height - headTopPixels) * windowRect.height / Screen.height;
+            headPixelOffset = Mathf.Clamp(Mathf.FloorToInt(emptyAbove), 0, windowRect.height);
+        }
         int minWindowY = monitor.yMin - headPixelOffset;
 
         int targetY = Mathf.Clamp(windowRect.y, minWindowY, maxWindowY);
