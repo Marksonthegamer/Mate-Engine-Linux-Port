@@ -422,7 +422,6 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         if (_fillMonitorActive)
         {
-            AvatarFreeMovement.ClearScreenGuard();
             print("Window fills the monitor's work area; the avatar is dragged inside the window.");
         }
         else

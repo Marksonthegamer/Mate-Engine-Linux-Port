@@ -66,6 +66,9 @@ namespace PulseAudio
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr pa_context_get_sink_input_info_list(IntPtr context, PaSinkInputInfoCbT cb, IntPtr userdata);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr pa_context_get_sink_input_info(IntPtr context, uint idx, PaSinkInputInfoCbT cb, IntPtr userdata);
         
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr pa_proplist_gets(IntPtr proplist, [MarshalAs(UnmanagedType.LPStr)] string key);
@@ -380,20 +383,18 @@ namespace PulseAudio
             {
                 var sinkInput = Marshal.PtrToStructure<PaSinkInputInfo>(info);
                 var audioProgram = ParseSinkInputProperties(sinkInput);
-                if (!audioProgram.IsMuted && IsAudioRelatedNode(audioProgram.MediaClass) && audioProgram.ProcessName != Path.GetFileName(Process.GetCurrentProcess().ProcessName))
+                // Corked (paused/idle) streams are kept on purpose: Chromium based browsers cork between tracks.
+                bool usable = !audioProgram.IsMuted && IsAudioRelatedNode(audioProgram.MediaClass) && audioProgram.ProcessName != Path.GetFileName(Process.GetCurrentProcess().ProcessName);
+                lock (_programsLock)
                 {
-                    lock (_programsLock)
+                    // The same sink input is reported again by change events, keep one entry per stream.
+                    _audioPrograms.RemoveAll(p => p.NodeId == audioProgram.NodeId);
+                    if (!usable) return;
+                    _audioPrograms.Add(audioProgram);
+                    if (IsAllowedApp(audioProgram))
                     {
-                        _audioPrograms.Add(audioProgram);
-                        bool isAllowed = SaveLoadHandler.Instance.data.allowedApps.Any(app =>
-                            (!string.IsNullOrEmpty(audioProgram.Name) && audioProgram.Name.IndexOf(app, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                            (!string.IsNullOrEmpty(audioProgram.ProcessName) && audioProgram.ProcessName.IndexOf(app, StringComparison.OrdinalIgnoreCase) >= 0));
-                        if (isAllowed)
-                        {
-                            StartMonitoringStream(audioProgram.NodeId);
-                        }
+                        StartMonitoringStream(audioProgram.NodeId);
                     }
-                    //Log($"Found playback process: {audioProgram.ProcessName}");
                 }
             }
             catch (Exception ex)
@@ -402,11 +403,74 @@ namespace PulseAudio
             }
         }
         
+        /// <summary>
+        /// True when the stream belongs to one of the allowed apps. Case-insensitive substring match against
+        /// both the application name ("Brave") and the binary name ("brave").
+        /// </summary>
+        public static bool IsAllowedApp(AudioProgram audioProgram, IList<string> allowedApps = null)
+        {
+            if (audioProgram == null) return false;
+            allowedApps ??= SaveLoadHandler.Instance != null ? SaveLoadHandler.Instance.data?.allowedApps : null;
+            if (allowedApps == null) return false;
+
+            for (int i = 0; i < allowedApps.Count; i++)
+            {
+                string app = allowedApps[i];
+                if (string.IsNullOrEmpty(app)) continue;
+                if (!string.IsNullOrEmpty(audioProgram.Name) && audioProgram.Name.IndexOf(app, StringComparison.OrdinalIgnoreCase) >= 0) return true;
+                if (!string.IsNullOrEmpty(audioProgram.ProcessName) && audioProgram.ProcessName.IndexOf(app, StringComparison.OrdinalIgnoreCase) >= 0) return true;
+            }
+            return false;
+        }
+
+        // The monitor delivers 25 peaks per second while callers poll every couple of seconds. A single sample
+        // is often a quiet moment between beats, so the loudest recent one is held for the pollers.
+        private const double PeakHoldSeconds = 3.0;
+
+        private struct PeakHold
+        {
+            public float Peak;      // loudest sample of the current hold window
+            public long PeakTicks;  // when that sample arrived
+            public long LastTicks;  // when the latest sample arrived
+        }
+
+        private readonly Dictionary<uint, PeakHold> _peakHolds = new();
+
+        private static double SecondsSince(long ticks) => (Stopwatch.GetTimestamp() - ticks) / (double)Stopwatch.Frequency;
+
+        /// <summary>
+        /// Loudest peak of a monitored stream over the last few seconds.
+        /// False (and -1) while the monitor has not delivered anything yet; 0 when it has gone quiet.
+        /// </summary>
+        public bool TryGetPeak(uint sinkInputIndex, out float peak)
+        {
+            lock (_programsLock)
+            {
+                if (_peakHolds.TryGetValue(sinkInputIndex, out var hold))
+                {
+                    // No fresh samples means the stream is paused: do not report the last loud moment forever.
+                    peak = SecondsSince(hold.LastTicks) > PeakHoldSeconds ? 0f : hold.Peak;
+                    return true;
+                }
+            }
+            peak = -1f;
+            return false;
+        }
+
         private readonly Dictionary<uint, IntPtr> _activeMonitors = new();
         
+        // Called from the Unity main thread and from the PulseAudio mainloop thread.
         public void StartMonitoringStream(uint sinkInputIndex)
         {
-            if (_activeMonitors.TryGetValue(sinkInputIndex, out _)) return;
+            lock (_programsLock)
+            {
+                StartMonitoringStreamLocked(sinkInputIndex);
+            }
+        }
+
+        private void StartMonitoringStreamLocked(uint sinkInputIndex)
+        {
+            if (_context == IntPtr.Zero || _activeMonitors.ContainsKey(sinkInputIndex)) return;
             PaSampleSpec ss = new PaSampleSpec { format = 5, rate = 25, channels = 1 };
             var stream = pa_stream_new(_context, "MateEnginePeakDetection", ref ss, IntPtr.Zero);
             if (stream == IntPtr.Zero)
@@ -425,21 +489,21 @@ namespace PulseAudio
                 return;
             }
             _activeMonitors.Add(sinkInputIndex, stream);
-            lock (_programsLock)
-                ProgramPeaks.TryAdd(sinkInputIndex, -1);
+            ProgramPeaks.TryAdd(sinkInputIndex, -1);
         }
         
         private void StopMonitoringStream(uint index)
         {
-            if (!_activeMonitors.TryGetValue(index, out var stream)) return;
-            pa_stream_disconnect(stream);
-            pa_stream_unref(stream);
-            _activeMonitors.Remove(index);
-        
             lock (_programsLock)
             {
                 _audioPrograms.RemoveAll(p => p.NodeId == index);
                 ProgramPeaks.Remove(index);
+                _peakHolds.Remove(index);
+
+                if (!_activeMonitors.TryGetValue(index, out var stream)) return;
+                pa_stream_disconnect(stream);
+                pa_stream_unref(stream);
+                _activeMonitors.Remove(index);
             }
         }
         
@@ -457,7 +521,8 @@ namespace PulseAudio
                 float maxPeak = 0f;
                 for (int i = 0; i < sampleCount; i++)
                 {
-                    if (samples[i] > maxPeak) maxPeak = samples[i];
+                    float sample = Math.Abs(samples[i]);
+                    if (sample > maxPeak) maxPeak = sample;
                 }
         
                 UpdateProgramPeak(userdata, maxPeak);
@@ -470,17 +535,15 @@ namespace PulseAudio
         {
             var type = t & PaSubscriptionEventType.TypeMask;
 
-            if (type == PaSubscriptionEventType.New)
+            if (type == PaSubscriptionEventType.New || type == PaSubscriptionEventType.Change)
             {
-                lock (_audioPrograms)
+                // A new stream is not in _audioPrograms yet and a changed one may have been corked/renamed:
+                // ask the server for it, OnSinkInputInfo updates the list and starts monitoring allowed apps.
+                var callback = _cachedSinkInputCb;
+                if (callback != null && c != IntPtr.Zero)
                 {
-                    var audioProgram = _audioPrograms.FirstOrDefault(p => p.NodeId == index);
-                    if (audioProgram != null && SaveLoadHandler.Instance.data.allowedApps.Any(app =>
-                        (!string.IsNullOrEmpty(audioProgram.Name) && audioProgram.Name.IndexOf(app, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                        (!string.IsNullOrEmpty(audioProgram.ProcessName) && audioProgram.ProcessName.IndexOf(app, StringComparison.OrdinalIgnoreCase) >= 0)))
-                    {
-                        StartMonitoringStream(audioProgram.NodeId);
-                    }
+                    IntPtr op = pa_context_get_sink_input_info(c, index, callback, IntPtr.Zero);
+                    if (op != IntPtr.Zero) pa_operation_unref(op);
                 }
             }
             if (type == PaSubscriptionEventType.Remove)
@@ -498,13 +561,25 @@ namespace PulseAudio
         {
             uint nodeId = (uint)idPtr.ToInt64();
             
-            lock (Instance._programsLock) 
+            var instance = Instance;
+            if (instance == null) return;
+
+            // Not gated on _audioPrograms: that list is emptied while GetPlayingAudioPrograms is querying,
+            // which used to throw peaks away. The monitor entry itself tells whether the stream is still alive.
+            lock (instance._programsLock)
             {
-                var program = Instance._audioPrograms.FirstOrDefault(p => p.NodeId == nodeId);
-                if (program != null)
+                if (!instance._activeMonitors.ContainsKey(nodeId)) return;
+                instance.ProgramPeaks[nodeId] = peak;
+
+                long now = Stopwatch.GetTimestamp();
+                instance._peakHolds.TryGetValue(nodeId, out var hold);
+                if (hold.LastTicks == 0 || peak >= hold.Peak || SecondsSince(hold.PeakTicks) > PeakHoldSeconds)
                 {
-                    Instance.ProgramPeaks[nodeId] = peak;
+                    hold.Peak = peak;
+                    hold.PeakTicks = now;
                 }
+                hold.LastTicks = now;
+                instance._peakHolds[nodeId] = hold;
             }
         }
 
@@ -629,7 +704,12 @@ namespace PulseAudio
 
         public void Cleanup()
         {
-            foreach (var key in _activeMonitors.Keys.ToList())
+            List<uint> monitored;
+            lock (_programsLock)
+            {
+                monitored = _activeMonitors.Keys.ToList();
+            }
+            foreach (var key in monitored)
             {
                 StopMonitoringStream(key);
             }
