@@ -5,13 +5,13 @@ public class FixedPosition : MonoBehaviour
     [Tooltip("When enabled, the transform is pinned to the fixed position every frame (cancels root motion drift).")]
     public bool lockPosition = true;
 
-    [Tooltip("World units the avatar is raised above its spawn point, so it rests nearer the vertical center of the window instead of hugging the bottom edge.")]
-    public float verticalRestOffset = 0.35f;
+    [Tooltip("World units the avatar is raised above its spawn point.")]
+    public float verticalRestOffset = 0f;
 
     private Vector3 fixedPosition;
     private Vector3 homePosition;
 
-    /// <summary>The avatar's rest position: where it spawned, raised by <see cref="verticalRestOffset"/>.</summary>
+    /// <summary>The avatar's rest position: where it spawned.</summary>
     public Vector3 HomePosition => homePosition;
 
     /// <summary>
@@ -29,7 +29,7 @@ public class FixedPosition : MonoBehaviour
 
     void Start()
     {
-        fixedPosition = transform.position + Vector3.up * verticalRestOffset;
+        fixedPosition = transform.position + (verticalRestOffset != 0f ? Vector3.up * verticalRestOffset : Vector3.zero);
         homePosition = fixedPosition;
         transform.position = fixedPosition;
 

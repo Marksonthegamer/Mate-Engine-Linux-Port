@@ -346,20 +346,20 @@ public class AvatarSettingsMenu : MonoBehaviour
     private void CycleWindowSize()
     {
         var data = SaveLoadHandler.Instance.data;
-        var controller = uniWindowController ?? UniWindowController.current;
-
         switch (data.windowSizeState)
         {
             case SaveLoadHandler.SettingsData.WindowSizeState.Normal:
                 data.windowSizeState = SaveLoadHandler.SettingsData.WindowSizeState.Big;
-                controller.windowSize = new Vector2(2048, 1536); break;
+                break;
             case SaveLoadHandler.SettingsData.WindowSizeState.Big:
                 data.windowSizeState = SaveLoadHandler.SettingsData.WindowSizeState.Small;
-                controller.windowSize = new Vector2(768, 512); break;
+                break;
             case SaveLoadHandler.SettingsData.WindowSizeState.Small:
+            default:
                 data.windowSizeState = SaveLoadHandler.SettingsData.WindowSizeState.Normal;
-                controller.windowSize = new Vector2(1536, 1024); break;
+                break;
         }
+        RestoreWindowSize();
         SaveLoadHandler.Instance.SaveToDisk();
     }
 
@@ -528,12 +528,20 @@ public class AvatarSettingsMenu : MonoBehaviour
     private void RestoreWindowSize()
     {
         var data = SaveLoadHandler.Instance.data;
-        var controller = uniWindowController ?? UniWindowController.current;
-        switch (data.windowSizeState)
+        Vector2Int size = data.windowSizeState switch
         {
-            case SaveLoadHandler.SettingsData.WindowSizeState.Small: controller.windowSize = new Vector2(768, 512); break;
-            case SaveLoadHandler.SettingsData.WindowSizeState.Big: controller.windowSize = new Vector2(2048, 1536); break;
-            default: controller.windowSize = new Vector2(1536, 1024); break;
+            SaveLoadHandler.SettingsData.WindowSizeState.Small => new Vector2Int(768, 512),
+            SaveLoadHandler.SettingsData.WindowSizeState.Big => new Vector2Int(2048, 1536),
+            _ => new Vector2Int(1536, 1024)
+        };
+        if (WindowManager.Instance != null)
+        {
+            WindowManager.Instance.SetWindowSize(size);
+        }
+        else
+        {
+            var controller = uniWindowController ?? UniWindowController.current;
+            if (controller != null) controller.windowSize = new Vector2(size.x, size.y);
         }
     }
     public void ResetToDefaults()

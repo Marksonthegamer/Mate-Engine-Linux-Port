@@ -122,7 +122,7 @@ public class AvatarAnimatorController : MonoBehaviour
             isComplete = true;
             for (var i = 0; i < programs.Count; i++)
             {
-                foreach (var t in allowedApps.Where(t => audioPrograms[i].Name.StartsWith(t, StringComparison.OrdinalIgnoreCase) | audioPrograms[i].ProcessName.StartsWith(t, StringComparison.OrdinalIgnoreCase)))
+                foreach (var t in allowedApps.Where(t => (!string.IsNullOrEmpty(audioPrograms[i].Name) && audioPrograms[i].Name.IndexOf(t, StringComparison.OrdinalIgnoreCase) >= 0) || (!string.IsNullOrEmpty(audioPrograms[i].ProcessName) && audioPrograms[i].ProcessName.IndexOf(t, StringComparison.OrdinalIgnoreCase) >= 0)))
                 {
                     PulseAudioManager.Instance.StartMonitoringStream(audioPrograms[i].NodeId);
                 }
@@ -138,7 +138,7 @@ public class AvatarAnimatorController : MonoBehaviour
             {
                 for (int j = 0; j < allowedApps.Count; j++)
                 {
-                    if (audioPrograms[i].Name.StartsWith(allowedApps[j], StringComparison.OrdinalIgnoreCase) | audioPrograms[i].ProcessName.StartsWith(allowedApps[j], StringComparison.OrdinalIgnoreCase))
+                    if ((!string.IsNullOrEmpty(audioPrograms[i].Name) && audioPrograms[i].Name.IndexOf(allowedApps[j], StringComparison.OrdinalIgnoreCase) >= 0) || (!string.IsNullOrEmpty(audioPrograms[i].ProcessName) && audioPrograms[i].ProcessName.IndexOf(allowedApps[j], StringComparison.OrdinalIgnoreCase) >= 0))
                     {
                         var peak = PulseAudioManager.Instance.ProgramPeaks[audioPrograms[i].NodeId];
                         if (peak > SOUND_THRESHOLD)

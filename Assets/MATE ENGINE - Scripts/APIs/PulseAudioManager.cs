@@ -380,13 +380,15 @@ namespace PulseAudio
             {
                 var sinkInput = Marshal.PtrToStructure<PaSinkInputInfo>(info);
                 var audioProgram = ParseSinkInputProperties(sinkInput);
-                if (!audioProgram.IsMuted && !audioProgram.IsCorked && IsAudioRelatedNode(audioProgram.MediaClass) && audioProgram.ProcessName != Path.GetFileName(Process.GetCurrentProcess().ProcessName))
+                if (!audioProgram.IsMuted && IsAudioRelatedNode(audioProgram.MediaClass) && audioProgram.ProcessName != Path.GetFileName(Process.GetCurrentProcess().ProcessName))
                 {
                     lock (_programsLock)
                     {
                         _audioPrograms.Add(audioProgram);
-                        if (SaveLoadHandler.Instance.data.allowedApps.Contains(audioProgram.Name) |
-                            SaveLoadHandler.Instance.data.allowedApps.Contains(audioProgram.ProcessName))
+                        bool isAllowed = SaveLoadHandler.Instance.data.allowedApps.Any(app =>
+                            (!string.IsNullOrEmpty(audioProgram.Name) && audioProgram.Name.IndexOf(app, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                            (!string.IsNullOrEmpty(audioProgram.ProcessName) && audioProgram.ProcessName.IndexOf(app, StringComparison.OrdinalIgnoreCase) >= 0));
+                        if (isAllowed)
                         {
                             StartMonitoringStream(audioProgram.NodeId);
                         }
@@ -473,8 +475,9 @@ namespace PulseAudio
                 lock (_audioPrograms)
                 {
                     var audioProgram = _audioPrograms.FirstOrDefault(p => p.NodeId == index);
-                    if (audioProgram != null && SaveLoadHandler.Instance.data.allowedApps.Contains(audioProgram.Name) |
-                        SaveLoadHandler.Instance.data.allowedApps.Contains(audioProgram.ProcessName))
+                    if (audioProgram != null && SaveLoadHandler.Instance.data.allowedApps.Any(app =>
+                        (!string.IsNullOrEmpty(audioProgram.Name) && audioProgram.Name.IndexOf(app, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                        (!string.IsNullOrEmpty(audioProgram.ProcessName) && audioProgram.ProcessName.IndexOf(app, StringComparison.OrdinalIgnoreCase) >= 0)))
                     {
                         StartMonitoringStream(audioProgram.NodeId);
                     }

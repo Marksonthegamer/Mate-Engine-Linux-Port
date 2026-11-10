@@ -201,10 +201,7 @@ public class AvatarFreeMovement : MonoBehaviour
     /// </summary>
     public static void ApplyScreenGuard(RectInt windowRect, RectInt monitorRect)
     {
-        foreach (var instance in Instances)
-        {
-            if (instance.CanMove) instance.GuardScreen(windowRect, monitorRect);
-        }
+        // WindowManager clamps the window directly, preserving avatar framing without internal shifting.
     }
 
     /// <summary>Takes back whatever the screen guard added, e.g. when the window stops being movable.</summary>
@@ -212,76 +209,13 @@ public class AvatarFreeMovement : MonoBehaviour
     {
         foreach (var instance in Instances)
         {
-            if (Mathf.Approximately(instance._guardLift, 0f) || !instance.TryGetCamera()) continue;
-            var position = instance.GetPosition() - instance._camera.transform.up * instance._guardLift;
             instance._guardLift = 0f;
-            instance.SetPosition(position);
+            if (instance._fixedPosition != null) instance._fixedPosition.ResetToHome();
         }
     }
 
     private void GuardScreen(RectInt windowRect, RectInt monitorRect)
     {
-        if (_dragButton >= 0 || !TryGetCamera() || Screen.height <= 0 || windowRect.height <= 0) return;
-
-        var camTransform = _camera.transform;
-        float depth = Mathf.Max(Vector3.Dot(GetHome() - camTransform.position, camTransform.forward), _camera.nearClipPlane + 0.01f);
-        float halfHeight = _camera.orthographic
-            ? _camera.orthographicSize
-            : depth * Mathf.Tan(_camera.fieldOfView * 0.5f * Mathf.Deg2Rad);
-        float worldHeight = halfHeight * 2f;
-        float camTopY = camTransform.position.y + halfHeight;
-        float camBottomY = camTransform.position.y - halfHeight;
-
-        float pixelsPerWorldUnit = windowRect.height / worldHeight;
-        float worldPerPixel = worldHeight / windowRect.height;
-
-        GetAvatarVerticalExtents(out float headOffset, out float feetOffset);
-
-        // Base position without current guard lift
-        var basePosition = GetPosition() - camTransform.up * _guardLift;
-        float baseRootY = basePosition.y;
-        float baseHeadY = baseRootY + headOffset;
-        float baseFeetY = baseRootY + feetOffset;
-
-        // Desktop root Y positions (X11 coords, 0 at top, pointing down)
-        float desktopHeadY = windowRect.y + (camTopY - baseHeadY) * pixelsPerWorldUnit;
-        float desktopFeetY = windowRect.y + (camTopY - baseFeetY) * pixelsPerWorldUnit;
-
-        // Strict ceiling: the lift may never take the head past the top of the camera frame.
-        // It is never negative, so the guard cannot push the avatar down either.
-        float maxAllowedHeadWorldY = camTopY - FramePaddingWorld;
-        float maxAllowedLift = Mathf.Max(0f, maxAllowedHeadWorldY - baseHeadY);
-
-        // Strict floor: feet must never cross the bottom of the camera frame
-        float minAllowedFeetWorldY = camBottomY + FramePaddingWorld;
-        float minAllowedLift = Mathf.Min(0f, minAllowedFeetWorldY - baseFeetY);
-
-        float desiredLift = 0f;
-
-        // 1. Bottom guard: feet below the monitor's bottom edge? Lift the avatar.
-        float bottomFloorY = monitorRect.yMax;
-        float bottomOverflowPx = desktopFeetY - bottomFloorY;
-        if (bottomOverflowPx > bottomGuardTolerancePixels)
-        {
-            desiredLift = bottomOverflowPx * worldPerPixel;
-        }
-
-        // 2. Top guard: the compositor stops the window at the top panel while the frame above the head is empty.
-        // Lift the avatar into that empty space so the head reaches the top edge.
-        float topCeilingY = monitorRect.y;
-        if (windowRect.y <= topCeilingY + 45)
-        {
-            float targetHeadDesktopY = topCeilingY + topGuardTolerancePixels;
-            float topGapPx = desktopHeadY - targetHeadDesktopY;
-            if (topGapPx > 0f)
-            {
-                float topLift = topGapPx * worldPerPixel;
-                desiredLift = Mathf.Max(desiredLift, topLift);
-            }
-        }
-
-        _guardLift = Mathf.Clamp(desiredLift, minAllowedLift, maxAllowedLift);
-        SetPosition(basePosition + camTransform.up * _guardLift);
     }
 
     /// <summary>

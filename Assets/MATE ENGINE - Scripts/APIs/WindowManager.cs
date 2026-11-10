@@ -308,14 +308,12 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     }
 
     /// <summary>
-    /// Adjusts the avatar inside the window so its feet do not sink below the screen floor,
-    /// its head can reach the top panel, and its upper body is NEVER clipped outside the window.
+    /// Clamps the window so its companion does not sink below the screen floor,
+    /// and its head can reach the top panel without clipping.
     /// </summary>
     private void ApplyWindowScreenGuard()
     {
         if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero || _closing) return;
-        // A monitor-filling window always touches the top panel; the guard would pin the avatar to the top.
-        if (_fillMonitorRequested || _fillMonitorActive) return;
         if (!GetWindowRect(_unityWindow, out var windowRect) || windowRect.height <= 0) return;
 
         if (_monitors == null || _monitors.Count == 0) QueryMonitors();
@@ -324,7 +322,24 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         var monitor = GetMonitorRectFromWindow(_unityWindow);
         if (monitor.height <= 0) return;
 
-        AvatarFreeMovement.ApplyScreenGuard(windowRect, monitor);
+        // Feet sit at ~62% from top of window in standard framing.
+        // Prevent feet from going below bottom floor.
+        int feetPixelOffset = (int)(windowRect.height * 0.62f);
+        int maxWindowY = monitor.yMax - feetPixelOffset;
+
+        // Head reaches near top of window (~2% padding).
+        int headPixelOffset = (int)(windowRect.height * 0.02f);
+        int minWindowY = monitor.yMin - headPixelOffset;
+
+        int targetY = Mathf.Clamp(windowRect.y, minWindowY, maxWindowY);
+        int minWindowX = monitor.xMin - windowRect.width / 2;
+        int maxWindowX = monitor.xMax - windowRect.width / 2;
+        int targetX = Mathf.Clamp(windowRect.x, minWindowX, maxWindowX);
+
+        if (targetX != windowRect.x || targetY != windowRect.y)
+        {
+            SetWindowPosition(new Vector2Int(targetX, targetY));
+        }
     }
 
     #region Fill monitor
