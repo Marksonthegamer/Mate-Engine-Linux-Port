@@ -210,6 +210,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void Awake()
     {
+        _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         Init();
         CheckSingleInstanceForNoNetWmPidSupportCompositors();
         var pid = Process.GetCurrentProcess().Id;
@@ -957,10 +958,22 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             return _windowManagerImplementation.GetWindowPosition();
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
         {
+            // One synchronous round-trip per frame is enough; several scripts ask for this every Update.
+            bool cacheable = IsMainThread;
+            int frame = cacheable ? Time.frameCount : -1;
+            if (cacheable && frame == _cachedWindowFrame)
+                return _cachedWindowPos;
+
             // Use XTranslateCoordinates to get absolute position
             if (XTranslateCoordinates(_display, _unityWindow, _rootWindow, 0, 0, out var absX, out var absY, out _))
             {
-                return new Vector2Int(absX, absY);
+                var pos = new Vector2Int(absX, absY);
+                if (cacheable)
+                {
+                    _cachedWindowPos = pos;
+                    _cachedWindowFrame = frame;
+                }
+                return pos;
             }
 
             ShowError("XTranslateCoordinates failed.");
@@ -978,6 +991,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     {
         // A monitor-filling window stays where the window manager put it; the avatar moves inside it instead.
         if (_fillMonitorActive) return;
+        _cachedWindowFrame = -1; // the window is about to move, do not serve the old position again this frame
         if (SaveLoadHandler.Instance.data.useLegacyMoveResizeCalls)
         { 
             SetWindowPositionLegacy(position);
@@ -1287,21 +1301,53 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     {
         if (_windowManagerImplementation != null)
             return _windowManagerImplementation.GetMousePosition();
-        // Query mouse position
-        int rootX = 0, rootY = 0;
-        IntPtr rootReturn = IntPtr.Zero, childReturn = IntPtr.Zero;
-        int winX = 0, winY = 0;
-        uint maskReturn = 0;
-
-        if (!XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY, ref winX,
-                ref winY, ref maskReturn))
+        if (!QueryPointerPosition(out var position))
         {
             ShowError("No mouse found.");
             return Vector2Int.zero;
         }
 
-        return new Vector2Int(rootX, rootY);
+        return position;
     }
+
+    /// <summary>
+    /// XQueryPointer is a blocking round-trip to the X server. On the main thread the answer is kept for the
+    /// rest of the frame, so the many per-frame callers share a single request.
+    /// </summary>
+    private bool QueryPointerPosition(out Vector2Int position)
+    {
+        bool cacheable = IsMainThread;
+        int frame = cacheable ? Time.frameCount : -1;
+        if (cacheable && frame == _cachedMouseFrame)
+        {
+            position = _cachedMousePos;
+            return _cachedMouseValid;
+        }
+
+        int rootX = 0, rootY = 0;
+        IntPtr rootReturn = IntPtr.Zero, childReturn = IntPtr.Zero;
+        int winX = 0, winY = 0;
+        uint maskReturn = 0;
+
+        bool result = XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY,
+            ref winX, ref winY, ref maskReturn);
+        position = new Vector2Int(rootX, rootY);
+        if (cacheable)
+        {
+            _cachedMousePos = position;
+            _cachedMouseValid = result;
+            _cachedMouseFrame = frame;
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// True when the pointer position reported by <see cref="GetMousePosition()"/> can no longer be trusted:
+    /// on Wayland, XWayland only sees pointer motion while the cursor is over this window's input region,
+    /// so after the cursor leaves it XQueryPointer keeps returning the pixel where it exited.
+    /// </summary>
+    public bool IsPointerOutsideWindowOnWayland =>
+        _windowManagerImplementation == null && _currentSessionType == SessionTypes.Wayland && !_mouseOver;
 
     public bool GetMousePosition(out Vector2Int position)
     {
@@ -1310,15 +1356,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             position = _windowManagerImplementation.GetMousePosition();
             return true;
         }
-        // Query mouse position
-        int rootX = 0, rootY = 0;
-        IntPtr rootReturn = IntPtr.Zero, childReturn = IntPtr.Zero;
-        int winX = 0, winY = 0;
-        uint maskReturn = 0;
-
-        bool result = XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY, ref winX, ref winY, ref maskReturn);
-        position = new Vector2Int(rootX, rootY);
-        return result;
+        return QueryPointerPosition(out position);
     }
 
     public bool GetMouseButton(KeyCode button) // 0=left, 1=right, 2=middle
@@ -2114,31 +2152,84 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private List<XRectangle> GenerateRectangles(byte[] imageData, int width, int height)
     {
-        var rects = new List<XRectangle>();
-        
-        for (short y = 0; y < height; y++)
+        // The compositor hit-tests the pointer against every rectangle of the input region on each motion
+        // event (Mutter records one pick box per rectangle), so a pixel-exact silhouette with 1000+
+        // rectangles makes the whole desktop drop frames while the mouse moves. The mask is therefore
+        // snapped to a coarse grid: a cell takes input if any pixel inside it is opaque. Equal runs on
+        // consecutive cell rows are merged into one taller rectangle.
+        const int cell = MaskCellSize;
+        var rects = _maskRects;
+        rects.Clear();
+        var prevRow = _maskPrevRowRects; // indices into rects of the rectangles touching the previous cell row, by x
+        var curRow = _maskCurRowRects;
+        prevRow.Clear();
+
+        int gridWidth = (width + cell - 1) / cell;
+        if (_maskRowCells == null || _maskRowCells.Length < gridWidth)
+            _maskRowCells = new bool[gridWidth];
+        var rowCells = _maskRowCells;
+
+        for (int top = 0; top < height; top += cell)
         {
-            for (short x = 0; x < width; x++)
+            int bottom = Math.Min(top + cell, height);
+            Array.Clear(rowCells, 0, gridWidth);
+            for (int y = top; y < bottom; y++)
             {
-                int idx = (y * width + x) * 4;
-                if (imageData[idx + 3] > 10) 
+                int rowStart = y * width * 4 + 3;
+                for (int x = 0; x < width; x++)
                 {
-                    short startX = x;
-                    while (x < width && imageData[(y * width + x) * 4 + 3] > 10)
-                    {
-                        x++;
-                    }
-        
-                    rects.Add(new XRectangle 
-                    { 
-                        x = startX, 
-                        y = y, 
-                        width = (ushort)(x - startX), 
-                        height = 1 
-                    });
+                    if (imageData[rowStart + x * 4] <= 10) continue;
+                    int cx = x / cell;
+                    rowCells[cx] = true;
+                    x = (cx + 1) * cell - 1; // the rest of this cell is already known to be solid
                 }
             }
+
+            curRow.Clear();
+            int p = 0;
+            for (int cx = 0; cx < gridWidth; cx++)
+            {
+                if (!rowCells[cx]) continue;
+
+                int startCell = cx;
+                do
+                {
+                    cx++;
+                } while (cx < gridWidth && rowCells[cx]);
+
+                int startX = startCell * cell;
+                int runWidth = Math.Min(cx * cell, width) - startX;
+                int runHeight = bottom - top;
+
+                while (p < prevRow.Count && rects[prevRow[p]].x < startX) p++;
+
+                if (p < prevRow.Count)
+                {
+                    int index = prevRow[p];
+                    var above = rects[index];
+                    if (above.x == startX && above.width == runWidth && above.height + runHeight <= ushort.MaxValue)
+                    {
+                        above.height += (ushort)runHeight;
+                        rects[index] = above;
+                        curRow.Add(index);
+                        p++;
+                        continue;
+                    }
+                }
+
+                curRow.Add(rects.Count);
+                rects.Add(new XRectangle
+                {
+                    x = (short)startX,
+                    y = (short)top,
+                    width = (ushort)runWidth,
+                    height = (ushort)runHeight
+                });
+            }
+
+            (prevRow, curRow) = (curRow, prevRow);
         }
+
         return rects;
     }
      
@@ -2165,6 +2256,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             };
             XShapeCombineRectangles(_display, _unityWindow, ShapeInput, 0, 0, fullRect, 1, ShapeSet, Unsorted);
             XFlush(_display);
+            _appliedMaskCount = -1; // the next mask must be sent even if it equals the one before the drag
         }
     }
 
@@ -2187,10 +2279,18 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         // so the main thread is not stalled while the mask is computed.
         using (LockDisplay())
         {
-            XRectangle[] fullRect = { 
-                new() { x = 0, y = 0, width = (ushort)width, height = (ushort)height } 
-            };
-            XShapeCombineRectangles(_display, _unityWindow, ShapeBounding, 0, 0, fullRect, 1, ShapeSet, Unsorted);
+            // Every shape request makes the window manager re-read the window's shape, so only send
+            // the bounding shape when the window size actually changed.
+            if (width != _boundingShapeWidth || height != _boundingShapeHeight)
+            {
+                XRectangle[] fullRect = { 
+                    new() { x = 0, y = 0, width = (ushort)width, height = (ushort)height } 
+                };
+                XShapeCombineRectangles(_display, _unityWindow, ShapeBounding, 0, 0, fullRect, 1, ShapeSet, Unsorted);
+                _boundingShapeWidth = width;
+                _boundingShapeHeight = height;
+                _appliedMaskCount = -1;
+            }
 
             if (_useShm)
             {
@@ -2267,14 +2367,29 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         }
 
         List<XRectangle> rects = GenerateRectangles(imageBytes, width, height);
-        XRectangle[] rectArray = rects.ToArray();
+        int rectCount = rects.Count;
+
+        // Nothing moved across a cell border since the last update: leave the compositor alone.
+        bool unchanged = rectCount == _appliedMaskCount;
+        for (int i = 0; unchanged && i < rectCount; i++)
+        {
+            var a = rects[i];
+            var b = _appliedMaskRects[i];
+            unchanged = a.x == b.x && a.y == b.y && a.width == b.width && a.height == b.height;
+        }
+        if (unchanged) return;
+
+        if (_appliedMaskRects == null || _appliedMaskRects.Length < rectCount)
+            _appliedMaskRects = new XRectangle[Math.Max(rectCount, 64)];
+        rects.CopyTo(_appliedMaskRects);
 
         using (LockDisplay())
         {
             // An in-window drag may have started while the image was being scanned
             if (_inputMaskSuspended) return;
-            XShapeCombineRectangles(_display, _unityWindow, ShapeInput, 0, 0, rectArray, rectArray.Length, ShapeSet, YSorted);
+            XShapeCombineRectangles(_display, _unityWindow, ShapeInput, 0, 0, _appliedMaskRects, rectCount, ShapeSet, YSorted);
             XFlush(_display);
+            _appliedMaskCount = rectCount;
         }
     }
 
@@ -2347,11 +2462,17 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         image.Width = width;
         image.Height = height;
         int byteCount = width * height * 4;
-        image.Data = new byte[byteCount];
+        // Reused between mask updates: a fresh full-window buffer every 100ms lands on the large object heap
+        // and forces frequent stop-the-world collections. Only the first byteCount bytes are valid.
+        if (_cachedImageDataBuffer == null || _cachedImageDataBuffer.Length < byteCount)
+            _cachedImageDataBuffer = new byte[byteCount];
+        image.Data = _cachedImageDataBuffer;
 
+        bool copied = false;
         if (_useShm && _shmInfo.shmaddr != IntPtr.Zero)
         {
             Marshal.Copy(_shmInfo.shmaddr, image.Data, 0, byteCount);
+            copied = true;
         }
         else if (xImagePtr != IntPtr.Zero)
         {
@@ -2360,8 +2481,13 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             if (ximg.data != IntPtr.Zero)
             {
                 Marshal.Copy(ximg.data, image.Data, 0, byteCount);
+                copied = true;
             }
         }
+
+        // Nothing captured: behave like the freshly zeroed buffer did, not like the previous frame.
+        if (!copied)
+            Array.Clear(image.Data, 0, byteCount);
 
         return image;
     }
@@ -2477,6 +2603,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero) return;
 
         var toSet = (cursor != IntPtr.Zero) ? cursor : _defaultCursor;
+        if (toSet == _currentCursorSet) return;
+        _currentCursorSet = toSet;
         using (LockDisplay())
         {
             XDefineCursor(_display, _unityWindow, toSet);
@@ -2501,7 +2629,32 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private IntPtr _defaultCursor;
     private IntPtr _grabCursor;
     private IntPtr _grabbingCursor;
+    // Cursor last passed to XDefineCursor; -1 = nothing set yet, so the first SetCursor always goes through.
+    private IntPtr _currentCursorSet = new IntPtr(-1);
     private volatile bool _mouseOver;
+
+    // Per-frame caches for the synchronous pointer / window position queries (main thread only).
+    private int _mainThreadId;
+    private bool IsMainThread => Thread.CurrentThread.ManagedThreadId == _mainThreadId;
+    private Vector2Int _cachedMousePos;
+    private bool _cachedMouseValid;
+    private int _cachedMouseFrame = -1;
+    private Vector2Int _cachedWindowPos;
+    private int _cachedWindowFrame = -1;
+
+    // Scratch storage for the input mask, reused across updates to keep the shaping path allocation-free.
+    private byte[] _cachedImageDataBuffer;
+    private readonly List<XRectangle> _maskRects = new();
+    private readonly List<int> _maskPrevRowRects = new();
+    private readonly List<int> _maskCurRowRects = new();
+    private bool[] _maskRowCells;
+    // Input mask resolution in pixels. Larger cells mean fewer rectangles for the compositor to hit-test
+    // and fewer mask updates, at the cost of up to (cell - 1) px of clickable margin around the avatar.
+    private const int MaskCellSize = 8;
+    // The mask last sent to the X server; -1 forces the next one to be sent.
+    private XRectangle[] _appliedMaskRects;
+    private volatile int _appliedMaskCount = -1;
+    private int _boundingShapeWidth, _boundingShapeHeight;
 
     private int _damageEventBase;
     private IntPtr _damage = IntPtr.Zero;
