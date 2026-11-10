@@ -97,7 +97,14 @@ public class AvatarStateObjector : MonoBehaviour
                 rule.wasActive = true;
             }
 
-            rule.targetObject.transform.localScale = Vector3.Lerp(Vector3.zero, rule.originalScale, rule.currentLerp);
+            float avatarScale = (cachedAvatar != null) ? cachedAvatar.transform.localScale.x : 1f;
+            rule.targetObject.transform.localScale = Vector3.Lerp(Vector3.zero, rule.originalScale * avatarScale, rule.currentLerp);
+
+            if (currentModel != null)
+            {
+                Vector3 modelPos = currentModel.transform.position;
+                rule.targetObject.transform.position = new Vector3(modelPos.x, modelPos.y - 0.095f * avatarScale, modelPos.z);
+            }
 
             if (rule.wasActive && rule.currentLerp <= 0f)
             {

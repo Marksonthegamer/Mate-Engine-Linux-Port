@@ -26,12 +26,6 @@ public class AvatarFreeMovement : MonoBehaviour
     [Tooltip("How far the avatar may leave its spawn position horizontally, as a fraction of the visible area.")]
     [Range(0.1f, 1f)] public float maxOffsetViewFraction = 0.9f;
 
-    [Tooltip("Bottom guard: how many pixels the feet may sit below the screen edge before the avatar is lifted.")]
-    public float bottomGuardTolerancePixels = 8f;
-
-    [Tooltip("Top guard: screen margin in pixels below the top panel for the head.")]
-    public float topGuardTolerancePixels = 12f;
-
     /// <summary>True while any avatar is being dragged inside the window.</summary>
     public static bool IsMoving { get; private set; }
 
@@ -50,14 +44,23 @@ public class AvatarFreeMovement : MonoBehaviour
     private int _dragButton = -1;
     private Vector3 _grabOffset;
 
-    // World units the screen guard currently adds along the camera's up axis.
-    private float _guardLift;
+    // Scale and camera frame the current placement was last checked against.
+    private float _checkedScale = -1f;
+    private float _checkedHalfHeight = -1f;
+    private float _checkedAspect = -1f;
 
     // Cached model parts for the extents measurement; the VRM under this object can be swapped at runtime.
     private Animator _animator;
     private Transform _headBone;
     private Renderer[] _renderers;
     private float _nextExtentsRefresh;
+
+    // Tracked shadow planes to keep the shadow under the avatar when moved.
+    private Transform _shadowPlaneTransform;
+    private Transform _groundShadowTransform;
+    private Vector3 _initialShadowPlanePos;
+    private Vector3 _initialShadowPlaneScale;
+    private float _initialAvatarScale = 1f;
 
     /// <summary>
     /// True when this pointer press belongs to the in-window drag gesture,
@@ -156,6 +159,8 @@ public class AvatarFreeMovement : MonoBehaviour
             return;
         }
 
+        RefitAfterResize();
+
         if (!enableFreeMovement || IsMoving || MenuActions.IsMovementBlocked() || TutorialMenu.IsActive) return;
 
         if (ModifierHeld() && Input.GetMouseButtonDown(1))
@@ -172,7 +177,6 @@ public class AvatarFreeMovement : MonoBehaviour
     {
         if (!TryGetPointerWorld(out var start)) return false;
         _grabOffset = GetPosition() - start;
-        _guardLift = 0f; // the user takes over, whatever the guard added is now part of their placement
         _dragButton = button;
         _active = this;
         IsMoving = true;
@@ -182,40 +186,91 @@ public class AvatarFreeMovement : MonoBehaviour
 
     public void ResetPosition()
     {
-        _guardLift = 0f;
         if (_fixedPosition != null) _fixedPosition.ResetToHome();
+        SyncShadows();
     }
 
-    /// <summary>
-    /// Backwards compatible helper for bottom edge checking.
-    /// </summary>
-    public static void ApplyBottomGuard(RectInt windowRect, int floorY)
+    void LateUpdate()
     {
-        ApplyScreenGuard(windowRect, new RectInt(windowRect.x, 0, windowRect.width, floorY));
+        SyncShadows();
     }
 
-    /// <summary>
-    /// Called by the window manager when the window moves.
-    /// Adjusts the avatar inside the window so its feet do not sink below the screen floor,
-    /// its head can reach the top panel, and its upper body is never clipped outside the window.
-    /// </summary>
-    public static void ApplyScreenGuard(RectInt windowRect, RectInt monitorRect)
+    private void SyncShadows()
     {
-        // WindowManager clamps the window directly, preserving avatar framing without internal shifting.
-    }
-
-    /// <summary>Takes back whatever the screen guard added, e.g. when the window stops being movable.</summary>
-    public static void ClearScreenGuard()
-    {
-        foreach (var instance in Instances)
+        if (_shadowPlaneTransform == null)
         {
-            instance._guardLift = 0f;
-            if (instance._fixedPosition != null) instance._fixedPosition.ResetToHome();
+            var shadowPlaneGO = GameObject.Find("Shadow");
+            if (shadowPlaneGO != null)
+            {
+                _shadowPlaneTransform = shadowPlaneGO.transform;
+                _initialShadowPlanePos = _shadowPlaneTransform.position;
+                _initialShadowPlaneScale = _shadowPlaneTransform.localScale;
+                _initialAvatarScale = transform.lossyScale.x > 0.001f ? transform.lossyScale.x : 1f;
+            }
+        }
+
+        if (_groundShadowTransform == null)
+        {
+            var groundShadowGO = GameObject.Find("GroundShadow");
+            if (groundShadowGO != null)
+            {
+                _groundShadowTransform = groundShadowGO.transform;
+            }
+        }
+
+        Vector3 curPos = GetPosition();
+        Vector3 homePos = GetHome();
+        Vector3 offset = curPos - homePos;
+        float scale = transform.lossyScale.x;
+        float scaleFactor = scale / _initialAvatarScale;
+
+        // Realtime shadow receiver plane ("Shadow")
+        if (_shadowPlaneTransform != null)
+        {
+            _shadowPlaneTransform.position = _initialShadowPlanePos + offset;
+            _shadowPlaneTransform.localScale = _initialShadowPlaneScale * scaleFactor;
+        }
+
+        // Circular fake drag shadow ("GroundShadow")
+        if (_groundShadowTransform != null)
+        {
+            float feetYOffset = 0.095f * scale;
+            _groundShadowTransform.position = new Vector3(curPos.x, curPos.y - feetYOffset, curPos.z);
         }
     }
 
-    private void GuardScreen(RectInt windowRect, RectInt monitorRect)
+    /// <summary>
+    /// The avatar is never lifted inside the window to keep it on screen: the camera does not follow, so that
+    /// pushes the head out of the frame. Keeping the companion on the monitor is the window manager's job.
+    /// The only correction made here is for a placement the user dragged to: when the avatar is resized or
+    /// the camera frame changes, it is fitted into the frame again so a bigger avatar does not lose its head.
+    /// </summary>
+    private void RefitAfterResize()
     {
+        if (!TryGetCamera()) return;
+
+        RefreshModelCache();
+        float scale = _animator != null ? _animator.transform.lossyScale.y : transform.lossyScale.y;
+        // Only compared against its previous value, so the field of view serves for a perspective camera.
+        float halfHeight = _camera.orthographic ? _camera.orthographicSize : _camera.fieldOfView;
+        float aspect = _camera.aspect;
+
+        if (Mathf.Approximately(scale, _checkedScale) &&
+            Mathf.Approximately(halfHeight, _checkedHalfHeight) &&
+            Mathf.Approximately(aspect, _checkedAspect)) return;
+
+        bool first = _checkedScale < 0f;
+        _checkedScale = scale;
+        _checkedHalfHeight = halfHeight;
+        _checkedAspect = aspect;
+        if (first) return;
+
+        // At its rest position the avatar is framed by the scene itself, leave that alone.
+        var position = GetPosition();
+        if ((position - GetHome()).sqrMagnitude < 1e-6f) return;
+
+        _nextExtentsRefresh = 0f; // measure the resized model, not the cached one
+        SetPosition(ClampToView(position));
     }
 
     /// <summary>
