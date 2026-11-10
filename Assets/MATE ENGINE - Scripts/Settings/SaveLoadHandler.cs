@@ -195,6 +195,8 @@ public class SaveLoadHandler : MonoBehaviour
         public bool useKWinApi = false;
         public bool allowHyprlandMonitorSitting = false;
         public bool overrideRedirect = false;
+        // Wayland sessions without a dedicated backend: let the window cover the monitor and move the avatar inside it.
+        public bool fillMonitorOnWayland = false;
 
         //ALARM
         [Serializable]
@@ -232,6 +234,7 @@ public class SaveLoadHandler : MonoBehaviour
     //ALARM
     void MigrateAfterLoad()
     {
+        data.fillMonitorOnWayland = false;
         if (data.timers == null) data.timers = new List<SettingsData.TimerEntry>();
         if (string.IsNullOrEmpty(data.selectedParticleTheme)) data.selectedParticleTheme = "Standard";
         if (data == null) data = new SettingsData();

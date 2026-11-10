@@ -166,3 +166,15 @@ Assets/MATE\ ENGINE\ -\ Packages/StandaloneFileBrowser/Plugins/Linux/x86_64.meta
 Assets/MATE\ ENGINE\ -\ Packages/StandaloneFileBrowser/Plugins/Linux/x86_64.meta
 
 _build
+
+# Build output and crash dumps
+BuildOutput/
+*.blob
+mono_crash.*
+
+# Addressables generated linker file
+Assets/AddressableAssetsData/link.xml
+Assets/AddressableAssetsData/link.xml.meta
+
+# Analysis & Local Tools
+graphify-out/

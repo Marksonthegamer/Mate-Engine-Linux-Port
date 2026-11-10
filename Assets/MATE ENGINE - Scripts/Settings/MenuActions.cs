@@ -70,6 +70,13 @@ public class MenuActions : MonoBehaviour
         modelRoot = GameObject.Find("Model")?.transform;
         mainCam = Camera.main;
 
+        // Keep every menu on the visible part of the window (the window can hang over the screen edge).
+        foreach (var entry in menuEntries)
+        {
+            if (entry.menu != null && !entry.menu.TryGetComponent<MenuScreenClamper>(out _))
+                entry.menu.AddComponent<MenuScreenClamper>();
+        }
+
         CacheBigScreen();
         nextAvatarScan = Time.unscaledTime;
         entryOpenPrevFrame = AnyEntryOpenLocal();
