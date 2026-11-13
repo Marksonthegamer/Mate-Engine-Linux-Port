@@ -6,8 +6,6 @@ using UnityEngine.EventSystems;
 /// Lets the user reposition the avatar inside the window, independent of the window itself.
 /// Hold Alt and drag with the left mouse button, or drag with the middle mouse button.
 /// Alt + right click puts the avatar back where it spawned.
-/// When the window fills the monitor (see WindowManager.FillsMonitor) a plain left drag moves the avatar too,
-/// because there is no point in moving a screen-sized window.
 /// Added automatically next to <see cref="FixedPosition"/>.
 /// </summary>
 [DisallowMultipleComponent]
@@ -65,11 +63,13 @@ public class AvatarFreeMovement : MonoBehaviour
     // The frame only grows for an avatar that is too tall for it, and is left alone while someone
     // else (e.g. big screen mode) has changed the camera.
     // Some compositors (Mutter) never let a window cross the top of the work area. A small avatar has empty
-    // window above its head, so while the window is pressed against that edge the avatar is raised inside the
-    // window until its head reaches the top of the frame, and lowered again when the window leaves the edge.
-    private const float TopEdgeLiftSpeed = 4f; // world units per second
-    private static bool _windowAtTopEdge;
+    // window above its head, so that gap is closed inside the window: the nearer the window gets to the top
+    // edge, the further the avatar is raised, until its head reaches the top of the frame exactly when the
+    // window touches the edge. The window manager reports the proximity (0 = far away, 1 = at the edge).
+    private const float TopEdgeLiftSmoothTime = 0.12f; // seconds; turns a quick rise into a glide instead of a jump
+    private static float _topEdgeProximity;
     private float _topEdgeLift;
+    private float _topEdgeLiftVelocity;
 
     private static Camera _framedCamera;
     private static float _baseOrthoSize;
@@ -83,6 +83,8 @@ public class AvatarFreeMovement : MonoBehaviour
     private Vector3 _initialShadowPlanePos;
     private Vector3 _initialShadowPlaneScale;
     private float _initialAvatarScale = 1f;
+    private const float ShadowLookupSeconds = 0.25f;
+    private float _nextShadowLookup;
 
     /// <summary>
     /// True when this pointer press belongs to the in-window drag gesture,
@@ -98,22 +100,6 @@ public class AvatarFreeMovement : MonoBehaviour
             if (!instance.CanMove) continue;
             if (eventData.button == PointerEventData.InputButton.Middle && instance.allowMiddleButtonDrag) return true;
             if (eventData.button == PointerEventData.InputButton.Left && instance.ModifierHeld()) return true;
-        }
-        return false;
-    }
-
-    /// <summary>
-    /// Starts an in-window drag with the left button, without a modifier key.
-    /// Used by the window manager when the press landed on the avatar and the window itself should stay put.
-    /// </summary>
-    public static bool BeginPointerDrag()
-    {
-        if (IsMoving) return true;
-        if (MenuActions.IsMovementBlocked() || TutorialMenu.IsActive) return false;
-
-        foreach (var instance in Instances)
-        {
-            if (instance.CanMove && instance.BeginDrag(0)) return true;
         }
         return false;
     }
@@ -136,59 +122,55 @@ public class AvatarFreeMovement : MonoBehaviour
         return false;
     }
 
-    /// <summary>Screen position (Unity pixels) of the avatar's origin, i.e. its feet.</summary>
-    public static bool TryGetAvatarScreenPoint(out Vector2 screenPoint)
+    /// <summary>
+    /// Vertical screen positions (Unity pixels, y pointing up) of the top of the head and of the feet of the
+    /// standing avatar, without the top edge lift. The window manager uses this to know where the avatar really
+    /// is inside the window: a small avatar leaves a lot of empty window above its head.
+    /// <paramref name="canLift"/> tells whether the avatar can close that gap itself (see SetTopEdgeProximity).
+    /// </summary>
+    public static bool TryGetAvatarScreenSpan(out float headTopPixels, out float feetPixels, out bool canLift)
     {
-        screenPoint = Vector2.zero;
+        headTopPixels = feetPixels = 0f;
+        canLift = false;
         foreach (var instance in Instances)
         {
             if (!instance.isActiveAndEnabled || !instance.TryGetCamera()) continue;
-            screenPoint = instance._camera.WorldToScreenPoint(instance.GetPosition());
+            Vector3 feet = instance.GetPosition() - Vector3.up * instance._topEdgeLift;
+            Vector3 head = feet + Vector3.up * instance.GetStandingHeadOffset();
+            feetPixels = instance._camera.WorldToScreenPoint(feet).y;
+            headTopPixels = instance._camera.WorldToScreenPoint(head).y;
+            canLift = instance._camera.orthographic;
             return true;
         }
         return false;
     }
 
     /// <summary>
-    /// Vertical screen positions (Unity pixels, y pointing up) of the top of the head and of the feet of the
-    /// standing avatar. The window manager uses this to know where the avatar really is inside the window:
-    /// a small avatar leaves a lot of empty window above its head.
+    /// Told by the window manager how close the window is to the top of the work area:
+    /// 0 = far enough that the avatar stays where it is, 1 = pressed against the edge.
     /// </summary>
-    public static bool TryGetAvatarScreenSpan(out float headTopPixels, out float feetPixels)
-    {
-        headTopPixels = feetPixels = 0f;
-        foreach (var instance in Instances)
-        {
-            if (!instance.isActiveAndEnabled || !instance.TryGetCamera()) continue;
-            Vector3 feet = instance.GetPosition();
-            Vector3 head = feet + Vector3.up * instance.GetStandingHeadOffset();
-            feetPixels = instance._camera.WorldToScreenPoint(feet).y;
-            headTopPixels = instance._camera.WorldToScreenPoint(head).y;
-            return true;
-        }
-        return false;
-    }
-
-    /// <summary>Told by the window manager whether the window is pressed against the top of the work area.</summary>
-    public static void SetWindowAtTopEdge(bool atTopEdge) => _windowAtTopEdge = atTopEdge;
+    public static void SetTopEdgeProximity(float proximity) => _topEdgeProximity = Mathf.Clamp01(proximity);
 
     private void UpdateTopEdgeLift()
     {
-        if (!_windowAtTopEdge && _topEdgeLift <= 0f) return;
+        if (_topEdgeProximity <= 0f && _topEdgeLift <= 0f) return;
         if (!TryGetCamera() || !_camera.orthographic) return;
 
         var position = GetPosition();
         float unliftedY = position.y - _topEdgeLift;
 
-        float wanted = 0f;
-        if (_windowAtTopEdge)
-        {
-            // Standing height, not the current pose, so the avatar does not bob with its animation.
-            float camTopY = _camera.transform.position.y + _camera.orthographicSize;
-            wanted = Mathf.Max(0f, camTopY - GetStandingHeadOffset() - FramePaddingWorld - unliftedY);
-        }
+        // Standing height, not the current pose, so the avatar does not bob with its animation.
+        float camTopY = _camera.transform.position.y + _camera.orthographicSize;
+        float fullLift = Mathf.Max(0f, camTopY - GetStandingHeadOffset() - FramePaddingWorld - unliftedY);
+        float wanted = fullLift * _topEdgeProximity;
 
-        float lift = Mathf.MoveTowards(_topEdgeLift, wanted, TopEdgeLiftSpeed * Time.unscaledDeltaTime);
+        float lift = Mathf.SmoothDamp(_topEdgeLift, wanted, ref _topEdgeLiftVelocity, TopEdgeLiftSmoothTime,
+            Mathf.Infinity, Time.unscaledDeltaTime);
+        if (Mathf.Abs(lift - wanted) < 1e-4f)
+        {
+            lift = wanted;
+            _topEdgeLiftVelocity = 0f;
+        }
         if (Mathf.Approximately(lift, _topEdgeLift)) return;
 
         _topEdgeLift = lift;
@@ -247,6 +229,7 @@ public class AvatarFreeMovement : MonoBehaviour
         if (!TryGetPointerWorld(out var start)) return false;
         _grabOffset = GetPosition() - start;
         _topEdgeLift = 0f; // the user takes over: the lift becomes part of their placement
+        _topEdgeLiftVelocity = 0f;
         _dragButton = button;
         _active = this;
         IsMoving = true;
@@ -257,6 +240,7 @@ public class AvatarFreeMovement : MonoBehaviour
     public void ResetPosition()
     {
         _topEdgeLift = 0f;
+        _topEdgeLiftVelocity = 0f;
         if (_fixedPosition != null) _fixedPosition.ResetToHome();
         SyncShadows();
     }
@@ -268,24 +252,31 @@ public class AvatarFreeMovement : MonoBehaviour
 
     private void SyncShadows()
     {
-        if (_shadowPlaneTransform == null)
+        // GameObject.Find walks the whole scene and does not see inactive objects (the ground shadow is
+        // only active while dragging), so a missing shadow is looked up now and then, not every frame.
+        if ((_shadowPlaneTransform == null || _groundShadowTransform == null) && Time.unscaledTime >= _nextShadowLookup)
         {
-            var shadowPlaneGO = GameObject.Find("Shadow");
-            if (shadowPlaneGO != null)
-            {
-                _shadowPlaneTransform = shadowPlaneGO.transform;
-                _initialShadowPlanePos = _shadowPlaneTransform.position;
-                _initialShadowPlaneScale = _shadowPlaneTransform.localScale;
-                _initialAvatarScale = transform.lossyScale.x > 0.001f ? transform.lossyScale.x : 1f;
-            }
-        }
+            _nextShadowLookup = Time.unscaledTime + ShadowLookupSeconds;
 
-        if (_groundShadowTransform == null)
-        {
-            var groundShadowGO = GameObject.Find("GroundShadow");
-            if (groundShadowGO != null)
+            if (_shadowPlaneTransform == null)
             {
-                _groundShadowTransform = groundShadowGO.transform;
+                var shadowPlaneGO = GameObject.Find("Shadow");
+                if (shadowPlaneGO != null)
+                {
+                    _shadowPlaneTransform = shadowPlaneGO.transform;
+                    _initialShadowPlanePos = _shadowPlaneTransform.position;
+                    _initialShadowPlaneScale = _shadowPlaneTransform.localScale;
+                    _initialAvatarScale = transform.lossyScale.x > 0.001f ? transform.lossyScale.x : 1f;
+                }
+            }
+
+            if (_groundShadowTransform == null)
+            {
+                var groundShadowGO = GameObject.Find("GroundShadow");
+                if (groundShadowGO != null)
+                {
+                    _groundShadowTransform = groundShadowGO.transform;
+                }
             }
         }
 

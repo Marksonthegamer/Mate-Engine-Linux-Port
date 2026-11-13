@@ -74,12 +74,6 @@ public class SettingsMenuPosition : MonoBehaviour
         RectInt screen = monitorRects.Count > 0 ? GetBestMonitor(winRect) : new RectInt(0, 0, Screen.currentResolution.width, Screen.currentResolution.height);
 
         bool atRightEdge = winRect.x + winRect.width >= (screen.x + screen.width - edgeMargin);
-        if (WindowManager.Instance.FillsMonitor)
-        {
-            // The window covers the monitor, so its edge says nothing: flip the menus when there is
-            // no room for them to the right of the avatar.
-            atRightEdge = !HasRoomRightOfAvatar();
-        }
         if (!initedEdge) { lastAtRightEdge = atRightEdge; initedEdge = true; }
 
         if (atRightEdge != lastAtRightEdge)
@@ -97,26 +91,6 @@ public class SettingsMenuPosition : MonoBehaviour
                 }
             }
         }
-    }
-
-    bool HasRoomRightOfAvatar()
-    {
-        if (!AvatarFreeMovement.TryGetAvatarScreenPoint(out var avatarPoint)) return true;
-
-        float needed = 0f;
-        foreach (var m in menus)
-        {
-            var rect = m.settingsMenu;
-            if (!rect || !rect.gameObject.activeInHierarchy) continue;
-            var canvas = rect.GetComponentInParent<Canvas>();
-            float pixelsPerUnit = canvas != null ? canvas.scaleFactor : 1f;
-            float extent = (Mathf.Abs(m.originalX) + rect.rect.width * Mathf.Abs(rect.localScale.x) * 0.5f) * pixelsPerUnit;
-            needed = Mathf.Max(needed, extent);
-        }
-        // No menu open: keep the current side instead of flipping invisibly.
-        if (needed <= 0f) return !lastAtRightEdge;
-
-        return avatarPoint.x + needed + edgeMargin <= Screen.width;
     }
 
     void RefreshMonitors()

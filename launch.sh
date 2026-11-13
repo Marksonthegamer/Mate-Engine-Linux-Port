@@ -40,6 +40,6 @@ else
 fi
 
 cd "$TARGET_DIR" || exit 1
-SDL_VIDEO_X11_VISUALID=$visual_id "./MateEngineX.$(uname -m)" "$@" | grep -v "[Vulkan init] extensions: "
+SDL_VIDEO_X11_VISUALID=$visual_id "./MateEngineX.$(uname -m)" "$@" | grep -vF --line-buffered "[Vulkan init] extensions: "
 
 echo "\`\`\`"

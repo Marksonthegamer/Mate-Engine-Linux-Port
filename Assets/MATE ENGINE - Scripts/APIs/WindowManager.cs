@@ -1,7 +1,6 @@
 #pragma warning disable 0162
 //#pragma warning disable 0168
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -64,13 +63,6 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private volatile bool _windowGeometryChanged;
     private volatile bool _inputMaskSuspended;
 
-    // Fill-monitor mode: the window covers the work area of its monitor and the avatar moves inside it.
-    private const float FillMonitorSettleSeconds = 1f;
-    private const float FillMonitorCoverage = 0.95f;
-    private bool _fillMonitorRequested;
-    private bool _fillMonitorActive;
-    private Coroutine _fillMonitorRoutine;
-
     private bool _dontUpdateCursor;
     
     public bool transparentInputEnabled = true;
@@ -90,6 +82,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     TDBus.Connection _dBusConnection;
     TDBus.ConnectionInfo _dBusConnectionInfo;
+
+    // Global pointer position from the compositor, for sessions where the X server does not know it.
+    private GnomePointerSource _gnomePointer;
+    private Vector2Int _pointerDesktopSize;
+    private Vector2Int _pointerRootSize;
     
     private async void OnEnable()
     {
@@ -131,6 +128,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                 case DesktopEnvironments.Gnome:
                     // Mutter needs no dedicated backend: the generic X11 code path is used,
                     // and on Wayland dragging is handed to the compositor (see StartInteractiveMove).
+                    // XWayland does not see the pointer outside our window there; a shell extension does.
+                    if (_currentSessionType == SessionTypes.Wayland)
+                        _gnomePointer ??= new GnomePointerSource(_dBusConnection);
                     break;
             }
             _windowManagerImplementation?.SetXUnityWindow(_unityWindow);
@@ -308,12 +308,15 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         UpdateCursorState();
     }
 
+    // Longest distance from the top of the work area, as a fraction of the window height, over which the
+    // avatar is raised inside the window. Smaller = the avatar gets closer to the top before it is raised,
+    // but then covers the empty window above its head more abruptly.
+    private const float TopEdgeLiftZoneFraction = 0.06f;
+
     /// <summary>
     /// Clamps the window so its companion does not sink below the screen floor,
     /// and its head can reach the top panel without clipping.
     /// </summary>
-    private const int TopEdgeTolerancePixels = 4;
-
     private void ApplyWindowScreenGuard()
     {
         if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero || _closing) return;
@@ -324,31 +327,43 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         var monitor = GetMonitorRectFromWindow(_unityWindow);
         if (monitor.height <= 0) return;
-
-        // Pressed against the top of the work area (Mutter does not let a window go higher): the avatar
-        // closes the remaining gap inside the window.
         var workArea = GetWorkArea(monitor);
-        AvatarFreeMovement.SetWindowAtTopEdge(!_fillMonitorActive && Mathf.Abs(windowRect.y - workArea.yMin) <= TopEdgeTolerancePixels);
 
-        // Feet sit at ~62% from top of window in standard framing.
-        // Prevent feet from going below bottom floor.
-        int feetPixelOffset = (int)(windowRect.height * 0.62f);
+        // Where the avatar really is inside the window. Feet at ~62% and 2% of empty window above the head
+        // are the standard framing, used until an avatar is there to be measured. The real values differ
+        // for a scaled avatar, a grown camera frame and an avatar that was dragged inside the window.
+        float feetFromTop = windowRect.height * 0.62f;
+        float emptyAbove = windowRect.height * 0.02f;
+        bool canLift = false;
+        if (Screen.height > 0 && AvatarFreeMovement.TryGetAvatarScreenSpan(out float headTopPixels, out float feetPixels, out canLift))
+        {
+            float pixelScale = (float)windowRect.height / Screen.height;
+            feetFromTop = (Screen.height - feetPixels) * pixelScale;
+            emptyAbove = (Screen.height - headTopPixels) * pixelScale;
+        }
+
+        // The feet must not sink below the bottom of the monitor.
+        int feetPixelOffset = Mathf.Clamp(Mathf.CeilToInt(feetFromTop), 0, windowRect.height);
         int maxWindowY = monitor.yMax - feetPixelOffset;
 
-        // Empty window above the head: the window may leave the screen by that much, so the head itself
-        // can reach the top edge. A scaled-down avatar has a lot of it; assuming a fixed 2% stopped it early.
-        int headPixelOffset = (int)(windowRect.height * 0.02f);
-        if (Screen.height > 0 && AvatarFreeMovement.TryGetAvatarScreenSpan(out float headTopPixels, out _))
-        {
-            float emptyAbove = (Screen.height - headTopPixels) * windowRect.height / Screen.height;
-            headPixelOffset = Mathf.Clamp(Mathf.FloorToInt(emptyAbove), 0, windowRect.height);
-        }
-        int minWindowY = monitor.yMin - headPixelOffset;
+        // The empty window above the head would stop the avatar short of the top of the screen: Mutter does
+        // not let a window cross the top of the work area. So over the last stretch before that edge the
+        // avatar is raised inside the window, and its head arrives at the top together with the window.
+        // The stretch is kept short (a small avatar has a lot of empty window to make up, and should follow
+        // the pointer normally for as long as possible) and never reaches down to where the avatar stands
+        // on the floor; a window too tall for that keeps the avatar in place and may leave the screen instead.
+        float liftZone = Mathf.Min(emptyAbove, windowRect.height * TopEdgeLiftZoneFraction, maxWindowY - workArea.yMin);
+        bool lifts = canLift && liftZone >= 1f;
+
+        int headPixelOffset = lifts ? 0 : Mathf.Clamp(Mathf.FloorToInt(emptyAbove), 0, windowRect.height);
+        int minWindowY = Mathf.Min(monitor.yMin - headPixelOffset, maxWindowY);
 
         int targetY = Mathf.Clamp(windowRect.y, minWindowY, maxWindowY);
         int minWindowX = monitor.xMin - windowRect.width / 2;
         int maxWindowX = monitor.xMax - windowRect.width / 2;
         int targetX = Mathf.Clamp(windowRect.x, minWindowX, maxWindowX);
+
+        AvatarFreeMovement.SetTopEdgeProximity(lifts ? 1f - (targetY - workArea.yMin) / liftZone : 0f);
 
         if (targetX != windowRect.x || targetY != windowRect.y)
         {
@@ -356,120 +371,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         }
     }
 
-    #region Fill monitor
-
-    /// <summary>True while the window covers its monitor and the avatar is moved inside it instead of with it.</summary>
-    public bool FillsMonitor => _fillMonitorActive;
-
-    /// <summary>
-    /// Fill-monitor mode is for sessions where the window cannot be positioned freely (XWayland without a
-    /// compositor-specific backend). It needs click-through shaping: without it a screen-sized window
-    /// would swallow every click on the desktop.
-    /// </summary>
-    public bool CanFillMonitor
-    {
-        get
-        {
-#if UNITY_EDITOR
-            return false;
-#endif
-            if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero || _closing) return false;
-            if (_currentSessionType != SessionTypes.Wayland || _windowManagerImplementation != null) return false;
-            if (!_running) return false;
-            var data = SaveLoadHandler.Instance.data;
-            return !data.useLegacyMoveResizeCalls && !data.overrideRedirect;
-        }
-    }
-
-    /// <summary>
-    /// Enters or leaves fill-monitor mode. Entering is asynchronous: <see cref="FillsMonitor"/> turns true
-    /// once the window manager has actually resized the window. Returns false when the mode is not available.
-    /// </summary>
-    public bool SetFillMonitor(bool fill)
-    {
-        if (_fillMonitorRoutine != null)
-        {
-            StopCoroutine(_fillMonitorRoutine);
-            _fillMonitorRoutine = null;
-        }
-
-        if (fill)
-        {
-            if (!CanFillMonitor) return false;
-            _fillMonitorRoutine = StartCoroutine(FillMonitorRoutine());
-            return true;
-        }
-
-        bool wasFilling = _fillMonitorRequested || _fillMonitorActive;
-        _fillMonitorRequested = false;
-        _fillMonitorActive = false;
-        // Un-maximizing makes the window manager restore the previous size and position.
-        if (wasFilling) SetMaximized(false);
-        return true;
-    }
-
-    private IEnumerator FillMonitorRoutine()
-    {
-        _fillMonitorRequested = true;
-        _fillMonitorActive = false;
-
-        // Maximizing is done by the compositor itself, so it also works where it ignores position requests,
-        // and it yields exactly the work area (monitor minus panels and docks).
-        SetMaximized(true);
-        yield return WaitForWorkAreaCoverage();
-
-        if (!WindowCoversWorkArea())
-        {
-            // Some window types cannot be maximized: ask for the geometry directly instead.
-            SetMaximized(false);
-            if (TryGetCurrentWorkArea(out var area))
-            {
-                SetWindowPosition(area.position);
-                SetWindowSize(area.size);
-            }
-            yield return WaitForWorkAreaCoverage();
-        }
-
-        _fillMonitorActive = WindowCoversWorkArea();
-        _fillMonitorRequested = _fillMonitorActive;
-        _fillMonitorRoutine = null;
-
-        if (_fillMonitorActive)
-        {
-            print("Window fills the monitor's work area; the avatar is dragged inside the window.");
-        }
-        else
-        {
-            ShowError("The window manager did not resize the window to the monitor, keeping the movable window.");
-        }
-    }
-
-    private IEnumerator WaitForWorkAreaCoverage()
-    {
-        float deadline = Time.unscaledTime + FillMonitorSettleSeconds;
-        while (Time.unscaledTime < deadline && !WindowCoversWorkArea())
-            yield return null;
-    }
-
-    private bool TryGetCurrentWorkArea(out RectInt area)
-    {
-        area = default;
-        if (_monitors == null || _monitors.Count == 0) QueryMonitors();
-        if (_monitors == null || _monitors.Count == 0) return false;
-
-        var monitor = GetMonitorRectFromWindow(_unityWindow);
-        if (monitor.width <= 0 || monitor.height <= 0) monitor = _monitors.Values.First();
-        if (monitor.width <= 0 || monitor.height <= 0) return false;
-
-        area = GetWorkArea(monitor);
-        return true;
-    }
-
-    private bool WindowCoversWorkArea()
-    {
-        if (!GetWindowRect(_unityWindow, out var rect) || !TryGetCurrentWorkArea(out var area)) return false;
-        return rect.width >= area.width * FillMonitorCoverage && rect.height >= area.height * FillMonitorCoverage;
-    }
+    #region Work area
 
     /// <summary>
     /// The part of a monitor that is not covered by panels and docks (_NET_WORKAREA).
@@ -886,6 +788,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         if(_windowManagerImplementation is IDisposable disposable)
             disposable?.Dispose();
+        _gnomePointer?.Dispose();
+        _gnomePointer = null;
 
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero && _wakeupAtom != IntPtr.Zero)
         {
@@ -989,8 +893,6 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public void SetWindowPosition(Vector2Int position)
     {
-        // A monitor-filling window stays where the window manager put it; the avatar moves inside it instead.
-        if (_fillMonitorActive) return;
         _cachedWindowFrame = -1; // the window is about to move, do not serve the old position again this frame
         if (SaveLoadHandler.Instance.data.useLegacyMoveResizeCalls)
         { 
@@ -1324,14 +1226,21 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             return _cachedMouseValid;
         }
 
-        int rootX = 0, rootY = 0;
-        IntPtr rootReturn = IntPtr.Zero, childReturn = IntPtr.Zero;
-        int winX = 0, winY = 0;
-        uint maskReturn = 0;
+        // Over our own window the X server knows the pointer exactly and without delay. Anywhere else on
+        // Wayland (and during a compositor-driven move) it only has the pixel where the pointer left.
+        position = default;
+        bool result = (!_mouseOver || _interactiveMoveActive) && TryGetCompositorPointer(out position);
+        if (!result)
+        {
+            int rootX = 0, rootY = 0;
+            IntPtr rootReturn = IntPtr.Zero, childReturn = IntPtr.Zero;
+            int winX = 0, winY = 0;
+            uint maskReturn = 0;
 
-        bool result = XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY,
-            ref winX, ref winY, ref maskReturn);
-        position = new Vector2Int(rootX, rootY);
+            result = XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY,
+                ref winX, ref winY, ref maskReturn);
+            position = new Vector2Int(rootX, rootY);
+        }
         if (cacheable)
         {
             _cachedMousePos = position;
@@ -1342,12 +1251,50 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     }
 
     /// <summary>
+    /// Pointer position reported by the compositor itself, converted to X root coordinates.
+    /// Only available where a source exists (GNOME Wayland with the pointer extension enabled).
+    /// </summary>
+    private bool TryGetCompositorPointer(out Vector2Int position)
+    {
+        position = default;
+        var source = _gnomePointer;
+        if (source == null || !source.TryGetPosition(out var pointer, out var desktopSize)) return false;
+
+        // The compositor's coordinates differ from the X server's when XWayland is scaled.
+        if (desktopSize != _pointerDesktopSize || _pointerRootSize.x <= 0)
+        {
+            _pointerDesktopSize = desktopSize;
+            _pointerRootSize = Vector2Int.zero;
+            if (_display != IntPtr.Zero)
+            {
+                using (LockDisplay())
+                {
+                    if (XGetWindowAttributes(_display, _rootWindow, out var rootAttrs) != 0)
+                        _pointerRootSize = new Vector2Int(rootAttrs.width, rootAttrs.height);
+                }
+            }
+        }
+
+        var rootSize = _pointerRootSize;
+        if (desktopSize.x > 0 && desktopSize.y > 0 && rootSize.x > 0 && rootSize.y > 0 && rootSize != desktopSize)
+        {
+            pointer = new Vector2Int(
+                Mathf.RoundToInt(pointer.x * (float)rootSize.x / desktopSize.x),
+                Mathf.RoundToInt(pointer.y * (float)rootSize.y / desktopSize.y));
+        }
+        position = pointer;
+        return true;
+    }
+
+    /// <summary>
     /// True when the pointer position reported by <see cref="GetMousePosition()"/> can no longer be trusted:
     /// on Wayland, XWayland only sees pointer motion while the cursor is over this window's input region,
     /// so after the cursor leaves it XQueryPointer keeps returning the pixel where it exited.
+    /// Not the case while the compositor itself reports the pointer.
     /// </summary>
     public bool IsPointerOutsideWindowOnWayland =>
-        _windowManagerImplementation == null && _currentSessionType == SessionTypes.Wayland && !_mouseOver;
+        _windowManagerImplementation == null && _currentSessionType == SessionTypes.Wayland && !_mouseOver &&
+        !(_gnomePointer != null && _gnomePointer.IsLive);
 
     public bool GetMousePosition(out Vector2Int position)
     {
@@ -2381,6 +2328,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         if (_appliedMaskRects == null || _appliedMaskRects.Length < rectCount)
             _appliedMaskRects = new XRectangle[Math.Max(rectCount, 64)];
+        // The buffer no longer describes what the server has until the request below went out; if it is
+        // skipped, the next update must not compare against it and conclude nothing changed.
+        _appliedMaskCount = -1;
         rects.CopyTo(_appliedMaskRects);
 
         using (LockDisplay())
