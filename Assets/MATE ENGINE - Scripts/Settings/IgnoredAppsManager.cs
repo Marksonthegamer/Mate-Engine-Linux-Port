@@ -27,7 +27,7 @@ public class AllowedAppsManager : MonoBehaviour
             if (runningAppsDropdown.options.Count == 0) return;
 
             string selectedApp = runningAppsDropdown.options[runningAppsDropdown.value].text;
-            if (!AllowedApps.Contains(selectedApp))
+            if (!AllowedApps.Any(a => string.Equals(a, selectedApp, StringComparison.OrdinalIgnoreCase)))
             {
                 AllowedApps.Add(selectedApp);
                 UpdateAllowedListUI();
@@ -55,7 +55,7 @@ public class AllowedAppsManager : MonoBehaviour
         {
             _currentRunningAppNames = apps;
             var filteredAppNames = _currentRunningAppNames
-                .Where(app => !AllowedApps.Contains(app))
+                .Where(app => !AllowedApps.Any(a => string.Equals(a, app, StringComparison.OrdinalIgnoreCase)))
                 .OrderBy(app => app)
                 .ToList();
 
@@ -93,7 +93,7 @@ public class AllowedAppsManager : MonoBehaviour
             {
                 button.onClick.AddListener(() =>
                 {
-                    AllowedApps.Remove(app);
+                    AllowedApps.RemoveAll(a => string.Equals(a, app, StringComparison.OrdinalIgnoreCase));
                     UpdateAllowedListUI();
                     SaveLoadHandler.Instance.SaveToDisk();
                     SaveLoadHandler.SyncAllowedAppsToAllAvatars();
@@ -118,7 +118,16 @@ public class AllowedAppsManager : MonoBehaviour
         }
         for (int i = 0, count = audioPrograms.Count; i < count; i++)
         {
-            appNames.Add(audioPrograms[i].ProcessName == string.Empty ? audioPrograms[i].Name : audioPrograms[i].ProcessName);
+            string name = audioPrograms[i].Name;
+            string proc = audioPrograms[i].ProcessName;
+            string displayName = (!string.IsNullOrEmpty(name) && !name.StartsWith("SinkInput", StringComparison.OrdinalIgnoreCase))
+                ? name
+                : (!string.IsNullOrEmpty(proc) ? proc : name);
+
+            if (!string.IsNullOrEmpty(displayName) && !appNames.Any(n => string.Equals(n, displayName, StringComparison.OrdinalIgnoreCase)))
+            {
+                appNames.Add(displayName);
+            }
         }
         onComplete?.Invoke(appNames.OrderBy(n => n).ToList());
     }

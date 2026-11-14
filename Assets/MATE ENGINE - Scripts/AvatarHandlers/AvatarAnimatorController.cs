@@ -11,6 +11,8 @@ public class AvatarAnimatorController : MonoBehaviour
     [Header("State Values")]
     public Animator animator;
     public float SOUND_THRESHOLD = 0.02f;
+    [Tooltip("Linux: peak level (0..1) of an allowed app's audio stream above which it counts as playing. Digital silence is exactly 0.")]
+    public float streamPeakThreshold = 0.02f;
     public List<string> allowedApps = new();
     public int totalIdleAnimations = 10;
     public float IDLE_SWITCH_TIME = 12f, IDLE_TRANSITION_TIME = 3f;
@@ -122,33 +124,25 @@ public class AvatarAnimatorController : MonoBehaviour
             isComplete = true;
             for (var i = 0; i < programs.Count; i++)
             {
-                foreach (var t in allowedApps.Where(t => audioPrograms[i].Name.StartsWith(t, StringComparison.OrdinalIgnoreCase) | audioPrograms[i].ProcessName.StartsWith(t, StringComparison.OrdinalIgnoreCase)))
-                {
-                    PulseAudioManager.Instance.StartMonitoringStream(audioPrograms[i].NodeId);
-                }
+                if (PulseAudioManager.IsAllowedApp(programs[i], allowedApps))
+                    PulseAudioManager.Instance.StartMonitoringStream(programs[i].NodeId);
             }
         });
         while (!isComplete)
         {
             yield return null;
         }
-        if (audioPrograms.Count > 0)
+        for (int i = 0; i < audioPrograms.Count; i++)
         {
-            for (int i = 0; i < audioPrograms.Count; i++)
+            var program = audioPrograms[i];
+            if (!PulseAudioManager.IsAllowedApp(program, allowedApps)) continue;
+
+            bool hasPeak = PulseAudioManager.Instance.TryGetPeak(program.NodeId, out float peak);
+            // Until the peak monitor has delivered its first sample, an uncorked audible stream counts as playing.
+            if (hasPeak ? peak > streamPeakThreshold : (!program.IsCorked && program.Volume > SOUND_THRESHOLD))
             {
-                for (int j = 0; j < allowedApps.Count; j++)
-                {
-                    if (audioPrograms[i].Name.StartsWith(allowedApps[j], StringComparison.OrdinalIgnoreCase) | audioPrograms[i].ProcessName.StartsWith(allowedApps[j], StringComparison.OrdinalIgnoreCase))
-                    {
-                        var peak = PulseAudioManager.Instance.ProgramPeaks[audioPrograms[i].NodeId];
-                        if (peak > SOUND_THRESHOLD)
-                        {
-                            result = true;
-                            break;
-                        }
-                    }
-                }
-                if (result) break;
+                result = true;
+                break;
             }
         }
         onComplete?.Invoke(result);

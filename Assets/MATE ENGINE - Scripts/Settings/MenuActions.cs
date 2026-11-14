@@ -33,6 +33,8 @@ public class MenuActions : MonoBehaviour
     public bool followBone = true;
     public HumanBodyBones targetBone = HumanBodyBones.Head;
     [Range(0f, 1f)] public float followSmoothness = 0.15f;
+    [Tooltip("Distance in pixels the radial menu's center keeps from the edges of the visible part of the window.")]
+    public float radialScreenPadding = 120f;
 
     [Header("Perf")]
     public float avatarScanInterval = 0.25f;
@@ -48,6 +50,11 @@ public class MenuActions : MonoBehaviour
     private Animator currentAnimator;
 
     private Vector3 screenPosition;
+
+    // Part of the window that hangs over the monitor edge, refreshed a few times per second.
+    private const float RadialInsetRefreshSeconds = 0.2f;
+    private float nextRadialInsetRefresh;
+    private float radialInsetLeft, radialInsetTop, radialInsetRight, radialInsetBottom;
 
     private AvatarBigScreenHandler bigScreen;
     private FieldInfo bigScreenActiveField;
@@ -69,6 +76,13 @@ public class MenuActions : MonoBehaviour
 
         modelRoot = GameObject.Find("Model")?.transform;
         mainCam = Camera.main;
+
+        // Keep every menu on the visible part of the window (the window can hang over the screen edge).
+        foreach (var entry in menuEntries)
+        {
+            if (entry.menu != null && !entry.menu.TryGetComponent<MenuScreenClamper>(out _))
+                entry.menu.AddComponent<MenuScreenClamper>();
+        }
 
         CacheBigScreen();
         nextAvatarScan = Time.unscaledTime;
@@ -109,7 +123,7 @@ public class MenuActions : MonoBehaviour
                 var bone = currentAnimator.GetBoneTransform(targetBone);
                 if (bone != null)
                 {
-                    Vector3 targetScreenPos = mainCam.WorldToScreenPoint(bone.position);
+                    Vector3 targetScreenPos = ClampRadialScreenPosition(mainCam.WorldToScreenPoint(bone.position));
                     screenPosition = Vector3.Lerp(screenPosition, targetScreenPos, 1f - followSmoothness);
                     if (RectTransformUtility.ScreenPointToWorldPointInRectangle(radialRect.parent as RectTransform, screenPosition, mainCam, out Vector3 worldPos))
                         radialRect.position = worldPos;
@@ -146,13 +160,54 @@ public class MenuActions : MonoBehaviour
             var bone = currentAnimator.GetBoneTransform(targetBone);
             if (bone != null)
             {
-                screenPosition = mainCam.WorldToScreenPoint(bone.position);
+                screenPosition = ClampRadialScreenPosition(mainCam.WorldToScreenPoint(bone.position));
                 if (RectTransformUtility.ScreenPointToWorldPointInRectangle(radialRect.parent as RectTransform, screenPosition, mainCam, out Vector3 worldPos))
                     radialRect.position = worldPos;
             }
         }
         if (radialMenu.Open())
             PlayMenuOpenSound();
+    }
+
+    /// <summary>
+    /// Keeps the radial menu's center on the visible part of the window: inside the window itself (the bone
+    /// can be outside the camera frame) and inside the monitor (the window can hang over the screen edge).
+    /// </summary>
+    Vector3 ClampRadialScreenPosition(Vector3 position)
+    {
+        if (Screen.width <= 0 || Screen.height <= 0) return position;
+
+        if (Time.unscaledTime >= nextRadialInsetRefresh)
+        {
+            nextRadialInsetRefresh = Time.unscaledTime + RadialInsetRefreshSeconds;
+            radialInsetLeft = radialInsetTop = radialInsetRight = radialInsetBottom = 0f;
+            var windowManager = WindowManager.Instance;
+            if (windowManager != null &&
+                windowManager.GetWindowOffscreenInsets(out RectInt windowRect, out int left, out int top, out int right, out int bottom) &&
+                windowRect.width > 0 && windowRect.height > 0)
+            {
+                float kx = (float)Screen.width / windowRect.width;
+                float ky = (float)Screen.height / windowRect.height;
+                radialInsetLeft = left * kx;
+                radialInsetRight = right * kx;
+                radialInsetTop = top * ky;
+                radialInsetBottom = bottom * ky;
+            }
+        }
+
+        // Unity screen space has y pointing up, so the window's bottom inset is the low end.
+        float minX = radialInsetLeft, maxX = Screen.width - radialInsetRight;
+        float minY = radialInsetBottom, maxY = Screen.height - radialInsetTop;
+        if (maxX - minX < 1f) { minX = 0f; maxX = Screen.width; }
+        if (maxY - minY < 1f) { minY = 0f; maxY = Screen.height; }
+
+        // In an area too small for the padding the menu is centered instead.
+        float padX = Mathf.Min(Mathf.Max(0f, radialScreenPadding), (maxX - minX) * 0.5f);
+        float padY = Mathf.Min(Mathf.Max(0f, radialScreenPadding), (maxY - minY) * 0.5f);
+
+        position.x = Mathf.Clamp(position.x, minX + padX, maxX - padX);
+        position.y = Mathf.Clamp(position.y, minY + padY, maxY - padY);
+        return position;
     }
 
     void CacheBigScreen()

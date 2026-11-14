@@ -57,17 +57,20 @@ public class SettingsHandlerButtons : MonoBehaviour
     public void CycleWindowSize()
     {
         var data = SaveLoadHandler.Instance.data;
+        var windowManager = WindowManager.Instance;
+
         switch (data.windowSizeState)
         {
             case SaveLoadHandler.SettingsData.WindowSizeState.Normal:
                 data.windowSizeState = SaveLoadHandler.SettingsData.WindowSizeState.Big;
-                WindowManager.Instance.SetWindowSize(new Vector2Int(2048, 1536));break;
+                windowManager.SetWindowSize(new Vector2Int(2048, 1536)); break;
             case SaveLoadHandler.SettingsData.WindowSizeState.Big:
                 data.windowSizeState = SaveLoadHandler.SettingsData.WindowSizeState.Small;
-                WindowManager.Instance.SetWindowSize(new Vector2Int(768, 512)); break;
+                windowManager.SetWindowSize(new Vector2Int(768, 512)); break;
             case SaveLoadHandler.SettingsData.WindowSizeState.Small:
+            default:
                 data.windowSizeState = SaveLoadHandler.SettingsData.WindowSizeState.Normal;
-                WindowManager.Instance.SetWindowSize(new Vector2Int(1536, 1024)); break;
+                windowManager.SetWindowSize(new Vector2Int(1536, 1024)); break;
         }
         SaveLoadHandler.Instance.SaveToDisk();
     }

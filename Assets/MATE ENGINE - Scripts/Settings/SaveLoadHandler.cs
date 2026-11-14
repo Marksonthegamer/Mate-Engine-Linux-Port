@@ -232,9 +232,9 @@ public class SaveLoadHandler : MonoBehaviour
     //ALARM
     void MigrateAfterLoad()
     {
+        if (data == null) data = new SettingsData();
         if (data.timers == null) data.timers = new List<SettingsData.TimerEntry>();
         if (string.IsNullOrEmpty(data.selectedParticleTheme)) data.selectedParticleTheme = "Standard";
-        if (data == null) data = new SettingsData();
         if (data.alarms == null) data.alarms = new List<SettingsData.AlarmEntry>();
         if (data.settingsVersion < 1)
         {

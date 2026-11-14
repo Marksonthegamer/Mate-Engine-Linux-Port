@@ -19,6 +19,7 @@ public enum DesktopEnvironments
 {
     Kde,
     Hyprland,
+    Gnome,
     OtherX11,
     OtherWayland,
     Unknown
@@ -50,6 +51,18 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private Vector2Int _initialWindowPos;
     private volatile bool _isDragging;
 
+    // True while the compositor owns the current drag (_NET_WM_MOVERESIZE), so we must not move the window ourselves.
+    private bool _interactiveMoveActive;
+    private int _interactiveMoveReleasedFrames;
+    private bool? _wmSupportsMoveResize;
+
+    // Bottom guard: after a compositor-driven move the final geometry arrives asynchronously (ConfigureNotify),
+    // so the check is repeated for a short while after the drag ends.
+    private const float BottomGuardSettleSeconds = 1f;
+    private float _bottomGuardUntil;
+    private volatile bool _windowGeometryChanged;
+    private volatile bool _inputMaskSuspended;
+
     private bool _dontUpdateCursor;
     
     public bool transparentInputEnabled = true;
@@ -69,6 +82,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     TDBus.Connection _dBusConnection;
     TDBus.ConnectionInfo _dBusConnectionInfo;
+
+    // Global pointer position from the compositor, for sessions where the X server does not know it.
+    private GnomePointerSource _gnomePointer;
+    private Vector2Int _pointerDesktopSize;
+    private Vector2Int _pointerRootSize;
     
     private async void OnEnable()
     {
@@ -90,47 +108,32 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             if(_dBusConnectionInfo == null)
                 _dBusConnectionInfo = await _dBusConnection.ConnectAsync();
             
-            if (Enum.TryParse(Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP"), true, out _currentDesktopEnv))
-            {
-                switch(_currentDesktopEnv)
-                {
-                    case DesktopEnvironments.Hyprland:
-                        _windowManagerImplementation = Singleton<HyprlandManager>.Instance;
-                        break;
-                    case DesktopEnvironments.Kde:
-                        if (SaveLoadHandler.Instance.data.useKWinApi)
-                        {
-                            var km = new KWinManager(_dBusConnection, _dBusConnectionInfo);
-                            await km.SetupDBus();
-                            _windowManagerImplementation = km;
-                        }
-                        break;
-                }
-                _windowManagerImplementation?.SetXUnityWindow(_unityWindow);
-            }
-            else
-            {
-                _currentDesktopEnv = _currentSessionType switch
-                {
-                    SessionTypes.X11 => DesktopEnvironments.OtherX11,
-                    SessionTypes.Wayland => DesktopEnvironments.OtherWayland,
-                    _ => DesktopEnvironments.Unknown
-                };
-            }
-            if (!Enum.TryParse(Environment.GetEnvironmentVariable("XDG_SESSION_TYPE"), true, out _currentSessionType))
-            {
-                _currentSessionType = SessionTypes.Unknown;
-            }
+            _currentSessionType = DetectSessionType();
+            _currentDesktopEnv = DetectDesktopEnvironment(_currentSessionType);
+            print($"Desktop environment: {_currentDesktopEnv}, session type: {_currentSessionType}");
 
-            if (_currentSessionType == SessionTypes.Wayland)
+            switch (_currentDesktopEnv)
             {
-                // Removed _WaylandWarningPosted here because later OnEnable calls are blocked
-                Singleton<DBusNotificationHelper>.Instance.Init(_dBusConnection);
-                await Singleton<DBusNotificationHelper>.Instance.Send("Wayland is not fully supported by MateEngine",
-                    "Although Wayland improves security, its fundamental design choices prevent MateEngine (and other X11 applications) from getting window information." +
-                    "Thus, features like window-sitting could hardly be implemented under various Wayland-based DEs. Please use X11 DEs to enjoy the best of MateEngine.",
-                    "wayland", null, 30000);
+                case DesktopEnvironments.Hyprland:
+                    _windowManagerImplementation = Singleton<HyprlandManager>.Instance;
+                    break;
+                case DesktopEnvironments.Kde:
+                    if (SaveLoadHandler.Instance.data.useKWinApi)
+                    {
+                        var km = new KWinManager(_dBusConnection, _dBusConnectionInfo);
+                        await km.SetupDBus();
+                        _windowManagerImplementation = km;
+                    }
+                    break;
+                case DesktopEnvironments.Gnome:
+                    // Mutter needs no dedicated backend: the generic X11 code path is used,
+                    // and on Wayland dragging is handed to the compositor (see StartInteractiveMove).
+                    // XWayland does not see the pointer outside our window there; a shell extension does.
+                    if (_currentSessionType == SessionTypes.Wayland)
+                        _gnomePointer ??= new GnomePointerSource(_dBusConnection);
+                    break;
             }
+            _windowManagerImplementation?.SetXUnityWindow(_unityWindow);
         }
         catch (Exception e)
         {
@@ -140,13 +143,61 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     IWindowManagerImplementation _windowManagerImplementation = null;
 
+    private static SessionTypes DetectSessionType()
+    {
+        if (Enum.TryParse(Environment.GetEnvironmentVariable("XDG_SESSION_TYPE"), true, out SessionTypes type) &&
+            Enum.IsDefined(typeof(SessionTypes), type) && type != SessionTypes.Unknown)
+            return type;
+        // XDG_SESSION_TYPE can be missing or "tty" (e.g. compositor started from a console)
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY")))
+            return SessionTypes.Wayland;
+        return SessionTypes.Unknown;
+    }
+
+    private static DesktopEnvironments DetectDesktopEnvironment(SessionTypes sessionType)
+    {
+        // XDG_CURRENT_DESKTOP is a colon separated list, e.g. "ubuntu:GNOME" or "GNOME-Classic:GNOME"
+        var desktops = (Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP") ?? string.Empty)
+            .Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var entry in desktops)
+        {
+            var desktop = entry.Trim();
+            if (desktop.Equals("KDE", StringComparison.OrdinalIgnoreCase)) return DesktopEnvironments.Kde;
+            if (desktop.Equals("Hyprland", StringComparison.OrdinalIgnoreCase)) return DesktopEnvironments.Hyprland;
+            if (desktop.IndexOf("GNOME", StringComparison.OrdinalIgnoreCase) >= 0) return DesktopEnvironments.Gnome;
+        }
+
+        return sessionType switch
+        {
+            SessionTypes.X11 => DesktopEnvironments.OtherX11,
+            SessionTypes.Wayland => DesktopEnvironments.OtherWayland,
+            _ => DesktopEnvironments.Unknown
+        };
+    }
+
     private Vector2 _lastPos;
 
     private void Update()
     {
         if (_mouseOver)
             UpdateCursorState();
-        if (_isDragging)
+        if (_windowGeometryChanged || _bottomGuardUntil > 0f)
+        {
+            _windowGeometryChanged = false;
+            ApplyWindowScreenGuard();
+            if (_bottomGuardUntil > 0f && Time.unscaledTime >= _bottomGuardUntil)
+                _bottomGuardUntil = 0f;
+        }
+        if (_isDragging && _interactiveMoveActive)
+        {
+            // The compositor swallows the button release that ends its move; XWayland replays it once the
+            // pointer is back over the window. If Unity never sees it, end the drag from the X server state.
+            if (GetMouseButton(KeyCode.Mouse0))
+                _interactiveMoveReleasedFrames = 0;
+            else if (++_interactiveMoveReleasedFrames > 10)
+                EndDrag();
+        }
+        else if (_isDragging)
         {
             var currentMousePos = GetMousePosition();
             var delta = currentMousePos - _initialMousePos;
@@ -159,6 +210,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void Awake()
     {
+        _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         Init();
         CheckSingleInstanceForNoNetWmPidSupportCompositors();
         var pid = Process.GetCurrentProcess().Id;
@@ -173,6 +225,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             return;
 #endif
             SetWindowBorderless(SaveLoadHandler.Instance.data.windowType != WindowType.ShowBorder);
+            SetMaximized(false);
             XSelectInput(_display, _unityWindow, StructureNotifyMask | EnterWindowMask | LeaveWindowMask | PropertyChangeMask);
             EnableClickThroughTransparency();
             LoadCursors();
@@ -213,20 +266,268 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        // Alt+drag / middle-drag moves the avatar inside the window instead of the window itself
+        if (AvatarFreeMovement.ClaimsPointer(eventData)) return;
+
         _initialMousePos = GetMousePosition();
         _initialWindowPos = GetWindowPosition();
         _isDragging = true;
+        _interactiveMoveActive = false;
+        _interactiveMoveReleasedFrames = 0;
+        _bottomGuardUntil = 0f;
         if (_windowManagerImplementation != null)
             _windowManagerImplementation.IsDragging = true;
+
+        if (UsesInteractiveMove && (eventData == null || eventData.button == PointerEventData.InputButton.Left))
+        {
+            // Root coordinates of the press: window origin + pointer position inside the window (X11 has y pointing down)
+            var rootPos = eventData != null
+                ? _initialWindowPos + new Vector2Int(Mathf.RoundToInt(eventData.position.x),
+                    Mathf.RoundToInt(Screen.height - 1 - eventData.position.y))
+                : _initialMousePos;
+            _interactiveMoveActive = StartInteractiveMove(rootPos, 1);
+        }
         UpdateCursorState();
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public void OnPointerUp(PointerEventData eventData) => EndDrag();
+
+    private void EndDrag()
     {
+        if (_interactiveMoveActive)
+        {
+            // Check now and again whenever the window reports new geometry, until the move has settled
+            _windowGeometryChanged = true;
+            _bottomGuardUntil = Time.unscaledTime + BottomGuardSettleSeconds;
+        }
         _isDragging = false;
+        _interactiveMoveActive = false;
+        _interactiveMoveReleasedFrames = 0;
         if (_windowManagerImplementation != null)
             _windowManagerImplementation.IsDragging = false;
         UpdateCursorState();
+    }
+
+    // Longest distance from the top of the work area, as a fraction of the window height, over which the
+    // avatar is raised inside the window. Smaller = the avatar gets closer to the top before it is raised,
+    // but then covers the empty window above its head more abruptly.
+    private const float TopEdgeLiftZoneFraction = 0.06f;
+
+    /// <summary>
+    /// Clamps the window so its companion does not sink below the screen floor,
+    /// and its head can reach the top panel without clipping.
+    /// </summary>
+    private void ApplyWindowScreenGuard()
+    {
+        if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero || _closing) return;
+        if (!GetWindowRect(_unityWindow, out var windowRect) || windowRect.height <= 0) return;
+
+        if (_monitors == null || _monitors.Count == 0) QueryMonitors();
+        if (_monitors == null || _monitors.Count == 0) return;
+
+        var monitor = GetMonitorRectFromWindow(_unityWindow);
+        if (monitor.height <= 0) return;
+        var workArea = GetWorkArea(monitor);
+
+        // Where the avatar really is inside the window. Feet at ~62% and 2% of empty window above the head
+        // are the standard framing, used until an avatar is there to be measured. The real values differ
+        // for a scaled avatar, a grown camera frame and an avatar that was dragged inside the window.
+        float feetFromTop = windowRect.height * 0.62f;
+        float emptyAbove = windowRect.height * 0.02f;
+        bool canLift = false;
+        if (Screen.height > 0 && AvatarFreeMovement.TryGetAvatarScreenSpan(out float headTopPixels, out float feetPixels, out canLift))
+        {
+            float pixelScale = (float)windowRect.height / Screen.height;
+            feetFromTop = (Screen.height - feetPixels) * pixelScale;
+            emptyAbove = (Screen.height - headTopPixels) * pixelScale;
+        }
+
+        // The feet must not sink below the bottom of the monitor.
+        int feetPixelOffset = Mathf.Clamp(Mathf.CeilToInt(feetFromTop), 0, windowRect.height);
+        int maxWindowY = monitor.yMax - feetPixelOffset;
+
+        // The empty window above the head would stop the avatar short of the top of the screen: Mutter does
+        // not let a window cross the top of the work area. So over the last stretch before that edge the
+        // avatar is raised inside the window, and its head arrives at the top together with the window.
+        // The stretch is kept short (a small avatar has a lot of empty window to make up, and should follow
+        // the pointer normally for as long as possible) and never reaches down to where the avatar stands
+        // on the floor; a window too tall for that keeps the avatar in place and may leave the screen instead.
+        float liftZone = Mathf.Min(emptyAbove, windowRect.height * TopEdgeLiftZoneFraction, maxWindowY - workArea.yMin);
+        bool lifts = canLift && liftZone >= 1f;
+
+        int headPixelOffset = lifts ? 0 : Mathf.Clamp(Mathf.FloorToInt(emptyAbove), 0, windowRect.height);
+        int minWindowY = Mathf.Min(monitor.yMin - headPixelOffset, maxWindowY);
+
+        int targetY = Mathf.Clamp(windowRect.y, minWindowY, maxWindowY);
+        int minWindowX = monitor.xMin - windowRect.width / 2;
+        int maxWindowX = monitor.xMax - windowRect.width / 2;
+        int targetX = Mathf.Clamp(windowRect.x, minWindowX, maxWindowX);
+
+        AvatarFreeMovement.SetTopEdgeProximity(lifts ? 1f - (targetY - workArea.yMin) / liftZone : 0f);
+
+        if (targetX != windowRect.x || targetY != windowRect.y)
+        {
+            SetWindowPosition(new Vector2Int(targetX, targetY));
+        }
+    }
+
+    #region Work area
+
+    /// <summary>
+    /// The part of a monitor that is not covered by panels and docks (_NET_WORKAREA).
+    /// Falls back to the whole monitor when the window manager does not publish it.
+    /// </summary>
+    public RectInt GetWorkArea(RectInt monitor)
+    {
+        if (_display == IntPtr.Zero || monitor.width <= 0 || monitor.height <= 0) return monitor;
+
+        var result = monitor;
+        using (LockDisplay())
+        {
+            var atom = XInternAtom(_display, "_NET_WORKAREA", true);
+            if (atom == IntPtr.Zero) return monitor;
+
+            // CARDINAL[4] per desktop: x, y, width, height. Format 32 properties are returned as C longs.
+            var status = XGetWindowProperty(_display, _rootWindow, atom, 0, 4, false, (IntPtr)XaCardinal,
+                out _, out var actualFormat, out var nItems, out _, out var prop);
+            if (status == 0 && prop != IntPtr.Zero && actualFormat == 32 && nItems >= 4)
+            {
+                int x = (int)Marshal.ReadIntPtr(prop, 0).ToInt64();
+                int y = (int)Marshal.ReadIntPtr(prop, IntPtr.Size).ToInt64();
+                int w = (int)Marshal.ReadIntPtr(prop, IntPtr.Size * 2).ToInt64();
+                int h = (int)Marshal.ReadIntPtr(prop, IntPtr.Size * 3).ToInt64();
+
+                // The property spans all monitors, cut it down to the requested one.
+                int xMin = Mathf.Max(monitor.xMin, x), yMin = Mathf.Max(monitor.yMin, y);
+                int xMax = Mathf.Min(monitor.xMax, x + w), yMax = Mathf.Min(monitor.yMax, y + h);
+                if (xMax - xMin > monitor.width / 2 && yMax - yMin > monitor.height / 2)
+                    result = new RectInt(xMin, yMin, xMax - xMin, yMax - yMin);
+            }
+            if (prop != IntPtr.Zero) XFree(prop);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// How many pixels of the window lie outside the work area of its monitor on each side.
+    /// UI uses this to stay on the visible part of the window.
+    /// </summary>
+    public bool GetWindowOffscreenInsets(out RectInt windowRect, out int left, out int top, out int right, out int bottom)
+    {
+        left = top = right = bottom = 0;
+        windowRect = default;
+        if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero || _closing) return false;
+        if (!GetWindowRect(_unityWindow, out windowRect) || windowRect.width <= 0 || windowRect.height <= 0) return false;
+        if (_monitors == null || _monitors.Count == 0) return false;
+
+        var monitor = GetMonitorRectFromWindow(_unityWindow);
+        if (monitor.width <= 0 || monitor.height <= 0) return false;
+        var area = GetWorkArea(monitor);
+
+        left = Mathf.Max(0, area.xMin - windowRect.xMin);
+        top = Mathf.Max(0, area.yMin - windowRect.yMin);
+        right = Mathf.Max(0, windowRect.xMax - area.xMax);
+        bottom = Mathf.Max(0, windowRect.yMax - area.yMax);
+        return true;
+    }
+
+    private void SetMaximized(bool maximized)
+    {
+        if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero || _closing) return;
+        if (_netWmState == IntPtr.Zero || _netWmStateMaxHorz == IntPtr.Zero || _netWmStateMaxVert == IntPtr.Zero) return;
+
+        var xClient = new XClientMessageEvent
+        {
+            type = ClientMessage,
+            window = _unityWindow,
+            message_type = _netWmState,
+            format = 32,
+        };
+        xClient.data0 = new IntPtr(maximized ? 1 : 0); // 1=ADD, 0=REMOVE
+        xClient.data1 = _netWmStateMaxVert;
+        xClient.data2 = _netWmStateMaxHorz;
+        xClient.data3 = new IntPtr(1); // source indication: normal application
+        xClient.data4 = IntPtr.Zero;
+
+        using (LockDisplay())
+        {
+            XSendEvent(_display, _rootWindow, false, SubstructureNotifyMask | SubstructureRedirectMask, ref xClient);
+            XFlush(_display);
+        }
+    }
+
+    #endregion
+
+    /// <summary>
+    /// True when window dragging is delegated to the compositor instead of polling the pointer.
+    /// Wayland compositors ignore position requests from XWayland clients and do not report the pointer
+    /// once it leaves our surface, so only a compositor-driven move (xdg_toplevel.move) can work there.
+    /// X11 sessions keep the polling path, which also drives window snapping.
+    /// </summary>
+    public bool UsesInteractiveMove
+    {
+        get
+        {
+            if (_currentSessionType != SessionTypes.Wayland || _windowManagerImplementation != null) return false;
+            var data = SaveLoadHandler.Instance.data;
+            // Legacy calls are the user's escape hatch; override-redirect windows are not managed by the WM at all.
+            if (data.useLegacyMoveResizeCalls || data.overrideRedirect) return false;
+            return WmSupportsMoveResize();
+        }
+    }
+
+    private bool WmSupportsMoveResize()
+    {
+        if (_wmSupportsMoveResize.HasValue) return _wmSupportsMoveResize.Value;
+        if (_display == IntPtr.Zero || _netWmMoveresize == IntPtr.Zero) return false;
+
+        bool supported = false;
+        using (LockDisplay())
+        {
+            var supportedAtom = XInternAtom(_display, "_NET_SUPPORTED", false);
+            var status = XGetWindowProperty(_display, _rootWindow, supportedAtom, 0, 1024, false, (IntPtr)XaAtom,
+                out _, out var actualFormat, out var nItems, out _, out var prop);
+            if (status == 0 && prop != IntPtr.Zero && actualFormat == 32)
+            {
+                for (var i = 0; i < (int)nItems && !supported; i++)
+                    supported = Marshal.ReadIntPtr(prop, i * IntPtr.Size) == _netWmMoveresize;
+            }
+            if (prop != IntPtr.Zero) XFree(prop);
+        }
+
+        if (!supported)
+            ShowError("Window manager does not advertise _NET_WM_MOVERESIZE, falling back to polled window dragging.");
+        _wmSupportsMoveResize = supported;
+        return supported;
+    }
+
+    /// <summary>
+    /// Asks the window manager to move the window with the pointer (_NET_WM_MOVERESIZE).
+    /// XWayland compositors turn this into a native interactive move. Must be called while the button is held.
+    /// </summary>
+    public bool StartInteractiveMove(Vector2Int mouseRootPos, int button = 1)
+    {
+        if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero || _netWmMoveresize == IntPtr.Zero) return false;
+
+        var xClient = new XClientMessageEvent
+        {
+            type = ClientMessage,
+            window = _unityWindow,
+            message_type = _netWmMoveresize,
+            format = 32,
+        };
+        xClient.data0 = new IntPtr(mouseRootPos.x);
+        xClient.data1 = new IntPtr(mouseRootPos.y);
+        xClient.data2 = new IntPtr(NetWmMoveresizeMove);
+        xClient.data3 = new IntPtr(button);
+        xClient.data4 = new IntPtr(1); // source indication: normal application
+
+        using (LockDisplay())
+        {
+            var sent = XSendEvent(_display, _rootWindow, false, SubstructureRedirectMask | SubstructureNotifyMask, ref xClient);
+            XFlush(_display);
+            return sent != 0;
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -265,6 +566,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         _netWmStateMaxVert = XInternAtom(_display, "_NET_WM_STATE_MAXIMIZED_VERT", false);
         _netWmWindowType = XInternAtom(_display, "_NET_WM_WINDOW_TYPE", false);
         _netMoveResizeWindow = XInternAtom(_display, "_NET_MOVERESIZE_WINDOW", false);
+        _netWmMoveresize = XInternAtom(_display, "_NET_WM_MOVERESIZE", false);
         _netWmStateAbove = XInternAtom(_display, "_NET_WM_STATE_ABOVE", false);
         _netWmStateSkipTaskbar = XInternAtom(_display, "_NET_WM_STATE_SKIP_TASKBAR", false);
         _netWmWindowTypeDock = XInternAtom(_display, "_NET_WM_WINDOW_TYPE_DOCK", false);
@@ -486,6 +788,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         if(_windowManagerImplementation is IDisposable disposable)
             disposable?.Dispose();
+        _gnomePointer?.Dispose();
+        _gnomePointer = null;
 
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero && _wakeupAtom != IntPtr.Zero)
         {
@@ -498,8 +802,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                 format = 32
             };
         
-            XSendEvent(_display, _unityWindow, false, 0, ref wakeUpEv);
-            XFlush(_display);
+            using (LockDisplay())
+            {
+                XSendEvent(_display, _unityWindow, false, 0, ref wakeUpEv);
+                XFlush(_display);
+            }
         }
         if (_x11EventThread is { IsAlive: true })
         {
@@ -555,10 +862,22 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             return _windowManagerImplementation.GetWindowPosition();
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
         {
+            // One synchronous round-trip per frame is enough; several scripts ask for this every Update.
+            bool cacheable = IsMainThread;
+            int frame = cacheable ? Time.frameCount : -1;
+            if (cacheable && frame == _cachedWindowFrame)
+                return _cachedWindowPos;
+
             // Use XTranslateCoordinates to get absolute position
             if (XTranslateCoordinates(_display, _unityWindow, _rootWindow, 0, 0, out var absX, out var absY, out _))
             {
-                return new Vector2Int(absX, absY);
+                var pos = new Vector2Int(absX, absY);
+                if (cacheable)
+                {
+                    _cachedWindowPos = pos;
+                    _cachedWindowFrame = frame;
+                }
+                return pos;
             }
 
             ShowError("XTranslateCoordinates failed.");
@@ -574,6 +893,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public void SetWindowPosition(Vector2Int position)
     {
+        _cachedWindowFrame = -1; // the window is about to move, do not serve the old position again this frame
         if (SaveLoadHandler.Instance.data.useLegacyMoveResizeCalls)
         { 
             SetWindowPositionLegacy(position);
@@ -604,8 +924,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             xClient.data3 = IntPtr.Zero;
             xClient.data4 = IntPtr.Zero;
 
-            XSendEvent(_display, _rootWindow, false, SubstructureRedirectMask | SubstructureNotifyMask, ref xClient);
-            XFlush(_display);
+            using (LockDisplay())
+            {
+                XSendEvent(_display, _rootWindow, false, SubstructureRedirectMask | SubstructureNotifyMask, ref xClient);
+                XFlush(_display);
+            }
         }
     }
 
@@ -613,8 +936,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     {
         if (_display != IntPtr.Zero && _unityWindow != IntPtr.Zero)
         {
-            XMoveWindow(_display, _unityWindow, position.x, position.y);
-            XFlush(_display);
+            using (LockDisplay())
+            {
+                XMoveWindow(_display, _unityWindow, position.x, position.y);
+                XFlush(_display);
+            }
         }
     }
 
@@ -803,6 +1129,10 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public void SetWindowSize(Vector2Int size)
     {
+        if (size.x > 0 && size.y > 0 && (Screen.width != size.x || Screen.height != size.y))
+        {
+            Screen.SetResolution(size.x, size.y, FullScreenMode.Windowed);
+        }
         if (SaveLoadHandler.Instance.data.useLegacyMoveResizeCalls)
         {
             SetWindowSizeLegacy(size);
@@ -873,21 +1203,98 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     {
         if (_windowManagerImplementation != null)
             return _windowManagerImplementation.GetMousePosition();
-        // Query mouse position
-        int rootX = 0, rootY = 0;
-        IntPtr rootReturn = IntPtr.Zero, childReturn = IntPtr.Zero;
-        int winX = 0, winY = 0;
-        uint maskReturn = 0;
-
-        if (!XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY, ref winX,
-                ref winY, ref maskReturn))
+        if (!QueryPointerPosition(out var position))
         {
             ShowError("No mouse found.");
             return Vector2Int.zero;
         }
 
-        return new Vector2Int(rootX, rootY);
+        return position;
     }
+
+    /// <summary>
+    /// XQueryPointer is a blocking round-trip to the X server. On the main thread the answer is kept for the
+    /// rest of the frame, so the many per-frame callers share a single request.
+    /// </summary>
+    private bool QueryPointerPosition(out Vector2Int position)
+    {
+        bool cacheable = IsMainThread;
+        int frame = cacheable ? Time.frameCount : -1;
+        if (cacheable && frame == _cachedMouseFrame)
+        {
+            position = _cachedMousePos;
+            return _cachedMouseValid;
+        }
+
+        // Over our own window the X server knows the pointer exactly and without delay. Anywhere else on
+        // Wayland (and during a compositor-driven move) it only has the pixel where the pointer left.
+        position = default;
+        bool result = (!_mouseOver || _interactiveMoveActive) && TryGetCompositorPointer(out position);
+        if (!result)
+        {
+            int rootX = 0, rootY = 0;
+            IntPtr rootReturn = IntPtr.Zero, childReturn = IntPtr.Zero;
+            int winX = 0, winY = 0;
+            uint maskReturn = 0;
+
+            result = XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY,
+                ref winX, ref winY, ref maskReturn);
+            position = new Vector2Int(rootX, rootY);
+        }
+        if (cacheable)
+        {
+            _cachedMousePos = position;
+            _cachedMouseValid = result;
+            _cachedMouseFrame = frame;
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Pointer position reported by the compositor itself, converted to X root coordinates.
+    /// Only available where a source exists (GNOME Wayland with the pointer extension enabled).
+    /// </summary>
+    private bool TryGetCompositorPointer(out Vector2Int position)
+    {
+        position = default;
+        var source = _gnomePointer;
+        if (source == null || !source.TryGetPosition(out var pointer, out var desktopSize)) return false;
+
+        // The compositor's coordinates differ from the X server's when XWayland is scaled.
+        if (desktopSize != _pointerDesktopSize || _pointerRootSize.x <= 0)
+        {
+            _pointerDesktopSize = desktopSize;
+            _pointerRootSize = Vector2Int.zero;
+            if (_display != IntPtr.Zero)
+            {
+                using (LockDisplay())
+                {
+                    if (XGetWindowAttributes(_display, _rootWindow, out var rootAttrs) != 0)
+                        _pointerRootSize = new Vector2Int(rootAttrs.width, rootAttrs.height);
+                }
+            }
+        }
+
+        var rootSize = _pointerRootSize;
+        if (desktopSize.x > 0 && desktopSize.y > 0 && rootSize.x > 0 && rootSize.y > 0 && rootSize != desktopSize)
+        {
+            pointer = new Vector2Int(
+                Mathf.RoundToInt(pointer.x * (float)rootSize.x / desktopSize.x),
+                Mathf.RoundToInt(pointer.y * (float)rootSize.y / desktopSize.y));
+        }
+        position = pointer;
+        return true;
+    }
+
+    /// <summary>
+    /// True when the pointer position reported by <see cref="GetMousePosition()"/> can no longer be trusted:
+    /// on Wayland, XWayland only sees pointer motion while the cursor is over this window's input region,
+    /// so after the cursor leaves it XQueryPointer keeps returning the pixel where it exited.
+    /// Not the case while the compositor itself reports the pointer.
+    /// </summary>
+    public bool IsPointerOutsideWindowOnWayland =>
+        _windowManagerImplementation == null && _currentSessionType == SessionTypes.Wayland && !_mouseOver &&
+        !(_gnomePointer != null && _gnomePointer.IsLive);
 
     public bool GetMousePosition(out Vector2Int position)
     {
@@ -896,15 +1303,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             position = _windowManagerImplementation.GetMousePosition();
             return true;
         }
-        // Query mouse position
-        int rootX = 0, rootY = 0;
-        IntPtr rootReturn = IntPtr.Zero, childReturn = IntPtr.Zero;
-        int winX = 0, winY = 0;
-        uint maskReturn = 0;
-
-        bool result = XQueryPointer(_display, _rootWindow, ref rootReturn, ref childReturn, ref rootX, ref rootY, ref winX, ref winY, ref maskReturn);
-        position = new Vector2Int(rootX, rootY);
-        return result;
+        return QueryPointerPosition(out position);
     }
 
     public bool GetMouseButton(KeyCode button) // 0=left, 1=right, 2=middle
@@ -1168,17 +1567,22 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         rect = new RectInt();
         if(_windowManagerImplementation != null)
             return _windowManagerImplementation.GetWindowRect(window, out rect);
-        var result = XGetWindowAttributes(_display, window, out var attr);
-        if (result == 0) return false;
+        if (_display == IntPtr.Zero || window == IntPtr.Zero) return false;
 
-        if (!XTranslateCoordinates(_display, window, _rootWindow, 0, 0, out var absX, out var absY, out _))
-            return false;
+        using (LockDisplay())
+        {
+            var result = XGetWindowAttributes(_display, window, out var attr);
+            if (result == 0) return false;
 
-        rect.x = absX;
-        rect.y = absY;
-        rect.width = attr.width;
-        rect.height = attr.height;
-        return true;
+            if (!XTranslateCoordinates(_display, window, _rootWindow, 0, 0, out var absX, out var absY, out _))
+                return false;
+
+            rect.x = absX;
+            rect.y = absY;
+            rect.width = attr.width;
+            rect.height = attr.height;
+            return true;
+        }
     }
 
     public void SetTopmost(bool topmost = true)
@@ -1695,37 +2099,117 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private List<XRectangle> GenerateRectangles(byte[] imageData, int width, int height)
     {
-        var rects = new List<XRectangle>();
-        
-        for (short y = 0; y < height; y++)
+        // The compositor hit-tests the pointer against every rectangle of the input region on each motion
+        // event (Mutter records one pick box per rectangle), so a pixel-exact silhouette with 1000+
+        // rectangles makes the whole desktop drop frames while the mouse moves. The mask is therefore
+        // snapped to a coarse grid: a cell takes input if any pixel inside it is opaque. Equal runs on
+        // consecutive cell rows are merged into one taller rectangle.
+        const int cell = MaskCellSize;
+        var rects = _maskRects;
+        rects.Clear();
+        var prevRow = _maskPrevRowRects; // indices into rects of the rectangles touching the previous cell row, by x
+        var curRow = _maskCurRowRects;
+        prevRow.Clear();
+
+        int gridWidth = (width + cell - 1) / cell;
+        if (_maskRowCells == null || _maskRowCells.Length < gridWidth)
+            _maskRowCells = new bool[gridWidth];
+        var rowCells = _maskRowCells;
+
+        for (int top = 0; top < height; top += cell)
         {
-            for (short x = 0; x < width; x++)
+            int bottom = Math.Min(top + cell, height);
+            Array.Clear(rowCells, 0, gridWidth);
+            for (int y = top; y < bottom; y++)
             {
-                int idx = (y * width + x) * 4;
-                if (imageData[idx + 3] > 10) 
+                int rowStart = y * width * 4 + 3;
+                for (int x = 0; x < width; x++)
                 {
-                    short startX = x;
-                    while (x < width && imageData[(y * width + x) * 4 + 3] > 10)
-                    {
-                        x++;
-                    }
-        
-                    rects.Add(new XRectangle 
-                    { 
-                        x = startX, 
-                        y = y, 
-                        width = (ushort)(x - startX), 
-                        height = 1 
-                    });
+                    if (imageData[rowStart + x * 4] <= 10) continue;
+                    int cx = x / cell;
+                    rowCells[cx] = true;
+                    x = (cx + 1) * cell - 1; // the rest of this cell is already known to be solid
                 }
             }
+
+            curRow.Clear();
+            int p = 0;
+            for (int cx = 0; cx < gridWidth; cx++)
+            {
+                if (!rowCells[cx]) continue;
+
+                int startCell = cx;
+                do
+                {
+                    cx++;
+                } while (cx < gridWidth && rowCells[cx]);
+
+                int startX = startCell * cell;
+                int runWidth = Math.Min(cx * cell, width) - startX;
+                int runHeight = bottom - top;
+
+                while (p < prevRow.Count && rects[prevRow[p]].x < startX) p++;
+
+                if (p < prevRow.Count)
+                {
+                    int index = prevRow[p];
+                    var above = rects[index];
+                    if (above.x == startX && above.width == runWidth && above.height + runHeight <= ushort.MaxValue)
+                    {
+                        above.height += (ushort)runHeight;
+                        rects[index] = above;
+                        curRow.Add(index);
+                        p++;
+                        continue;
+                    }
+                }
+
+                curRow.Add(rects.Count);
+                rects.Add(new XRectangle
+                {
+                    x = (short)startX,
+                    y = (short)top,
+                    width = (ushort)runWidth,
+                    height = (ushort)runHeight
+                });
+            }
+
+            (prevRow, curRow) = (curRow, prevRow);
         }
+
         return rects;
     }
      
+    /// <summary>
+    /// Called while the avatar is dragged inside the window (Alt/middle drag). The click-through mask follows
+    /// the avatar with a delay, so a fast pointer would land on a transparent hole and the press would be lost
+    /// to the window behind. For the duration of the drag the whole window takes input and the per-frame
+    /// mask scan is paused; the next redraw after the drag rebuilds the mask.
+    /// </summary>
+    public void SetInWindowDrag(bool active)
+    {
+        if (_inputMaskSuspended == active) return;
+        // Set before taking the display lock: the shaping thread re-checks it under the lock before applying a mask.
+        _inputMaskSuspended = active;
+
+        if (!active || !_running || _closing || _display == IntPtr.Zero || _unityWindow == IntPtr.Zero) return;
+
+        using (LockDisplay())
+        {
+            if (XGetWindowAttributes(_display, _unityWindow, out var attrs) == 0) return;
+            XRectangle[] fullRect =
+            {
+                new() { x = 0, y = 0, width = (ushort)attrs.width, height = (ushort)attrs.height }
+            };
+            XShapeCombineRectangles(_display, _unityWindow, ShapeInput, 0, 0, fullRect, 1, ShapeSet, Unsorted);
+            XFlush(_display);
+            _appliedMaskCount = -1; // the next mask must be sent even if it equals the one before the drag
+        }
+    }
+
     private void UpdateInputMask(int width, int height)
     {
-        if (_isDragging || !_running || _closing)
+        if (_isDragging || _inputMaskSuspended || !_running || _closing)
             return;
 
         // Throttle logic...
@@ -1735,76 +2219,89 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
         _shapingStopwatch.Restart();
 
-        XRectangle[] fullRect = { 
-            new() { x = 0, y = 0, width = (ushort)width, height = (ushort)height } 
-        };
-        XShapeCombineRectangles(_display, _unityWindow, ShapeBounding, 0, 0, fullRect, 1, ShapeSet, Unsorted);
-
         IntPtr xImagePtr = IntPtr.Zero;
         byte[] imageBytes;
 
-        if (_useShm)
+        // Capture: several dependent requests, keep them together. The pixel scan below runs unlocked
+        // so the main thread is not stalled while the mask is computed.
+        using (LockDisplay())
         {
-            if (width != _shmWidth || height != _shmHeight)
+            // Every shape request makes the window manager re-read the window's shape, so only send
+            // the bounding shape when the window size actually changed.
+            if (width != _boundingShapeWidth || height != _boundingShapeHeight)
             {
-                if (!TryResizeShm(width, height))
-                {
-                    ShowError("Failed to resize SHM, falling back to XGetImage");
-                    _useShm = false; 
-                }
+                XRectangle[] fullRect = { 
+                    new() { x = 0, y = 0, width = (ushort)width, height = (ushort)height } 
+                };
+                XShapeCombineRectangles(_display, _unityWindow, ShapeBounding, 0, 0, fullRect, 1, ShapeSet, Unsorted);
+                _boundingShapeWidth = width;
+                _boundingShapeHeight = height;
+                _appliedMaskCount = -1;
             }
-        }
 
-        IntPtr backingPixmap = XCompositeNameWindowPixmap(_display, _unityWindow);
-
-        if (backingPixmap != IntPtr.Zero)
-        {
             if (_useShm)
             {
-                if (XShmGetImage(_display, backingPixmap, _shmImagePtr, 0, 0, AllPlanes))
+                if (width != _shmWidth || height != _shmHeight)
                 {
-                    xImagePtr = _shmImagePtr;
+                    if (!TryResizeShm(width, height))
+                    {
+                        ShowError("Failed to resize SHM, falling back to XGetImage");
+                        _useShm = false; 
+                    }
+                }
+            }
+
+            IntPtr backingPixmap = XCompositeNameWindowPixmap(_display, _unityWindow);
+
+            if (backingPixmap != IntPtr.Zero)
+            {
+                if (_useShm)
+                {
+                    if (XShmGetImage(_display, backingPixmap, _shmImagePtr, 0, 0, AllPlanes))
+                    {
+                        xImagePtr = _shmImagePtr;
+                    }
+                    else
+                    {
+                        ShowError("XShmGetImage on Pixmap failed.");
+                        _useShm = false;
+                    }
                 }
                 else
                 {
-                    ShowError("XShmGetImage on Pixmap failed.");
-                    _useShm = false;
+                    xImagePtr = XGetImage(_display, backingPixmap, 0, 0, (uint)width, (uint)height, AllPlanes, ZPixmap);
+                    if (xImagePtr == IntPtr.Zero)
+                    {
+                        ShowError("XGetImage failed");
+                        XFreePixmap(_display, backingPixmap);
+                        return;
+                    }
                 }
+
+                XFreePixmap(_display, backingPixmap);
             }
             else
             {
-                xImagePtr = XGetImage(_display, backingPixmap, 0, 0, (uint)width, (uint)height, AllPlanes, ZPixmap);
-                if (xImagePtr == IntPtr.Zero)
+                if (_useShm)
                 {
-                    ShowError("XGetImage failed");
-                    XFreePixmap(_display, backingPixmap);
-                    return;
-                }
-            }
-
-            XFreePixmap(_display, backingPixmap);
-        }
-        else
-        {
-            if (_useShm)
-            {
-                if (XShmGetImage(_display, _unityWindow, _shmImagePtr, 0, 0, AllPlanes))
-                {
-                    xImagePtr = _shmImagePtr;
+                    if (XShmGetImage(_display, _unityWindow, _shmImagePtr, 0, 0, AllPlanes))
+                    {
+                        xImagePtr = _shmImagePtr;
+                    }
+                    else
+                    {
+                        ShowError("XShmGetImage on Window failed unexpectedly.");
+                        _useShm = false;
+                    }
                 }
                 else
                 {
-                    ShowError("XShmGetImage on Window failed unexpectedly.");
-                    _useShm = false;
-                }
-            }
-            else
-            {
-                xImagePtr = XGetImage(_display, _unityWindow, 0, 0, (uint)width, (uint)height, AllPlanes, ZPixmap);
-                if (xImagePtr == IntPtr.Zero)
-                {
-                    ShowError("XGetImage failed");
-                    return;
+                    xImagePtr = XGetImage(_display, _unityWindow, 0, 0, (uint)width, (uint)height, AllPlanes, ZPixmap);
+                    if (xImagePtr == IntPtr.Zero)
+                    {
+                        ShowError("XGetImage failed");
+                        return;
+                    }
                 }
             }
         }
@@ -1817,11 +2314,33 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         }
 
         List<XRectangle> rects = GenerateRectangles(imageBytes, width, height);
-        XRectangle[] rectArray = rects.ToArray();
+        int rectCount = rects.Count;
 
-        XShapeCombineRectangles(_display, _unityWindow, ShapeInput, 0, 0, rectArray, rectArray.Length, ShapeSet, YSorted);
+        // Nothing moved across a cell border since the last update: leave the compositor alone.
+        bool unchanged = rectCount == _appliedMaskCount;
+        for (int i = 0; unchanged && i < rectCount; i++)
+        {
+            var a = rects[i];
+            var b = _appliedMaskRects[i];
+            unchanged = a.x == b.x && a.y == b.y && a.width == b.width && a.height == b.height;
+        }
+        if (unchanged) return;
 
-        XFlush(_display);
+        if (_appliedMaskRects == null || _appliedMaskRects.Length < rectCount)
+            _appliedMaskRects = new XRectangle[Math.Max(rectCount, 64)];
+        // The buffer no longer describes what the server has until the request below went out; if it is
+        // skipped, the next update must not compare against it and conclude nothing changed.
+        _appliedMaskCount = -1;
+        rects.CopyTo(_appliedMaskRects);
+
+        using (LockDisplay())
+        {
+            // An in-window drag may have started while the image was being scanned
+            if (_inputMaskSuspended) return;
+            XShapeCombineRectangles(_display, _unityWindow, ShapeInput, 0, 0, _appliedMaskRects, rectCount, ShapeSet, YSorted);
+            XFlush(_display);
+            _appliedMaskCount = rectCount;
+        }
     }
 
     private bool TryResizeShm(int width, int height)
@@ -1893,11 +2412,17 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         image.Width = width;
         image.Height = height;
         int byteCount = width * height * 4;
-        image.Data = new byte[byteCount];
+        // Reused between mask updates: a fresh full-window buffer every 100ms lands on the large object heap
+        // and forces frequent stop-the-world collections. Only the first byteCount bytes are valid.
+        if (_cachedImageDataBuffer == null || _cachedImageDataBuffer.Length < byteCount)
+            _cachedImageDataBuffer = new byte[byteCount];
+        image.Data = _cachedImageDataBuffer;
 
+        bool copied = false;
         if (_useShm && _shmInfo.shmaddr != IntPtr.Zero)
         {
             Marshal.Copy(_shmInfo.shmaddr, image.Data, 0, byteCount);
+            copied = true;
         }
         else if (xImagePtr != IntPtr.Zero)
         {
@@ -1906,8 +2431,13 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             if (ximg.data != IntPtr.Zero)
             {
                 Marshal.Copy(ximg.data, image.Data, 0, byteCount);
+                copied = true;
             }
         }
+
+        // Nothing captured: behave like the freshly zeroed buffer did, not like the previous frame.
+        if (!copied)
+            Array.Clear(image.Data, 0, byteCount);
 
         return image;
     }
@@ -1919,7 +2449,9 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             while (_running)
             {
                 if (_display == IntPtr.Zero) break;
-                // Removed XPending here to significantly improve CPU usage
+                // Removed XPending here to significantly improve CPU usage.
+                // XNextEvent blocks, so it must stay outside LockDisplay(): Xlib (XInitThreads) releases its
+                // internal lock while waiting, a user-level XLockDisplay would freeze the main thread instead.
                 XEvent ev = default;
                 XNextEvent(_display, ref ev);
 
@@ -1930,6 +2462,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                         var ce = ev.configureEvent;
                         if (ce.window == _unityWindow)
                         {
+                            _windowGeometryChanged = true;
                             UpdateInputMask(ce.width, ce.height);
                         }
                         break;
@@ -1960,8 +2493,12 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
                             var de = ev.damageNotifyEvent;
                             if (de.drawable == _unityWindow)
                             {
-                                XDamageSubtract(_display, de.damage, IntPtr.Zero, IntPtr.Zero);
-                                XGetWindowAttributes(_display, _unityWindow, out var attrs);
+                                XWindowAttributes attrs;
+                                using (LockDisplay())
+                                {
+                                    XDamageSubtract(_display, de.damage, IntPtr.Zero, IntPtr.Zero);
+                                    XGetWindowAttributes(_display, _unityWindow, out attrs);
+                                }
                                 UpdateInputMask(attrs.width, attrs.height);
                             }
                         }
@@ -2016,8 +2553,13 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         if (_display == IntPtr.Zero || _unityWindow == IntPtr.Zero) return;
 
         var toSet = (cursor != IntPtr.Zero) ? cursor : _defaultCursor;
-        XDefineCursor(_display, _unityWindow, toSet);
-        XFlush(_display);
+        if (toSet == _currentCursorSet) return;
+        _currentCursorSet = toSet;
+        using (LockDisplay())
+        {
+            XDefineCursor(_display, _unityWindow, toSet);
+            XFlush(_display);
+        }
     }
     #endregion
         
@@ -2030,13 +2572,39 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private IntPtr _netWmState, _netWmStateFullscreen, _netWmStateMaxHorz, _netWmStateMaxVert, _netWmStateAbove, _netWmStateSkipTaskbar;
     private IntPtr _netWmWindowType, _netWmWindowTypeDock, _netWmWindowTypeDesktop, _netWmWindowTypeNormal;
     private IntPtr _netMoveResizeWindow;
+    private IntPtr _netWmMoveresize;
     private IntPtr _netActiveWindow;
     private IntPtr _motifHintsAtom;
     
     private IntPtr _defaultCursor;
     private IntPtr _grabCursor;
     private IntPtr _grabbingCursor;
+    // Cursor last passed to XDefineCursor; -1 = nothing set yet, so the first SetCursor always goes through.
+    private IntPtr _currentCursorSet = new IntPtr(-1);
     private volatile bool _mouseOver;
+
+    // Per-frame caches for the synchronous pointer / window position queries (main thread only).
+    private int _mainThreadId;
+    private bool IsMainThread => Thread.CurrentThread.ManagedThreadId == _mainThreadId;
+    private Vector2Int _cachedMousePos;
+    private bool _cachedMouseValid;
+    private int _cachedMouseFrame = -1;
+    private Vector2Int _cachedWindowPos;
+    private int _cachedWindowFrame = -1;
+
+    // Scratch storage for the input mask, reused across updates to keep the shaping path allocation-free.
+    private byte[] _cachedImageDataBuffer;
+    private readonly List<XRectangle> _maskRects = new();
+    private readonly List<int> _maskPrevRowRects = new();
+    private readonly List<int> _maskCurRowRects = new();
+    private bool[] _maskRowCells;
+    // Input mask resolution in pixels. Larger cells mean fewer rectangles for the compositor to hit-test
+    // and fewer mask updates, at the cost of up to (cell - 1) px of clickable margin around the avatar.
+    private const int MaskCellSize = 8;
+    // The mask last sent to the X server; -1 forces the next one to be sent.
+    private XRectangle[] _appliedMaskRects;
+    private volatile int _appliedMaskCount = -1;
+    private int _boundingShapeWidth, _boundingShapeHeight;
 
     private int _damageEventBase;
     private IntPtr _damage = IntPtr.Zero;
@@ -2065,6 +2633,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private const int CWOverrideRedirect = 0x0200;
 
     private const int ClientMessage = 33;
+    private const int NetWmMoveresizeMove = 8;
     private const long StructureNotifyMask = (1L << 17);
     private const long SubstructureRedirectMask = 0x00080000;
     private const long SubstructureNotifyMask = 0x00040000;
@@ -2469,6 +3038,35 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     // X11 Library imports
     [DllImport(LibX11)]
     private static extern int XInitThreads();
+
+    [DllImport(LibX11)]
+    private static extern void XLockDisplay(IntPtr display);
+
+    [DllImport(LibX11)]
+    private static extern void XUnlockDisplay(IntPtr display);
+
+    /// <summary>
+    /// Holds the Xlib display lock so a group of requests/replies cannot interleave with the other thread
+    /// (main thread vs. WinShapeThread). Re-entrant. Never hold it across a blocking XNextEvent:
+    /// that would stall every other thread until the next event arrives.
+    /// </summary>
+    private readonly struct DisplayLock : IDisposable
+    {
+        private readonly IntPtr _lockedDisplay;
+
+        public DisplayLock(IntPtr display)
+        {
+            _lockedDisplay = display;
+            if (display != IntPtr.Zero) XLockDisplay(display);
+        }
+
+        public void Dispose()
+        {
+            if (_lockedDisplay != IntPtr.Zero) XUnlockDisplay(_lockedDisplay);
+        }
+    }
+
+    private DisplayLock LockDisplay() => new(_display);
     
     [DllImport(LibX11)]
     private static extern IntPtr XOpenDisplay(string displayName);

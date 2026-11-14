@@ -18,6 +18,8 @@ public class HandHolder : MonoBehaviour
 
     [Header("Hand Tracking Settings")]
     public float maxIKWeight = 1f, blendInTime = 1f, blendOutTime = 1f;
+    [Tooltip("Seconds the cursor may sit still outside the window (Wayland) before the hand lets go.")]
+    public float mouseStationaryTimeout = 0.4f;
     public float maxHandDistance = 0.8f, minForwardOffset = 0.2f, verticalOffset = 0.05f;
     public float elbowHintDistance = 0.25f, elbowHintBackOffset = 0.1f, elbowHintHeightOffset = -0.05f;
     public string[] allowedStates = { "Idle", "HoverReaction" };
@@ -30,6 +32,8 @@ public class HandHolder : MonoBehaviour
     private Vector3 leftTargetPos, rightTargetPos;
     private float leftIKWeight, rightIKWeight;
     private bool leftIsActive, rightIsActive;
+    private Vector2Int _lastMousePos;
+    private float _mouseStationaryTimer;
 
     void Start()
     {
@@ -54,6 +58,8 @@ public class HandHolder : MonoBehaviour
 
     void Update()
     {
+        bool mouseStale = UpdateMouseStale();
+
         if (!enableHandHolding || !IsValid())
         {
             leftIKWeight = Mathf.MoveTowards(leftIKWeight, 0f, Time.deltaTime / blendOutTime);
@@ -70,6 +76,15 @@ public class HandHolder : MonoBehaviour
 
         if (!IsInAllowedState())
         {
+            leftIKWeight = Mathf.MoveTowards(leftIKWeight, 0f, Time.deltaTime / blendOutTime);
+            rightIKWeight = Mathf.MoveTowards(rightIKWeight, 0f, Time.deltaTime / blendOutTime);
+            return;
+        }
+
+        if (mouseStale)
+        {
+            // The reported cursor position is a leftover from where the cursor left the window: let go.
+            leftIsActive = rightIsActive = false;
             leftIKWeight = Mathf.MoveTowards(leftIKWeight, 0f, Time.deltaTime / blendOutTime);
             rightIKWeight = Mathf.MoveTowards(rightIKWeight, 0f, Time.deltaTime / blendOutTime);
             return;
@@ -97,6 +112,30 @@ public class HandHolder : MonoBehaviour
         Vector3 target = GetProjectedMouseTarget();
         if (leftIsActive) leftTargetPos = Vector3.Lerp(leftTargetPos, target, Time.deltaTime * followSpeed);
         if (rightIsActive) rightTargetPos = Vector3.Lerp(rightTargetPos, target, Time.deltaTime * followSpeed);
+    }
+
+    /// <summary>
+    /// On Wayland, XWayland stops receiving pointer motion once the cursor leaves the window's click-through
+    /// input shape, so the queried position freezes on the exit pixel. If that pixel is next to a hand, the
+    /// arm would stay stretched towards a cursor that is long gone. A position that has not changed for
+    /// <see cref="mouseStationaryTimeout"/> while the cursor is not over the window is treated as stale.
+    /// A cursor resting on the avatar itself is still tracked, so holding hands keeps working.
+    /// </summary>
+    bool UpdateMouseStale()
+    {
+        var wm = WindowManager.Instance;
+        if (wm == null) return false;
+
+        var mousePos = wm.GetMousePosition();
+        if (mousePos != _lastMousePos || !wm.IsPointerOutsideWindowOnWayland)
+        {
+            _lastMousePos = mousePos;
+            _mouseStationaryTimer = 0f;
+            return false;
+        }
+
+        _mouseStationaryTimer += Time.deltaTime;
+        return _mouseStationaryTimer > mouseStationaryTimeout;
     }
 
     float ComputeWorldWeight(Transform hand)
